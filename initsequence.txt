@@ -4,6 +4,7 @@ Abbreviation:
 
 Specification:
 	Healt signal LED
+		* threading model: IaaT
 		* onboard LED: PN0
 		* blinking 1Hz periodicity
 		* in case of error: continous lighting
