@@ -42,11 +42,18 @@
 // =============================================================================
 // Custom include files
 // =============================================================================
+#include "inputmanager.hpp"
 
 int main(void) {
-
 #error Check the oscillator settings before deploy!!!
 	ROM_SysCtlClockFreqSet(SYSCTL_SYSDIV_10 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ);
+
+	if(pdPASS != xTaskCreate(&inputManager::start, "TaaT_TBHB_Input",	configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
+	if(pdPASS != xTaskCreate(, "TaaT_Output",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
+	if(pdPASS != xTaskCreate(, "TaaT_WebServer",	configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
+	if(pdPASS != xTaskCreate(, "TaaT_ExositeIoT",	configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
+	if(pdPASS != xTaskCreate(, "TaaT_THBH_IP",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
+	if(pdPASS != xTaskCreate(, "TaaT_RTC",			configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
 
 	vTaskStartScheduler();
 	while(1);

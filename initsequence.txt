@@ -1,6 +1,9 @@
 Abbreviation:
 	IaaT: Interrupt as a Task
 	TaaT: Thread as a Task
+	THBH: Top Halve Bottom Halve interrupt model, where:
+		* top halve: IaaT 
+		* bottom halve: TaaT 
 
 Specification:
 	Healt signal LED
@@ -26,6 +29,14 @@ Specification:
 		* power-up
 		* 1h period --> RTC is setup accordingly (without losing clock ticks e.g. speedup or slowdown)
 	Web interface is located on an SD card with FAT32 FS
+
+Threading model:
+	* Separate TaaT + THBH for controling Input
+	* Separate TaaT for controling Output
+	* Separate TaaT for managing Web server
+	* Separate TaaT for managing Exosite IoT
+	* Separate TaaT + THBH for processing IP trafic
+	* Separate TaaT for managing RTC
 
 Behavioral models:
 	Onboard LED:
