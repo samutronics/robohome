@@ -63,56 +63,69 @@
     1 tab == 4 spaces!
 */
 
-#ifndef FREERTOS_CONFIG_H
-#define FREERTOS_CONFIG_H
 
-/*-----------------------------------------------------------
- * Application specific definitions.
+/*
+ * Implementation of pvPortMalloc() and vPortFree() that relies on the
+ * compilers own malloc() and free() implementations.
  *
- * These definitions should be adjusted for your particular hardware and
- * application requirements.
+ * This file can only be used if the linker is configured to to generate
+ * a heap memory area.
  *
- * THESE PARAMETERS ARE DESCRIBED WITHIN THE 'CONFIGURATION' SECTION OF THE
- * FreeRTOS API DOCUMENTATION AVAILABLE ON THE FreeRTOS.org WEB SITE. 
- *
- * See http://www.freertos.org/a00110.html.
- *----------------------------------------------------------*/
+ * See heap_1.c, heap_2.c and heap_4.c for alternative implementations, and the 
+ * memory management pages of http://www.FreeRTOS.org for more information.
+ */
 
-#define configUSE_PREEMPTION		1
-#define configUSE_IDLE_HOOK			0
-#define configUSE_TICK_HOOK			0
-#define configCPU_CLOCK_HZ			( ( unsigned long ) 20000000 )
-#define configTICK_RATE_HZ			( ( portTickType ) 1000 )
-#define configMINIMAL_STACK_SIZE	( ( unsigned short ) 59 )
-#define configTOTAL_HEAP_SIZE		( ( size_t ) ( 1468 ) )
-#define configMAX_TASK_NAME_LEN		( 3 )
-#define configUSE_TRACE_FACILITY	0
-#define configUSE_16_BIT_TICKS		0
-#define configIDLE_SHOULD_YIELD		0
-#define configUSE_CO_ROUTINES 		1
+#include <stdlib.h>
 
-#define configMAX_PRIORITIES		( ( unsigned portBASE_TYPE ) 2 )
-#define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
+/* Defining MPU_WRAPPERS_INCLUDED_FROM_API_FILE prevents task.h from redefining
+all the API functions to use the MPU wrappers.  That should only be done when
+task.h is included from an application file. */
+#define MPU_WRAPPERS_INCLUDED_FROM_API_FILE
 
-/* Set the following definitions to 1 to include the API function, or zero
-to exclude the API function. */
+#include "FreeRTOS.h"
+#include "task.h"
 
-#define INCLUDE_vTaskPrioritySet		0
-#define INCLUDE_uxTaskPriorityGet		0
-#define INCLUDE_vTaskDelete				0
-#define INCLUDE_vTaskCleanUpResources	0
-#define INCLUDE_vTaskSuspend			0
-#define INCLUDE_vTaskDelayUntil			0
-#define INCLUDE_vTaskDelay				1
+#undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE
 
-#define configKERNEL_INTERRUPT_PRIORITY 		255
-/* !!!! configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to zero !!!!
-See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY 	191 /* equivalent to 0xa0, or priority 5. */
+/*-----------------------------------------------------------*/
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// Project dependent FreeRTOS related settings
-/////////////////////////////////////////////////////////////////////////////////////////////
-#define configUSER_SPACE_STACK_SIZE		0xFF
+void *pvPortMalloc( size_t xWantedSize )
+{
+void *pvReturn;
 
-#endif /* FREERTOS_CONFIG_H */
+	vTaskSuspendAll();
+	{
+		pvReturn = malloc( xWantedSize );
+		traceMALLOC( pvReturn, xWantedSize );
+	}
+	xTaskResumeAll();
+
+	#if( configUSE_MALLOC_FAILED_HOOK == 1 )
+	{
+		if( pvReturn == NULL )
+		{
+			extern void vApplicationMallocFailedHook( void );
+			vApplicationMallocFailedHook();
+		}
+	}
+	#endif
+	
+	return pvReturn;
+}
+/*-----------------------------------------------------------*/
+
+void vPortFree( void *pv )
+{
+	if( pv )
+	{
+		vTaskSuspendAll();
+		{
+			free( pv );
+			traceFREE( pv, 0 );
+		}
+		xTaskResumeAll();
+	}
+}
+
+
+
