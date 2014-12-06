@@ -89,7 +89,7 @@
 #define configUSE_TRACE_FACILITY	0
 #define configUSE_16_BIT_TICKS		0
 #define configIDLE_SHOULD_YIELD		0
-#define configUSE_CO_ROUTINES 		1
+#define configUSE_CO_ROUTINES 		0
 
 #define configMAX_PRIORITIES		( ( unsigned portBASE_TYPE ) 2 )
 #define configMAX_CO_ROUTINE_PRIORITIES ( 2 )

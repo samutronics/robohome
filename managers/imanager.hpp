@@ -11,13 +11,17 @@
 #ifndef _IMANAGER_H_
 #define _IMANAGER_H_
 
+namespace manager {
+
 class IManager {
 	protected: virtual void task(void *pvParameters) = 0;
 };
 
+}  // namespace manager
+
 #define TO_BE_RUNABLE(derived)									\
 	public: static inline void start(void *pvParameters) {	\
-		derived d;												\
+		static derived d;										\
 		d.task(pvParameters);									\
 		while(1);												\
 	};															\

@@ -55,6 +55,18 @@ Behavioral models:
 		* post new event: LED_ON or LED_OFF
 		* jitter handling: clarification is required 
 
+	Input task:
+		* THBH model
+		* TH is an interrupt, which put the datas from the outside into the queue of the bottom side
+		* BH is basicaly TaaT, wich process datas from its input queue
+		* target: receive dedicated pushbutton change
+		
+	Output task:
+		* infinity loop
+		* quiryable input queue
+		* target: change the state of the dedicated LED acording to the input queue
+		
+
 Useful examples:
 	FreeRTOS demo (Warning this is for c129x board) *TivaWare*\examples\boards\dk-tm4c129x\freertos_demo\
 	FATFS for SD card (Warning this is for f232 board)*TivaWare*\examples\boards\ek-lm4f232\sd_card\
