@@ -50,7 +50,9 @@ inputManager::inputManager() {
 }
 
 void inputManager::task(void *pvParameters) {
+	while(1) {
 
+	}
 }
 
 //! =============================================================================

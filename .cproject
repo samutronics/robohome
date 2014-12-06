@@ -184,4 +184,5 @@
 			<resource resourceType="PROJECT" workspacePath="/homAutomation"/>
 		</configuration>
 	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 </cproject>
