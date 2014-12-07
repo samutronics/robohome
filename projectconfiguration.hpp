@@ -51,6 +51,11 @@
 typedef unsigned int	u32;
 typedef int				s32;
 
+typedef unsigned char	u8;
+typedef char			s8;
+
+#define DECLARE_LAST_ENUM(enumName) last_##enumName##_element
+
 // =============================================================================
 // Configuration options
 // =============================================================================
@@ -63,13 +68,28 @@ namespace outboundTask {
 const u32 outboundQueueLength = 4;
 const u32 outboundQueueWidth = 1;
 
+}  // namespace outboundTask
+
+namespace inboundTask {
+
+const u32 THQueueLength = 2;
+const u32 THQueueWidth = 1;
+
 }  // namespace inputTask
 
 }  // namespace configuration
 
 }  // namespace manager
 
+namespace ipc {
 
+namespace configuration {
+
+const u32 ipcQueueCount = 12;
+
+}  // namespace configuration
+
+}  // namespace ipc
 
 #endif // _PROJECTCONFIGURATION_HPP_
 //! =============================================================================

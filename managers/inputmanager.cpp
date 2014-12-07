@@ -13,10 +13,14 @@
 #include "../projectconfiguration.hpp"
 
 using namespace manager::task;
-using namespace manager::configuration::outboundTask;
+using namespace manager::configuration::inboundTask;
+
+DECLARE_TH(inputManager)
 
 inputManager::inputManager() {
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOJ);
+	_THQueue = xQueueCreate(THQueueLength, THQueueWidth);
+
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOJ);
     GPIOPinTypeGPIOInput(GPIO_PORTJ_BASE, GPIO_PIN_0);
     GPIOPadConfigSet(GPIO_PORTJ_BASE, GPIO_PIN_0, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
 
@@ -27,13 +31,20 @@ inputManager::inputManager() {
 
 void inputManager::task(void *pvParameters) {
 	while(1) {
+		if(0 == uxQueueMessagesWaiting(_THQueue)) {taskYIELD();}
+
+		u8 state;
+		xQueueReceive(_THQueue, &state, 0);
+
 		taskYIELD();
 	}
 }
 
 void inputManager::handlerTH() {
-	while(1) {
-	}
+	static bool loggedState = false;
+	loggedState = !loggedState;
+	xQueueSendToBackFromISR(_THQueue, &loggedState, NULL);
+	GPIOIntClear(GPIO_PORTJ_BASE, GPIO_INT_PIN_0);
 }
 
 //! =============================================================================

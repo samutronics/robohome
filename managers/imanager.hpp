@@ -28,7 +28,10 @@ class IManager {
 
 #define DEFINE_TH												\
 		private: static void handlerTH();						\
-		private: xQueueHandle _THQueue;
+		private: static xQueueHandle _THQueue;
+
+#define DECLARE_TH(derived)										\
+		xQueueHandle derived::_THQueue;
 
 #endif //_IMANAGER_H_
 //! =============================================================================
