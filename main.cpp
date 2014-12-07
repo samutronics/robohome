@@ -10,46 +10,11 @@
 //! =============================================================================
 
 // =============================================================================
-// standard includes
-// =============================================================================
-#include <stdint.h>
-#include <stdbool.h>
-
-// =============================================================================
-// FreeRTOS related includes -- porting for the given hardware
-// =============================================================================
-#include "portmacro.h"
-#include "FreeRTOS.h"
-
-// =============================================================================
-// FreeRTOS related includes -- scheduler
-// =============================================================================
-#include "list.h"
-#include "task.h"
-#include "queue.h"
-
-// =============================================================================
-// Define, which TivaWare librabry is used by the ROM
-// =============================================================================
-#define TARGET_IS_TM4C129_RA1
-
-// =============================================================================
-// Drived librarie includes
-// =============================================================================
-#include "rom.h"
-
-#include "hw_gpio.h"
-#include "hw_types.h"
-#include "hw_memmap.h"
-
-#include "gpio.h"
-#include "sysctl.h"
-#include "pin_map.h"
-
-// =============================================================================
 // Custom include files
 // =============================================================================
 #include "inputmanager.hpp"
+#include "outputManager.hpp"
+#include "projectconfiguration.hpp"
 
 using namespace manager::task;
 
@@ -145,9 +110,9 @@ int main(void) {
 
 
 
-	if(pdPASS != xTaskCreate(&inputManager::start, "TaaT_TBHB_Input",	configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
+	if(pdPASS != xTaskCreate(&inputManager::start,	"TaaT_TBHB_Input",	configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
+	if(pdPASS != xTaskCreate(&outputManager::start,	"TaaT_Output",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
 /*
-	if(pdPASS != xTaskCreate(, "TaaT_Output",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
 	if(pdPASS != xTaskCreate(, "TaaT_WebServer",	configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
 	if(pdPASS != xTaskCreate(, "TaaT_ExositeIoT",	configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
 	if(pdPASS != xTaskCreate(, "TaaT_THBH_IP",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}

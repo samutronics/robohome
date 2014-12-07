@@ -12,28 +12,23 @@
 #define _LED_MANAGER_H_
 
 #include "imanager.hpp"
-
-#include "../FreeRTOS/include/FreeRTOS.h"
-#include "../FreeRTOS/include/queue.h"
+#include "../projectconfiguration.hpp"
 
 namespace manager {
 
 namespace task {
 
 class inputManager: public IManager {
-	public: virtual ~inputManager();
+private: inputManager();
+private: virtual void task(void *pvParameters);
+TO_BE_RUNABLE(inputManager)
 
-	protected: inputManager();
-
-	private: virtual void task(void *pvParameters);
-	TO_BE_RUNABLE(inputManager)
-
-	private: xQueueHandle _queueInbound;
+private: xQueueHandle _queueInbound;
 };
 
-}  // namespace tasks
+}  // tasks
 
-}  // namespace manager
+}  // manager
 
 #endif //_LED_MANAGER_H_
 //! =============================================================================

@@ -12,26 +12,8 @@
 #include "inputmanager.hpp"
 #include "../projectconfiguration.hpp"
 
-#include <stdint.h>
-
-#define TARGET_IS_TM4C129_RA1
-
-#include "rom.h"
-
-#include "hw_gpio.h"
-#include "hw_types.h"
-#include "hw_memmap.h"
-
-#include "gpio.h"
-#include "sysctl.h"
-#include "pin_map.h"
-
 using namespace manager::task;
 using namespace manager::configuration::inputTask;
-
-inputManager::~inputManager() {
-
-}
 
 inputManager::inputManager() {
 	_queueInbound = xQueueCreate(inboundQueueLength, inboundQueueWidth);
