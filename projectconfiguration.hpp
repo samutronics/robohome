@@ -31,23 +31,19 @@
 #include "queue.h"
 
 // =============================================================================
-// Define, which TivaWare librabry is used by the ROM
+// Hardware dependent includes
 // =============================================================================
-#define TARGET_IS_TM4C129_RA1
-
-// =============================================================================
-// Drived librarie includes
-// =============================================================================
-#include "rom.h"
-
 #include "hw_gpio.h"
 #include "hw_ints.h"
 #include "hw_types.h"
 #include "hw_memmap.h"
 
+// =============================================================================
+// Drived librarie includes
+// =============================================================================
 #include "gpio.h"
 #include "sysctl.h"
-#include "pin_map.h"
+#include "interrupt.h"
 
 // =============================================================================
 // Define types
