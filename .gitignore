@@ -2,3 +2,4 @@ Debug/*
 .settings/org.eclipse.core.resources.prefs
 *~
 /Debug
+.launches/homeAutomation.launch
