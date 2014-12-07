@@ -23,6 +23,9 @@ inputManager::inputManager() {
 
     ROM_IntEnable(INT_GPIOJ);
     ROM_GPIOIntTypeSet(GPIO_PORTJ_BASE, GPIO_PIN_0, GPIO_RISING_EDGE);
+
+//    GPIOIntRegister(GPIO_PORTJ_BASE, &inputManager::handlerTH);
+
     ROM_GPIOIntEnable(GPIO_PORTJ_BASE, GPIO_INT_PIN_0);
 }
 
@@ -30,6 +33,11 @@ void inputManager::task(void *pvParameters) {
 	while(1) {
 
 		taskYIELD();
+	}
+}
+
+void inputManager::handlerTH() {
+	while(1) {
 	}
 }
 

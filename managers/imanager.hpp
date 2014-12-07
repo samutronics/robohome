@@ -20,11 +20,15 @@ class IManager {
 }  // namespace manager
 
 #define TO_BE_RUNABLE(derived)									\
-	public: static inline void start(void *pvParameters) {	\
+	public: static inline void start(void *pvParameters) {		\
 		static derived d;										\
 		d.task(pvParameters);									\
 		while(1);												\
 	};															\
+
+#define DEFINE_TH												\
+		private: static void handlerTH();						\
+		private: xQueueHandle _THQueue;
 
 #endif //_IMANAGER_H_
 //! =============================================================================

@@ -11,7 +11,7 @@
 MEMORY
 {
     FLASH (RX) : origin = 0x00000000, length = 0x00100000
-    SRAM (RWX) : origin = 0x20000000, length = 0x00040000
+    SRAM (RWX) : origin = 0x20000400, length = 0x0003FC00
 }
 
 /* The following command line options are set as part of the CCS project.    */
