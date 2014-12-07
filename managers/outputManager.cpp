@@ -23,8 +23,6 @@ outputManager::outputManager() {
 
 void outputManager::task(void *pvParameters) {
 	while(1) {
-//	    ROM_GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_1, 2);
-
 	    taskYIELD();
 	}
 }
