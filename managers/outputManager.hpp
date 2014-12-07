@@ -22,7 +22,7 @@ private: outputManager();
 private: virtual void task(void *pvParameters);
 TO_BE_RUNABLE(outputManager)
 
-private: xQueueHandle _queueInbound;
+private: xQueueHandle _queueOutbound;
 };
 
 } //task

@@ -41,6 +41,7 @@
 #include "rom.h"
 
 #include "hw_gpio.h"
+#include "hw_ints.h"
 #include "hw_types.h"
 #include "hw_memmap.h"
 
@@ -61,10 +62,10 @@ namespace manager {
 
 namespace configuration {
 
-namespace inputTask {
+namespace outboundTask {
 
-const u32 inboundQueueLength = 4;
-const u32 inboundQueueWidth = 1;
+const u32 outboundQueueLength = 4;
+const u32 outboundQueueWidth = 1;
 
 }  // namespace inputTask
 

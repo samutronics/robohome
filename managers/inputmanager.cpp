@@ -13,27 +13,23 @@
 #include "../projectconfiguration.hpp"
 
 using namespace manager::task;
-using namespace manager::configuration::inputTask;
+using namespace manager::configuration::outboundTask;
 
 inputManager::inputManager() {
-	_queueInbound = xQueueCreate(inboundQueueLength, inboundQueueWidth);
-
-    // PJ0 are used for user buttons
     ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOJ);
-
     ROM_GPIOPinTypeGPIOInput(GPIO_PORTJ_BASE, GPIO_PIN_0);
 
-    //TODO: refator: this method uses the SRAM vector table. Registration need in the startup file
-//    ROM_GPIOIntRegister(GPIO_PORTJ_BASE, PortAIntHandler);
+    HWREG(GPIO_PORTJ_BASE + GPIO_O_PUR) = (HWREG(GPIO_PORTJ_BASE + GPIO_O_PUR) | GPIO_PIN_0);
 
+    ROM_IntEnable(INT_GPIOJ);
     ROM_GPIOIntTypeSet(GPIO_PORTJ_BASE, GPIO_PIN_0, GPIO_RISING_EDGE);
-    ROM_GPIOIntEnable(GPIO_PORTJ_BASE, GPIO_PIN_0);
-
+    ROM_GPIOIntEnable(GPIO_PORTJ_BASE, GPIO_INT_PIN_0);
 }
 
 void inputManager::task(void *pvParameters) {
 	while(1) {
 
+		taskYIELD();
 	}
 }
 

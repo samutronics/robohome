@@ -22,8 +22,6 @@ class inputManager: public IManager {
 private: inputManager();
 private: virtual void task(void *pvParameters);
 TO_BE_RUNABLE(inputManager)
-
-private: xQueueHandle _queueInbound;
 };
 
 }  // tasks
