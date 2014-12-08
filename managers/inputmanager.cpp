@@ -35,7 +35,7 @@ inputManager::inputManager() {
 void inputManager::task(void *pvParameters) {
 	while(1) {
 		// The thread gives up its time-slice, if the TH queue is empty: there was no interrupt
-		if(0 == uxQueueMessagesWaiting(_THQueue)) {taskYIELD();}
+		while(0 == uxQueueMessagesWaiting(_THQueue)) {taskYIELD();}
 
 		// If item received, read it from the TH queue
 		u8 state;
