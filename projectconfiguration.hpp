@@ -1,12 +1,24 @@
 //! =============================================================================
 //! \copyright
-//! \section
+//! \section		API documentation
 //! \subsection
-//! \brief
+//! \brief			This file contains the core settings, that are relating to
+//!					the project, but not to the hardware or the operation system.
 //! \author         Norbert Toth
 //! \date			04.12.2014.
-//! \details
+//! \details		This file contains the project wide required stuffs, like
+//!						configuration constants, includes and definitions. The
+//!						configuration section is breaked down into several
+//!						namespaces. The namespace convenctions are follows
+//!						the follovings:
+//!						* the outermost namespace is equal to the module
+//!							collector namespace (the directory, where
+//!							the module lives)
+//!						* the midle namespace is equal to the module namespace
+//!						* whitin the namespace above is the namespace "configuration"
 //! \note
+//!	\warning		Change this settings could highly affects the system
+//!						performance and / or memory consuption
 //! =============================================================================
 #ifndef _PROJECTCONFIGURATION_HPP_
 #define _PROJECTCONFIGURATION_HPP_
@@ -50,7 +62,8 @@
 // =============================================================================
 typedef unsigned int	u32;
 typedef int				s32;
-
+typedef unsigned short	u16;
+typedef short			s16;
 typedef unsigned char	u8;
 typedef char			s8;
 
@@ -61,25 +74,27 @@ typedef char			s8;
 // =============================================================================
 namespace manager {
 
-namespace configuration {
-
 namespace outboundTask {
+namespace configuration {
 
 const u32 outboundQueueLength = 4;
 const u32 outboundQueueWidth = 1;
 
+}  // namespace configuration
 }  // namespace outboundTask
 
 namespace inboundTask {
+namespace configuration {
 
 const u32 THQueueLength = 2;
 const u32 THQueueWidth = 1;
 
-}  // namespace inputTask
-
 }  // namespace configuration
+}  // namespace inboundTask
 
 }  // namespace manager
+
+namespace communication {
 
 namespace ipc {
 
@@ -90,6 +105,8 @@ const u32 ipcQueueCount = 12;
 }  // namespace configuration
 
 }  // namespace ipc
+
+}  // namespace communication
 
 #endif // _PROJECTCONFIGURATION_HPP_
 //! =============================================================================

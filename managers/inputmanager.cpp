@@ -9,11 +9,14 @@
 //! \note
 //! =============================================================================
 
+#include "ipcQueue.hpp"
 #include "inputmanager.hpp"
 #include "../projectconfiguration.hpp"
 
-using namespace manager::task;
-using namespace manager::configuration::inboundTask;
+using namespace communication::ipc;
+using namespace manager::inboundTask;
+using namespace manager::inboundTask::configuration;
+
 
 DECLARE_TH(inputManager)
 
@@ -31,11 +34,19 @@ inputManager::inputManager() {
 
 void inputManager::task(void *pvParameters) {
 	while(1) {
+		// The thread gives up its time-slice, if the TH queue is empty: there was no interrupt
 		if(0 == uxQueueMessagesWaiting(_THQueue)) {taskYIELD();}
 
+		// If item received, read it from the TH queue
 		u8 state;
 		xQueueReceive(_THQueue, &state, 0);
 
+		// This is the place, where the thread couly process the datas
+
+		// Forward the item to the targeted thread
+		xQueueSendToBack(ipcQueue::singleton().queue(outboundQueue), &state, NULL);
+
+		// The task gives up its remained time-slice
 		taskYIELD();
 	}
 }

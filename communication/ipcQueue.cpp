@@ -10,9 +10,13 @@
 //! =============================================================================
 #include "ipcQueue.hpp"
 
-using namespace ipc;
+using namespace communication::ipc;
+using namespace manager::outboundTask::configuration;
+
+ipcQueue ipcQueue::_singleton;
 
 ipcQueue::ipcQueue() {
+	_q[outboundQueue] = xQueueCreate(outboundQueueLength, outboundQueueWidth);
 }
 
 //! =============================================================================

@@ -2,10 +2,11 @@
 //! \copyright
 //! \section
 //! \subsection
-//! \brief
+//! \brief			Implementation of main() method
 //! \author         Norbert Toth
 //! \date			30.11.2014.
-//! \details
+//! \details		The file targets to implement ONLY the main method. Any other
+//!						compilable stuff should be in another files.
 //! \note
 //! =============================================================================
 
@@ -16,8 +17,16 @@
 #include "outputManager.hpp"
 #include "projectconfiguration.hpp"
 
-using namespace manager::task;
+using namespace manager::inboundTask;
+using namespace manager::outboundTask;
 
+//! =============================================================================
+//! \function main is responsible for:
+//!		* Setup system wide availeble stuffs, that are not relating to another
+//!			modules, like system clock
+//!		* Create and deploy user threads
+//!		* Start scheduler
+//! =============================================================================
 int main(void) {
 
 	SysCtlMOSCConfigSet(SYSCTL_MOSC_HIGHFREQ);

@@ -1,12 +1,13 @@
 //! =============================================================================
 //! \copyright
-//! \section
+//! \section		API documentation
 //! \subsection
-//! \brief
+//! \brief			Task definition interface file
 //! \author         Norbert Toth
 //! \date			03.12.2014.
-//! \details
-//! \note
+//! \details		This file define the interface, and the macros for the
+//!						implementation, that are used for TaaT.
+//! \note			For abbrevation see SDS
 //! =============================================================================
 #ifndef _IMANAGER_H_
 #define _IMANAGER_H_

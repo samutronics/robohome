@@ -9,9 +9,10 @@
 //! \note
 //! =============================================================================
 #include "outputManager.hpp"
+#include "../projectconfiguration.hpp"
 
-using namespace manager::task;
-using namespace manager::configuration::outboundTask;
+using namespace manager::outboundTask;
+using namespace manager::outboundTask::configuration;
 
 outputManager::outputManager() {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPION);

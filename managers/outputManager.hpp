@@ -15,7 +15,7 @@
 #include "../projectconfiguration.hpp"
 
 namespace manager {
-namespace task {
+namespace outboundTask {
 
 class outputManager: public IManager{
 private: outputManager();
@@ -25,9 +25,9 @@ TO_BE_RUNABLE(outputManager)
 private: xQueueHandle _queueOutbound;
 };
 
-} //task
+} // outboundTask
 
-} //manager
+} // manager
 
 #endif // _OUTPUTMANAGER_H_
 //! =============================================================================

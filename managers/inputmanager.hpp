@@ -16,7 +16,7 @@
 
 namespace manager {
 
-namespace task {
+namespace inboundTask {
 
 class inputManager: public IManager {
 private: inputManager();
@@ -25,7 +25,7 @@ TO_BE_RUNABLE(inputManager)
 DEFINE_TH
 };
 
-}  // tasks
+}  // inboundTask
 
 }  // manager
 
