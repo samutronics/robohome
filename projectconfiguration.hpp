@@ -54,8 +54,15 @@
 // Drived librarie includes
 // =============================================================================
 #include "gpio.h"
+#include "flash.h"
 #include "sysctl.h"
+#include "pin_map.h"
 #include "interrupt.h"
+
+// =============================================================================
+// Define types
+// =============================================================================
+#include "lwiplib.h"
 
 // =============================================================================
 // Define types
@@ -72,6 +79,13 @@ typedef char			s8;
 // =============================================================================
 // Configuration options
 // =============================================================================
+namespace system {
+
+const u32 requestedSystemClockFrequency = 120000000;
+static u32 currentSystemClockFrequency = 0;
+
+}  // system
+
 namespace manager {
 
 namespace outboundTask {
@@ -80,8 +94,8 @@ namespace configuration {
 const u32 outboundQueueLength = 4;
 const u32 outboundQueueWidth = 1;
 
-}  // namespace configuration
-}  // namespace outboundTask
+}  // configuration
+}  // outboundTask
 
 namespace inboundTask {
 namespace configuration {
@@ -89,10 +103,18 @@ namespace configuration {
 const u32 THQueueLength = 2;
 const u32 THQueueWidth = 1;
 
-}  // namespace configuration
-}  // namespace inboundTask
+}  // configuration
+}  // inboundTask
 
-}  // namespace manager
+namespace networkTask {
+namespace configuration {
+
+const u32 IPGatheringStrategie = IPADDR_USE_DHCP;
+
+}  // configuration
+}  // inboundTask
+
+}  // manager
 
 namespace communication {
 
@@ -102,11 +124,10 @@ namespace configuration {
 
 const u32 ipcQueueCount = 12;
 
-}  // namespace configuration
+}  // configuration
+}  // ipc
 
-}  // namespace ipc
-
-}  // namespace communication
+}  // communication
 
 #endif // _PROJECTCONFIGURATION_HPP_
 //! =============================================================================

@@ -31,6 +31,9 @@
 #include <stdbool.h>
 #include "lwiplib.h"
 
+#include "hw_emac.h"
+#include "hw_types.h"
+
 //*****************************************************************************
 //
 // Ensure that ICMP checksum offloading is enabled; otherwise the TM4C129
@@ -97,44 +100,26 @@
 //
 //*****************************************************************************
 #include "lwip/snmp_asn1.h"
-//#include "lwip/mib2.h"
-#include "lwip/snmp_structs.h"
-#include "lwip/snmp_msg.h"
+//#include "third_party/lwip-1.4.1/src/core/snmp/mib2.c"
+//#include "third_party/lwip-1.4.1/src/core/snmp/mib_structs.c"
+//#include "third_party/lwip-1.4.1/src/core/snmp/msg_in.c"
+//#include "third_party/lwip-1.4.1/src/core/snmp/msg_out.c"
 
 //*****************************************************************************
 //
 // Include the network interface code.
 //
 //*****************************************************************************
-#include "netif/etharp.h"
-
-//*****************************************************************************
-//
-// Include the network interface PPP code.
-//
-//*****************************************************************************
-#include "netif/ppp/auth.h"
-#include "netif/ppp/chap.h"
-#include "netif/ppp/chpms.h"
-#include "netif/ppp/fsm.h"
-#include "netif/ppp/ipcp.h"
-#include "netif/ppp/lcp.h"
-#include "netif/ppp/magic.h"
-#include "netif/ppp/md5.h"
-#include "netif/ppp/pap.h"
-#include "netif/ppp/ppp.h"
-#include "netif/ppp_oe.h"
-#include "netif/ppp/randm.h"
-#include "netif/ppp/vj.h"
+//#include "third_party/lwip-1.4.1/src/netif/etharp.c"
 
 //*****************************************************************************
 //
 // Include Tiva-specific lwIP interface/porting layer code.
 //
 //*****************************************************************************
-#include "api/perf.h"
-#include "lwip/sys.h"
-#include "ports/tiva-tm4c129/netif/tiva-tm4c129.h"
+#include "arch/perf.h"
+#include "netif/tivaif.h"
+//#include "third_party/lwip-1.4.1/ports/tiva-tm4c129/netif/tiva-tm4c129.c"
 
 //*****************************************************************************
 //

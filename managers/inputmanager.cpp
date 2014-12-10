@@ -17,7 +17,6 @@ using namespace communication::ipc;
 using namespace manager::inboundTask;
 using namespace manager::inboundTask::configuration;
 
-
 DECLARE_TH(inputManager)
 
 inputManager::inputManager() {

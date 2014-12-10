@@ -45,6 +45,8 @@
 #ifndef __TIVAIF_H__
 #define __TIVAIF_H__
 
+#include <stdint.h>
+
 extern int tivaif_input(struct netif *psNetif);
 extern err_t tivaif_init(struct netif *psNetif);
 extern void tivaif_interrupt(struct netif *netif, uint32_t ui32Status);
