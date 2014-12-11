@@ -38,6 +38,10 @@ networkManager::networkManager() {
     mac[5] = ((usr1 >> 16) & 0xff);
 
     lwIPInit(system::currentSystemClockFrequency, mac, 0, 0, 0, IPGatheringStrategie);
+
+    LocatorInit();
+    LocatorMACAddrSet(mac);
+    LocatorAppTitleSet("automation");
 }
 
 void networkManager::task(void *pvParameters) {
