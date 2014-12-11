@@ -32,6 +32,8 @@
 #ifndef __ARCH_SYS_ARCH_H__
 #define __ARCH_SYS_ARCH_H__
 
+#include "lwipopts.h"
+
 #if RTOS_FREERTOS
 #include "FreeRTOS.h"
 #include "task.h"

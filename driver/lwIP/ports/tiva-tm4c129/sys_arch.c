@@ -41,6 +41,7 @@
 /* lwIP includes. */
 #include "lwip/opt.h"
 #include "lwip/sys.h"
+#include "lwip/stats.h"
 
 #if NO_SYS
 
