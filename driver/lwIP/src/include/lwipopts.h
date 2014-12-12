@@ -56,9 +56,11 @@
 //
 //*****************************************************************************
 #define SYS_LIGHTWEIGHT_PROT            1           // default is 0
-#define NO_SYS                          1           // default is 0
-//#define MEMCPY(dst,src,len)             memcpy(dst,src,len)
-//#define SMEMCPY(dst,src,len)            memcpy(dst,src,len)
+#define NO_SYS                          0           // default is 0
+#define RTOS_FREERTOS					1
+#define LWIP_COMPAT_MUTEX				1
+#define MEMCPY(dst,src,len)             memcpy(dst,src,len)
+#define SMEMCPY(dst,src,len)            memcpy(dst,src,len)
 
 //*****************************************************************************
 //
@@ -270,8 +272,8 @@
 // ---------- Thread options ----------
 //
 //*****************************************************************************
-//#define TCPIP_THREAD_NAME              "tcpip_thread"
-//#define TCPIP_THREAD_STACKSIZE          0
+#define TCPIP_THREAD_NAME              "tcpip_thread"
+#define TCPIP_THREAD_STACKSIZE          configUSER_SPACE_STACK_SIZE
 //#define TCPIP_THREAD_PRIO               1
 //#define TCPIP_MBOX_SIZE                 0
 //#define SLIPIF_THREAD_NAME             "slipif_loop"
