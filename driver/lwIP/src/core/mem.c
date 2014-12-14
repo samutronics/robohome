@@ -65,6 +65,9 @@
 
 #include <string.h>
 
+extern void vPortFree(void *pv);
+extern void* pvPortMalloc(size_t xWantedSize);
+
 #if MEM_USE_POOLS
 /* lwIP head implemented with different sized pools */
 
@@ -310,7 +313,11 @@ mem_init(void)
 void
 mem_free(void *rmem)
 {
-  struct mem *mem;
+
+	vPortFree(rmem);
+	return;
+
+	struct mem *mem;
   LWIP_MEM_FREE_DECL_PROTECT();
 
   if (rmem == NULL) {
@@ -493,7 +500,9 @@ mem_trim(void *rmem, mem_size_t newsize)
 void *
 mem_malloc(mem_size_t size)
 {
-  mem_size_t ptr, ptr2;
+	return pvPortMalloc(size);
+
+	mem_size_t ptr, ptr2;
   struct mem *mem, *mem2;
 #if LWIP_ALLOW_MEM_FREE_FROM_OTHER_CONTEXT
   u8_t local_mem_free_count = 0;

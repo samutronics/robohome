@@ -368,7 +368,7 @@ void
 sys_mbox_post(sys_mbox_t *mbox, void *msg)
 {
   /* Send this message to the queue. */
-  while(xQueueSend(mbox->queue, &msg, portMAX_DELAY) != pdPASS);
+  while(xQueueSendToBack(mbox->queue, &msg, portMAX_DELAY) != pdPASS);
 }
 
 /**
@@ -383,7 +383,7 @@ err_t
 sys_mbox_trypost(sys_mbox_t *mbox, void *msg)
 {
   /* Send this message to the queue. */
-  if(xQueueSend(mbox->queue, &msg, 0) == pdPASS) {
+  if(xQueueSendToBack(mbox->queue, &msg, 0) == pdPASS) {
     return ERR_OK;
   }
 
@@ -432,11 +432,11 @@ sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
       return SYS_ARCH_TIMEOUT;
     }
   } else {
-    /* Try to receive a message until one arrives. */
-    while(xQueueReceive(mbox->queue, msg, portMAX_DELAY) != pdPASS);
+	  /* Try to receive a message until one arrives. */
+	  while(xQueueReceive(mbox->queue, msg, portMAX_DELAY) != pdPASS);
 
-    /* Return the amount of time it took for the message to be received. */
-    return (xTaskGetTickCount() - starttime) * portTICK_RATE_MS;
+	  /* Return the amount of time it took for the message to be received. */
+	  return (xTaskGetTickCount() - starttime) * portTICK_RATE_MS;
   }
 }
 
@@ -574,21 +574,21 @@ sys_thread_new(const char *name, lwip_thread_fn thread, void *arg,
   }
 
   /* Allocate memory for the thread's stack. */
-  data = mem_malloc(stacksize);
-  if(!data) {
-    return NULL;
-  }
+//  data = mem_malloc(stacksize);
+//  if(!data) {
+//    return NULL;
+//  }
 
   /* Save the details of this thread. */
-  threads[i].stackstart = data;
-  threads[i].stackend = (void *)((char *)data + stacksize);
-  threads[i].thread = thread;
-  threads[i].arg = arg;
+//  threads[i].stackstart = data;
+//  threads[i].stackend = (void *)((char *)data + stacksize);
+//  threads[i].thread = thread;
+//  threads[i].arg = arg;
 
   /* Create a new thread. */
 #if RTOS_FREERTOS
-  if(xTaskCreate(sys_arch_thread, (signed portCHAR *)name,
-                 stacksize/sizeof(int), (void *)i, tskIDLE_PRIORITY+prio,
+  if(xTaskCreate(thread, (signed portCHAR *)name,
+                 stacksize, (void *)i, tskIDLE_PRIORITY+prio,
                  &threads[i].taskhandle) != pdTRUE){
     threads[i].stackstart = NULL;
     threads[i].stackend = NULL;

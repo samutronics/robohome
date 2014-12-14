@@ -85,7 +85,7 @@
 #define configTICK_RATE_HZ			( ( portTickType ) 1000 )
 #define configMINIMAL_STACK_SIZE	( ( unsigned short ) 59 )
 #define configTOTAL_HEAP_SIZE		( ( size_t ) ( 0x10000 ) )
-#define configMAX_TASK_NAME_LEN		( 3 )
+#define configMAX_TASK_NAME_LEN		( 12 )
 #define configUSE_TRACE_FACILITY	0
 #define configUSE_16_BIT_TICKS		0
 #define configIDLE_SHOULD_YIELD		0
@@ -108,7 +108,7 @@ to exclude the API function. */
 #define configKERNEL_INTERRUPT_PRIORITY 		255
 /* !!!! configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to zero !!!!
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY 	191 /* equivalent to 0xa0, or priority 5. */
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY 	0 /* equivalent to 0xa0, or priority 5. */
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /// Project dependent FreeRTOS related settings

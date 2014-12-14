@@ -214,7 +214,7 @@
 // ---------- TCP options ----------
 //
 //*****************************************************************************
-#define LWIP_TCP                        1
+#define LWIP_TCP                        0
 //#define TCP_TTL                         (IP_DEFAULT_TTL)
 #define TCP_WND                         4096   // default is 2048
 //#define TCP_MAXRTX                      12
@@ -275,7 +275,7 @@
 #define TCPIP_THREAD_NAME              "tcpip_thread"
 #define TCPIP_THREAD_STACKSIZE          configUSER_SPACE_STACK_SIZE
 //#define TCPIP_THREAD_PRIO               1
-//#define TCPIP_MBOX_SIZE                 0
+#define TCPIP_MBOX_SIZE                 5
 //#define SLIPIF_THREAD_NAME             "slipif_loop"
 //#define SLIPIF_THREAD_STACKSIZE         0
 //#define SLIPIF_THREAD_PRIO              1
