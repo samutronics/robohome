@@ -214,7 +214,7 @@
 // ---------- TCP options ----------
 //
 //*****************************************************************************
-#define LWIP_TCP                        0
+#define LWIP_TCP                        1
 //#define TCP_TTL                         (IP_DEFAULT_TTL)
 #define TCP_WND                         4096   // default is 2048
 //#define TCP_MAXRTX                      12

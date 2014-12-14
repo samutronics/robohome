@@ -10,6 +10,7 @@
 //! =============================================================================
 
 #include "networkManager.hpp"
+#include "httpd.h"
 
 using namespace manager::networkTask;
 using namespace manager::networkTask::configuration;
@@ -38,6 +39,8 @@ networkManager::networkManager() {
     mac[5] = ((usr1 >> 16) & 0xff);
 
     lwIPInit(system::currentSystemClockFrequency, mac, 0, 0, 0, IPGatheringStrategie);
+
+    httpd_init();
 
     LocatorInit();
     LocatorMACAddrSet(mac);
