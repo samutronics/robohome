@@ -516,36 +516,6 @@ sys_mbox_valid(sys_mbox_t *mbox)
 }
 
 /**
- * The routine for a thread.  This handles some housekeeping around the
- * applications's thread routine.
- *
- * @param arg is the index into the thread structure for this thread
- */
-static void
-sys_arch_thread(void *arg)
-{
-  u32_t i;
-
-  /* Get this threads index. */
-  i = (u32_t)arg;
-
-  /* Call the application's thread routine. */
-  threads[i].thread(threads[i].arg);
-
-  /* Free the memory used by this thread's stack. */
-  mem_free(threads[i].stackstart);
-
-  /* Clear the stack from the thread structure. */
-  threads[i].stackstart = NULL;
-  threads[i].stackend = NULL;
-
-  /* Delete this task. */
-#if RTOS_FREERTOS
-  vTaskDelete(NULL);
-#endif
-}
-
-/**
  * Creates a new thread.
  *
  * @param name is the name of this thread
@@ -560,7 +530,6 @@ sys_thread_new(const char *name, lwip_thread_fn thread, void *arg,
                int stacksize, int prio)
 {
   sys_thread_t created_thread;
-  void *data;
   u32_t i;
 
   /* Find a thread that is not in use. */
@@ -573,20 +542,7 @@ sys_thread_new(const char *name, lwip_thread_fn thread, void *arg,
       return NULL;
   }
 
-  /* Allocate memory for the thread's stack. */
-//  data = mem_malloc(stacksize);
-//  if(!data) {
-//    return NULL;
-//  }
-
-  /* Save the details of this thread. */
-//  threads[i].stackstart = data;
-//  threads[i].stackend = (void *)((char *)data + stacksize);
-//  threads[i].thread = thread;
-//  threads[i].arg = arg;
-
   /* Create a new thread. */
-#if RTOS_FREERTOS
   if(xTaskCreate(thread, (signed portCHAR *)name,
                  stacksize, (void *)i, tskIDLE_PRIORITY+prio,
                  &threads[i].taskhandle) != pdTRUE){
@@ -595,7 +551,6 @@ sys_thread_new(const char *name, lwip_thread_fn thread, void *arg,
     return NULL;
   }
   created_thread = threads[i].taskhandle;
-#endif /* RTOS_FREERTOS */
 
   /* Return this thread. */
   return created_thread;
