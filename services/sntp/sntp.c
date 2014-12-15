@@ -89,7 +89,7 @@
 
 /** Set this to 1 to allow SNTP_SERVER_ADDRESS to be a DNS name */
 #ifndef SNTP_SERVER_DNS
-#define SNTP_SERVER_DNS             0
+#define SNTP_SERVER_DNS             1
 #endif
 
 /** Set this to 1 to support more than one server */
