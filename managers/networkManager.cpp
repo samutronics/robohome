@@ -9,8 +9,9 @@
 //! \note
 //! =============================================================================
 
-#include "networkManager.hpp"
+#include "sntp.h"
 #include "httpd.h"
+#include "networkManager.hpp"
 
 using namespace manager::networkTask;
 using namespace manager::networkTask::configuration;
@@ -41,6 +42,7 @@ networkManager::networkManager() {
     lwIPInit(system::currentSystemClockFrequency, mac, 0, 0, 0, IPGatheringStrategie);
 
     httpd_init();
+    sntp_init();
 }
 
 void networkManager::task(void *pvParameters) {
