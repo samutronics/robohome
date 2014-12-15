@@ -36,6 +36,11 @@
 #ifndef __HTTPD_H__
 #define __HTTPD_H__
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include "lwip/opt.h"
 #include "lwip/err.h"
 #include "lwip/pbuf.h"
@@ -232,5 +237,9 @@ void httpd_post_data_recved(void *connection, u16_t recved_len);
 #endif /* LWIP_HTTPD_SUPPORT_POST */
 
 void httpd_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __HTTPD_H__ */
