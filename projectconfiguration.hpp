@@ -41,6 +41,7 @@
 #include "list.h"
 #include "task.h"
 #include "queue.h"
+#include "event_groups.h"
 
 // =============================================================================
 // Hardware dependent includes
