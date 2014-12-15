@@ -41,10 +41,6 @@ networkManager::networkManager() {
     lwIPInit(system::currentSystemClockFrequency, mac, 0, 0, 0, IPGatheringStrategie);
 
     httpd_init();
-
-    LocatorInit();
-    LocatorMACAddrSet(mac);
-    LocatorAppTitleSet("automation");
 }
 
 void networkManager::task(void *pvParameters) {
