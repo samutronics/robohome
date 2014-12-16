@@ -28,6 +28,7 @@ Specification:
 	Current time is updated via SNTP:
 		* power-up
 		* 1h period --> RTC is setup accordingly (without losing clock ticks e.g. speedup or slowdown)
+		* Hibernate module will provide the RTC functionality in the system.
 	Web interface is located on an SD card with FAT32 FS
 
 Threading model:
