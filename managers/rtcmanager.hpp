@@ -28,7 +28,7 @@ DEFINE_TH
 
 } // manager
 
-#endif _RTCMANAGER_H_
+#endif // _RTCMANAGER_H_
 //! =============================================================================
 //! \copyright
 //! ====================== end of file: rtcmanager.hpp ==========================
