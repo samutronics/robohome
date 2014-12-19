@@ -116,20 +116,17 @@ const u32 IPGatheringStrategie = IPADDR_USE_DHCP;
 }  // configuration
 }  // inboundTask
 
-}  // manager
-
-namespace communication {
-
-namespace ipc {
+namespace rtcTask {
 
 namespace configuration {
 
-const u32 ipcQueueCount = 12;
+const u32 rtcQueueLength = 1;
+const u32 rtcQueueWidth = 1;
 
 }  // configuration
-}  // ipc
+}  // inboundTask
 
-}  // communication
+}  // manager
 
 #endif // _PROJECTCONFIGURATION_HPP_
 //! =============================================================================

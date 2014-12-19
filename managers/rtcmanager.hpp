@@ -17,7 +17,7 @@
 namespace manager {
 namespace rtcTask {
 
-class rtcManager: public IManager{
+class rtcManager: public IManager {
 private: rtcManager();
 private: virtual void task(void *pvParameters);
 TO_BE_RUNABLE(rtcManager)

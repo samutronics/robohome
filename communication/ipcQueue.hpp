@@ -22,7 +22,8 @@ namespace communication {
 namespace ipc {
 
 enum queueID {
-	outboundQueue = 0,
+	outboundQueue	= 0,
+	rtcQueue		= 1,
 	DECLARE_LAST_ENUM(queueID)
 };
 
@@ -42,7 +43,7 @@ public: inline xQueueHandle queue(queueID q);
 
 private: ipcQueue();
 
-private: xQueueHandle _q[configuration::ipcQueueCount];
+private: xQueueHandle _q[last_queueID_element];
 
 private: static ipcQueue _singleton;
 };
