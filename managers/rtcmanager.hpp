@@ -20,6 +20,7 @@ namespace rtcTask {
 class rtcManager: public IManager {
 private: rtcManager();
 private: virtual void task(void *pvParameters);
+private: static void delegateProcessSNTPTime(u32 time);
 TO_BE_RUNABLE(rtcManager)
 DEFINE_TH
 };

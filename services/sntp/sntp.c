@@ -158,7 +158,7 @@
 
 /** SNTP macro to change system time and/or the update the RTC clock */
 #ifndef SNTP_SET_SYSTEM_TIME
-#define SNTP_SET_SYSTEM_TIME(sec) ((void)sec)
+#define SNTP_SET_SYSTEM_TIME(sec) if(delegate) {delegate(sec);}
 #endif
 
 /** SNTP macro to change system time including microseconds */
@@ -264,6 +264,8 @@ PACK_STRUCT_END
 #ifdef PACK_STRUCT_USE_INCLUDES
 #  include "arch/epstruct.h"
 #endif
+
+void(*delegate)(unsigned int);
 
 /* function prototypes */
 static void sntp_request(void *arg);
@@ -686,8 +688,9 @@ sntp_request(void *arg)
  * Send out request instantly or after SNTP_STARTUP_DELAY.
  */
 void
-sntp_init(void)
+sntp_init(void(*d)(unsigned int))
 {
+	delegate = d;
   SNTP_RESET_RETRY_TIMEOUT();
   sntp_pcb = udp_new();
   LWIP_ASSERT("Failed to allocate udp pcb for sntp client", sntp_pcb != NULL);

@@ -42,7 +42,6 @@ networkManager::networkManager() {
     lwIPInit(system::currentSystemClockFrequency, mac, 0, 0, 0, IPGatheringStrategie);
 
     httpd_init();
-    sntp_init();
 }
 
 void networkManager::task(void *pvParameters) {

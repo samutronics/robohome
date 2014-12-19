@@ -16,7 +16,7 @@ extern "C"
 {
 #endif
 
-void sntp_init(void);
+void sntp_init(void(*d)(unsigned int));
 
 #ifdef __cplusplus
 }

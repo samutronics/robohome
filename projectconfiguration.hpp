@@ -121,7 +121,7 @@ namespace rtcTask {
 namespace configuration {
 
 const u32 rtcQueueLength = 1;
-const u32 rtcQueueWidth = 1;
+const u32 rtcQueueWidth = sizeof(u32);
 
 }  // configuration
 }  // inboundTask
