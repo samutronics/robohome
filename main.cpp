@@ -35,6 +35,22 @@ int main(void) {
 	SysCtlMOSCConfigSet(SYSCTL_MOSC_HIGHFREQ);
 	system::currentSystemClockFrequency = SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN | SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480), 120000000);
 
+
+/*    ROM_GPIOPinConfigure(GPIO_PQ3_SSI3XDAT1);
+
+    ROM_GPIOPinConfigure(GPIO_PQ0_SSI3CLK);
+
+    ROM_GPIOPinConfigure(GPIO_PQ2_SSI3XDAT0);
+
+    ROM_GPIOPinConfigure(GPIO_PQ1_SSI3FSS);
+
+    ROM_GPIOPinTypeSSI(GPIO_PORTF_BASE, GPIO_PIN_4 | GPIO_PIN_5);
+
+    ROM_GPIOPinTypeSSI(GPIO_PORTQ_BASE, GPIO_PIN_0 |GPIO_PIN_1 | GPIO_PIN_2|GPIO_PIN_3);
+
+    ROM_GPIOPinWrite(GPIO_PORTQ_BASE, GPIO_PIN_1, GPIO_PIN_1);
+*/
+
 	if(pdPASS != xTaskCreate(&inputManager::start,		"TaaT_TBHB_Input",	configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
 	if(pdPASS != xTaskCreate(&outputManager::start,		"TaaT_Output",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
 	if(pdPASS != xTaskCreate(&networkManager::start,	"TaaT_THBH_NP",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
