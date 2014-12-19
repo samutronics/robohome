@@ -44,6 +44,11 @@ void rtcManager::task(void *pvParameters) {
 		u32 time;
 		xQueueReceive(queueHandle, &time, 0);
 
+		std::tm* t = std::localtime(&time);
+		HibernateRTCDisable();
+		HibernateCalendarSet((tm*)&t);
+		HibernateRTCEnable();
+
 		// The task gives up its remained time-slice
 		taskYIELD();
 	}
