@@ -65,14 +65,14 @@ extern uint32_t g_ui32SysClock;
 static
 void SELECT (void)
 {
-    ROM_GPIOPinWrite(SDC_SSI_FSS_GPIO_PORT_BASE, SDC_SSI_FSS, 0);
+    MAP_GPIOPinWrite(SDC_SSI_FSS_GPIO_PORT_BASE, SDC_SSI_FSS, 0);
 }
 
 /* de-asserts the CS pin to the card */
 static
 void DESELECT (void)
 {
-    ROM_GPIOPinWrite(SDC_SSI_FSS_GPIO_PORT_BASE, SDC_SSI_FSS, SDC_SSI_FSS);
+    MAP_GPIOPinWrite(SDC_SSI_FSS_GPIO_PORT_BASE, SDC_SSI_FSS, SDC_SSI_FSS);
 }
 
 /*--------------------------------------------------------------------------
@@ -102,9 +102,9 @@ void xmit_spi(BYTE dat)
 {
     uint32_t ui32RcvDat;
 
-    ROM_SSIDataPut(SDC_SSI_BASE, dat); /* Write the data to the tx fifo */
+    MAP_SSIDataPut(SDC_SSI_BASE, dat); /* Write the data to the tx fifo */
 
-    ROM_SSIDataGet(SDC_SSI_BASE, &ui32RcvDat); /* flush data read during the write */
+    MAP_SSIDataGet(SDC_SSI_BASE, &ui32RcvDat); /* flush data read during the write */
 }
 
 
@@ -117,9 +117,9 @@ BYTE rcvr_spi (void)
 {
     uint32_t ui32RcvDat;
 
-    ROM_SSIDataPut(SDC_SSI_BASE, 0xFF); /* write dummy data */
+    MAP_SSIDataPut(SDC_SSI_BASE, 0xFF); /* write dummy data */
 
-    ROM_SSIDataGet(SDC_SSI_BASE, &ui32RcvDat); /* read data frm rx fifo */
+    MAP_SSIDataGet(SDC_SSI_BASE, &ui32RcvDat); /* read data frm rx fifo */
 
     return (BYTE)ui32RcvDat;
 }
@@ -164,8 +164,8 @@ void send_initial_clock_train(void)
     DESELECT();
 
     /* Switch the SSI TX line to a GPIO and drive it high too. */
-    ROM_GPIOPinTypeGPIOOutput(SDC_SSI_TX_GPIO_PORT_BASE, SDC_SSI_TX);
-    ROM_GPIOPinWrite(SDC_SSI_TX_GPIO_PORT_BASE, SDC_SSI_TX, SDC_SSI_TX);
+    MAP_GPIOPinTypeGPIOOutput(SDC_SSI_TX_GPIO_PORT_BASE, SDC_SSI_TX);
+    MAP_GPIOPinWrite(SDC_SSI_TX_GPIO_PORT_BASE, SDC_SSI_TX, SDC_SSI_TX);
 
     /* Send 10 bytes over the SSI. This causes the clock to wiggle the */
     /* required number of times. */
@@ -173,14 +173,14 @@ void send_initial_clock_train(void)
     {
         /* Write DUMMY data. SSIDataPut() waits until there is room in the */
         /* FIFO. */
-        ROM_SSIDataPut(SDC_SSI_BASE, 0xFF);
+        MAP_SSIDataPut(SDC_SSI_BASE, 0xFF);
 
         /* Flush data read during data write. */
-        ROM_SSIDataGet(SDC_SSI_BASE, &ui32Dat);
+        MAP_SSIDataGet(SDC_SSI_BASE, &ui32Dat);
     }
 
     /* Revert to hardware control of the SSI TX line. */
-    ROM_GPIOPinTypeSSI(SDC_SSI_TX_GPIO_PORT_BASE, SDC_SSI_TX);
+    MAP_GPIOPinTypeSSI(SDC_SSI_TX_GPIO_PORT_BASE, SDC_SSI_TX);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -198,20 +198,20 @@ void power_on (void)
      */
 
     /* Enable the peripherals used to drive the SDC on SSI */
-    ROM_SysCtlPeripheralEnable(SDC_SSI_SYSCTL_PERIPH);
-    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOQ);
-    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOH);
+    MAP_SysCtlPeripheralEnable(SDC_SSI_SYSCTL_PERIPH);
+    MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOQ);
+    MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+    MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOH);
 
     /*
      * Configure the appropriate pins to be SSI instead of GPIO. The FSS (CS)
      * signal is directly driven to ensure that we can hold it low through a
      * complete transaction with the SD card.
      */
-    ROM_GPIOPinTypeSSI(SDC_SSI_TX_GPIO_PORT_BASE, SDC_SSI_TX);
-    ROM_GPIOPinTypeSSI(SDC_SSI_RX_GPIO_PORT_BASE, SDC_SSI_RX);
-    ROM_GPIOPinTypeSSI(SDC_SSI_CLK_GPIO_PORT_BASE, SDC_SSI_CLK);
-    ROM_GPIOPinTypeGPIOOutput(SDC_SSI_FSS_GPIO_PORT_BASE, SDC_SSI_FSS);
+    MAP_GPIOPinTypeSSI(SDC_SSI_TX_GPIO_PORT_BASE, SDC_SSI_TX);
+    MAP_GPIOPinTypeSSI(SDC_SSI_RX_GPIO_PORT_BASE, SDC_SSI_RX);
+    MAP_GPIOPinTypeSSI(SDC_SSI_CLK_GPIO_PORT_BASE, SDC_SSI_CLK);
+    MAP_GPIOPinTypeGPIOOutput(SDC_SSI_FSS_GPIO_PORT_BASE, SDC_SSI_FSS);
 
     /*
      * Set the SSI output pins to 4MA drive strength and engage the
@@ -227,9 +227,9 @@ void power_on (void)
                          GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD);
 
     /* Configure the SSI3 port */
-    ROM_SSIConfigSetExpClk(SDC_SSI_BASE, g_ui32SysClock,
+    MAP_SSIConfigSetExpClk(SDC_SSI_BASE, g_ui32SysClock,
                            SSI_FRF_MOTO_MODE_0, SSI_MODE_MASTER, 400000, 8);
-    ROM_SSIEnable(SDC_SSI_BASE);
+    MAP_SSIEnable(SDC_SSI_BASE);
 
     /* Set DI and CS high and apply more than 74 pulses to SCLK for the card */
     /* to be able to accept a native command. */
@@ -245,7 +245,7 @@ void set_max_speed(void)
     unsigned long i;
 
     /* Disable the SSI */
-    ROM_SSIDisable(SDC_SSI_BASE);
+    MAP_SSIDisable(SDC_SSI_BASE);
 
     /* Set the maximum speed as half the system clock, with a max of 12.5 MHz. */
     i = g_ui32SysClock / 2;
@@ -255,11 +255,11 @@ void set_max_speed(void)
     }
 
     /* Configure the SSI0 port to run at 12.5MHz */
-    ROM_SSIConfigSetExpClk(SDC_SSI_BASE, g_ui32SysClock,
+    MAP_SSIConfigSetExpClk(SDC_SSI_BASE, g_ui32SysClock,
                            SSI_FRF_MOTO_MODE_0, SSI_MODE_MASTER, i, 8);
 
     /* Enable the SSI */
-    ROM_SSIEnable(SDC_SSI_BASE);
+    MAP_SSIEnable(SDC_SSI_BASE);
 }
 
 static
