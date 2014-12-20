@@ -311,7 +311,10 @@ sntp_process(u32_t *receive_timestamp)
   /* convert SNTP time (1900-based) to unix GMT time (1970-based)
    * @todo: if MSB is 1, SNTP time is 2036-based!
    */
-  time_t t = (ntohl(receive_timestamp[0]) - DIFF_SEC_1900_1970);
+//	  time_t t = (ntohl(receive_timestamp[0]) - DIFF_SEC_1900_1970);
+
+	//CCS time conversion is based on 1900
+	time_t t = ntohl(receive_timestamp[0]);
 
 #if SNTP_CALC_TIME_US
   u32_t us = ntohl(receive_timestamp[1]) / 4295;
