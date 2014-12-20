@@ -12,6 +12,8 @@
 #include "rtcmanager.hpp"
 #include "sntp.h"
 #include "time.h"
+#include "ustdlib.h"
+
 
 using namespace communication::ipc;
 using namespace manager::rtcTask;
@@ -23,7 +25,7 @@ rtcManager::rtcManager() {
 	std::tm t;
 	HibernateCalendarSet((tm*)&t);
 	t.tm_min = 0xFF;
-	HibernateCalendarMatchSet(0, (tm*)&t);
+	HibernateCalendarMatchSet(0, reinterpret_cast<tm*>(&t));
 	HibernateIntClear(HIBERNATE_INT_PIN_WAKE | HIBERNATE_INT_LOW_BAT | HIBERNATE_INT_RTC_MATCH_0);
 	HibernateIntEnable(HIBERNATE_INT_RTC_MATCH_0);
 	HibernateIntRegister(&rtcManager::handlerTH);
@@ -44,9 +46,14 @@ void rtcManager::task(void *pvParameters) {
 		u32 time;
 		xQueueReceive(queueHandle, &time, 0);
 
-		std::tm* t = std::localtime(&time);
+		std::tm t;
+		ulocaltime(time, reinterpret_cast<tm*>(&t));
+
+		// The hour has to be incremented, because the Budapest
+		//	time zone is shifted by one related to the GMT.
+		t.tm_hour++;
 		HibernateRTCDisable();
-		HibernateCalendarSet((tm*)&t);
+		HibernateCalendarSet(reinterpret_cast<tm*>(&t));
 		HibernateRTCEnable();
 
 		// The task gives up its remained time-slice
