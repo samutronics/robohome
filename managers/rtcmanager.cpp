@@ -66,7 +66,7 @@ void rtcManager::delegateProcessSNTPTime(u32 time) {
 }
 
 void rtcManager::handlerTH() {
-	sntp_init(&delegateProcessSNTPTime);
+//	sntp_init(&delegateProcessSNTPTime);
 	HibernateIntClear(HIBERNATE_INT_RTC_MATCH_0);
 }
 
