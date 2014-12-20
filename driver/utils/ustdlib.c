@@ -923,7 +923,7 @@ ulocaltime(time_t timer, struct tm *tm)
             break;
         }
     }
-    tm->tm_mon = temp;
+    tm->tm_mon = temp -1;
 
     //
     // Extract the day of the month.
