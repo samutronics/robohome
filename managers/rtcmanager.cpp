@@ -24,7 +24,6 @@ rtcManager::rtcManager() {
 
 	std::tm t;
 	HibernateCalendarSet((tm*)&t);
-	t.tm_min = 0xFF;
 	HibernateCalendarMatchSet(0, reinterpret_cast<tm*>(&t));
 	HibernateIntClear(HIBERNATE_INT_PIN_WAKE | HIBERNATE_INT_LOW_BAT | HIBERNATE_INT_RTC_MATCH_0);
 	HibernateIntEnable(HIBERNATE_INT_RTC_MATCH_0);
@@ -66,7 +65,6 @@ void rtcManager::delegateProcessSNTPTime(u32 time) {
 }
 
 void rtcManager::handlerTH() {
-//	sntp_init(&delegateProcessSNTPTime);
 	HibernateIntClear(HIBERNATE_INT_RTC_MATCH_0);
 }
 
