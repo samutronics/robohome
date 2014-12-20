@@ -55,9 +55,11 @@
 // =============================================================================
 #include "gpio.h"
 #include "flash.h"
+#include "timer.h"
 #include "sysctl.h"
 #include "pin_map.h"
 #include "interrupt.h"
+#include "hibernate.h"
 
 // =============================================================================
 // networking related includes
@@ -114,20 +116,17 @@ const u32 IPGatheringStrategie = IPADDR_USE_DHCP;
 }  // configuration
 }  // inboundTask
 
-}  // manager
-
-namespace communication {
-
-namespace ipc {
+namespace rtcTask {
 
 namespace configuration {
 
-const u32 ipcQueueCount = 12;
+const u32 rtcQueueLength = 1;
+const u32 rtcQueueWidth = sizeof(u32);
 
 }  // configuration
-}  // ipc
+}  // inboundTask
 
-}  // communication
+}  // manager
 
 #endif // _PROJECTCONFIGURATION_HPP_
 //! =============================================================================

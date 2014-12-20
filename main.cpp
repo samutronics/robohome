@@ -13,6 +13,7 @@
 // =============================================================================
 // Custom include files
 // =============================================================================
+#include "rtcmanager.hpp"
 #include "inputmanager.hpp"
 #include "outputManager.hpp"
 #include "networkManager.hpp"
@@ -20,6 +21,7 @@
 
 #include "lwiplib.h"
 
+using namespace manager::rtcTask;
 using namespace manager::inboundTask;
 using namespace manager::networkTask;
 using namespace manager::outboundTask;
@@ -38,10 +40,10 @@ int main(void) {
 	if(pdPASS != xTaskCreate(&inputManager::start,		"TaaT_TBHB_Input",	configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
 	if(pdPASS != xTaskCreate(&outputManager::start,		"TaaT_Output",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
 	if(pdPASS != xTaskCreate(&networkManager::start,	"TaaT_THBH_NP",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
+	if(pdPASS != xTaskCreate(&rtcManager::start,		"TaaT_RTC",			configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
 /*
 	if(pdPASS != xTaskCreate(, "TaaT_ExositeIoT",	configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
 	if(pdPASS != xTaskCreate(, "TaaT_WebServer",	configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
-	if(pdPASS != xTaskCreate(, "TaaT_RTC",			configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
 */
 	vTaskStartScheduler();
 	while(1);
