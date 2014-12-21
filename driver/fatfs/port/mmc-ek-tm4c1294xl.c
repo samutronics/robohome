@@ -59,7 +59,7 @@
 #define SDC_SSI_FSS             GPIO_PIN_4
 
 /* must be supplied by the application */
-extern uint32_t g_ui32SysClock;
+static const uint32_t g_ui32SysClock = 120000000;
 
 /* asserts the CS pin to the card */
 static
