@@ -1,7 +1,5 @@
-//! =============================================================================
-//! \copyright
-//! \section		API documentation
-//! \subsection
+// =============================================================================
+//! \file
 //! \brief			This file contains the core settings, that are relating to
 //!					the project, but not to the hardware or the operation system.
 //! \author         Norbert Toth
@@ -19,7 +17,7 @@
 //! \note
 //!	\warning		Change this settings could highly affects the system
 //!						performance and / or memory consuption
-//! =============================================================================
+// =============================================================================
 #ifndef _PROJECTCONFIGURATION_HPP_
 #define _PROJECTCONFIGURATION_HPP_
 
@@ -129,6 +127,7 @@ const u32 rtcQueueWidth = sizeof(u32);
 }  // manager
 
 #endif // _PROJECTCONFIGURATION_HPP_
-//! =============================================================================
+// =============================================================================
+//! \file
 //! \copyright
-//! ================= end of file: projectconfiguration.hpp =====================
+// ================= end of file: projectconfiguration.hpp =====================

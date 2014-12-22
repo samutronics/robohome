@@ -1,15 +1,13 @@
-//! =============================================================================
-//! \copyright
-//! \section
-//! \subsection
+// =============================================================================
+//! \file
 //! \brief			Documentation page
 //! \author         Norbert Toth
 //! \date			22.12.2014.
 //! \note
-//! =============================================================================
+// =============================================================================
 
 //! \page page0 SDS
-//! \tableleofcontents
+//! \tableofcontents
 //!	\section Design constraints
 //!
 //!
@@ -22,13 +20,6 @@
 
 
 
-
-Abbreviation:
-	IaaT: Interrupt as a Task
-	TaaT: Thread as a Task
-	THBH: Top Halve Bottom Halve interrupt model, where:
-		* top halve: IaaT 
-		* bottom halve: TaaT 
 
 Specification:
 	Healt signal LED
@@ -104,24 +95,23 @@ Useful examples:
 
 Documentation:
 For documentation, the project use the following doxy-style footers and headers:
-//! =============================================================================
-//! \copyright
-//! \section
-//! \subsection
+// =============================================================================
+//! \file
 //! \brief
 //! \author         Norbert Toth
-//! \date
-//! \details
+//! \date			22.12.2014.
 //! \note
-//! =============================================================================
+// =============================================================================
 
-//! =============================================================================
+// =============================================================================
+//! \file
 //! \copyright
-//! ================== end of file:  =======================
+// ================== end of file:  =======================
 
 Furthermore, create function and property description for each declaration is a MUST!!!
 Put into separate blocks each logical units of function and macro declaration is highly recommended.
 
-//! =============================================================================
+// =============================================================================
+//! \file
 //! \copyright
-//! ========================= end of file: SDS.hpp ==============================
+// ========================= end of file: SDS.hpp ==============================

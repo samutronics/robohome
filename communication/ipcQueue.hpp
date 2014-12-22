@@ -1,7 +1,5 @@
-//! =============================================================================
-//! \copyright
-//! \section		API documentation
-//! \subsection
+// =============================================================================
+//! \file
 //! \brief			This module contains a hardware independent queue management
 //!						system, that provide a solution to reach queues between
 //!						tasks.
@@ -11,7 +9,7 @@
 //!						accessable module, that manage creation, query and store
 //!						of ITCs.
 //! \note			For abbreaviotion see section SDS
-//! =============================================================================
+// =============================================================================
 #ifndef _IPCQUEUE_HPP_
 #define _IPCQUEUE_HPP_
 
@@ -27,7 +25,7 @@ enum queueID {
 	DECLARE_LAST_ENUM(queueID)
 };
 
-//! =============================================================================
+// =============================================================================
 //! \class		ipcQueue
 //! \brief		This class manages the access to the registered queues from
 //!					different thread.
@@ -35,7 +33,7 @@ enum queueID {
 //!					Due to performance reasons usage of the template classes and
 //!					methods prefered. To add new thread, the queueID enum has to
 //!					be extended.
-//! =============================================================================
+// =============================================================================
 class ipcQueue {
 public: static inline ipcQueue& singleton();
 
@@ -61,6 +59,7 @@ inline xQueueHandle ipcQueue::queue(queueID q) {
 
 #endif //_IPCQUEUE_HPP_
 
-//! =============================================================================
+// =============================================================================
+//! \file
 //! \copyright
-//! ======================= end of file: ipcQueue.cpp ===========================
+// ======================= end of file: ipcQueue.cpp ===========================
