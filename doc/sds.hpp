@@ -1,3 +1,28 @@
+//! =============================================================================
+//! \copyright
+//! \section
+//! \subsection
+//! \brief			Documentation page
+//! \author         Norbert Toth
+//! \date			22.12.2014.
+//! \note
+//! =============================================================================
+
+//! \page page0 SDS
+//! \tableleofcontents
+//!	\section Design constraints
+//!
+//!
+//!
+
+// =============================================================================
+// Custom include files
+// =============================================================================
+
+
+
+
+
 Abbreviation:
 	IaaT: Interrupt as a Task
 	TaaT: Thread as a Task
@@ -96,3 +121,7 @@ For documentation, the project use the following doxy-style footers and headers:
 
 Furthermore, create function and property description for each declaration is a MUST!!!
 Put into separate blocks each logical units of function and macro declaration is highly recommended.
+
+//! =============================================================================
+//! \copyright
+//! ========================= end of file: SDS.hpp ==============================

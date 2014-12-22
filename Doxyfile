@@ -840,7 +840,6 @@ RECURSIVE              = YES
 # run.
 
 EXCLUDE                = D:/homeAutomation/Debug \
-                         D:/homeAutomation/doc \
                          D:/homeAutomation/FreeRTOS \
                          D:/homeAutomation/driver
 
