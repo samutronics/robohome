@@ -15,6 +15,7 @@
 #include <stdbool.h>
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
+#include "timer.h"
 #include "driverlib/gpio.h"
 #include "driverlib/rom.h"
 #include "driverlib/rom_map.h"
@@ -92,6 +93,18 @@ BYTE CardType;            /* b0:MMC, b1:SDC, b2:Block addressing */
 
 static
 BYTE PowerFlag = 0;     /* indicates if "power" is on */
+
+static void intializeFSTimer() {
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER7);
+	TimerConfigure(TIMER7_BASE, TIMER_CFG_PERIODIC_UP);
+
+	TimerLoadSet(TIMER7_BASE, TIMER_A, 0);
+	TimerMatchSet(TIMER7_BASE, TIMER_A, 1200000);
+
+	TimerIntRegister(TIMER7_BASE, TIMER_BOTH, &disk_timerproc);
+	TimerIntEnable(TIMER7_BASE, TIMER_TIMA_TIMEOUT);
+	TimerEnable(TIMER7_BASE, TIMER_A);
+}
 
 /*-----------------------------------------------------------------------*/
 /* Transmit a byte to MMC via SPI  (Platform dependent)                  */
@@ -442,6 +455,7 @@ DSTATUS disk_initialize (
 {
     BYTE n, ty, ocr[4];
 
+    intializeFSTimer();
 
     if (drv) return STA_NOINIT;            /* Supports only single drive */
     if (Stat & STA_NODISK) return Stat;    /* No card in the socket */
@@ -717,6 +731,7 @@ void disk_timerproc (void)
     n = Timer2;
     if (n) Timer2 = --n;
 
+    TimerIntClear(TIMER7_BASE, TIMER_TIMA_TIMEOUT);
 }
 
 /*---------------------------------------------------------*/
