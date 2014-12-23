@@ -16,6 +16,7 @@
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 #include "timer.h"
+#include "pin_map.h"
 #include "driverlib/gpio.h"
 #include "driverlib/rom.h"
 #include "driverlib/rom_map.h"
@@ -210,34 +211,20 @@ void power_on (void)
      * SSI port and pins needed to talk to the card.
      */
 
+	//set the GPIO related settings for this soecific board.
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOQ);
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOH);
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+	GPIOPinConfigure(GPIO_PQ3_SSI3XDAT1);
+	GPIOPinConfigure(GPIO_PQ0_SSI3CLK);
+	GPIOPinConfigure(GPIO_PQ2_SSI3XDAT0);
+	GPIOPinConfigure(GPIO_PQ1_SSI3FSS);
+	GPIOPinTypeSSI(GPIO_PORTF_BASE, GPIO_PIN_4 | GPIO_PIN_5);
+	GPIOPinTypeSSI(GPIO_PORTQ_BASE, GPIO_PIN_0 |GPIO_PIN_1 | GPIO_PIN_2|GPIO_PIN_3);
+	GPIOPinWrite(GPIO_PORTQ_BASE, GPIO_PIN_1, GPIO_PIN_1); //select SD on the baseboard!!!
+
     /* Enable the peripherals used to drive the SDC on SSI */
     MAP_SysCtlPeripheralEnable(SDC_SSI_SYSCTL_PERIPH);
-    MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOQ);
-    MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-    MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOH);
-
-    /*
-     * Configure the appropriate pins to be SSI instead of GPIO. The FSS (CS)
-     * signal is directly driven to ensure that we can hold it low through a
-     * complete transaction with the SD card.
-     */
-    MAP_GPIOPinTypeSSI(SDC_SSI_TX_GPIO_PORT_BASE, SDC_SSI_TX);
-    MAP_GPIOPinTypeSSI(SDC_SSI_RX_GPIO_PORT_BASE, SDC_SSI_RX);
-    MAP_GPIOPinTypeSSI(SDC_SSI_CLK_GPIO_PORT_BASE, SDC_SSI_CLK);
-    MAP_GPIOPinTypeGPIOOutput(SDC_SSI_FSS_GPIO_PORT_BASE, SDC_SSI_FSS);
-
-    /*
-     * Set the SSI output pins to 4MA drive strength and engage the
-     * pull-up on the receive line.
-     */
-    MAP_GPIOPadConfigSet(SDC_SSI_RX_GPIO_PORT_BASE, SDC_SSI_RX,
-                         GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPU);
-    MAP_GPIOPadConfigSet(SDC_SSI_CLK_GPIO_PORT_BASE, SDC_SSI_CLK,
-                         GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD);
-    MAP_GPIOPadConfigSet(SDC_SSI_TX_GPIO_PORT_BASE, SDC_SSI_TX,
-                         GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD);
-    MAP_GPIOPadConfigSet(SDC_SSI_FSS_GPIO_PORT_BASE, SDC_SSI_FSS,
-                         GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD);
 
     /* Configure the SSI3 port */
     MAP_SSIConfigSetExpClk(SDC_SSI_BASE, g_ui32SysClock,
