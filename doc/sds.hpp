@@ -6,16 +6,16 @@
 //! \note
 // =============================================================================
 
-//! \page page0 SDS
+//! \page sds SDS
 //! \tableofcontents
-//!	\section Design constraints
+//! \section requirement Requirements
+//!
+//!	\section designconstraints Design constraints
+//! There are several design rules and contrains for developing embedded systems, so we can discuss only about the
+//! most importants.
 //!
 //!
 //!
-
-// =============================================================================
-// Custom include files
-// =============================================================================
 
 
 
@@ -92,24 +92,6 @@ Useful examples:
 	Web server *TivaWare*\examples\boards\ek-tm4c1294xl\enet_io
 	Exosite IoT *TivaWare*\examples\boards\ek-tm4c1294xl\qs_iot
 	Flashing over Ethernet (Warning this is for c129x board) *TivaWare*\examples\boards\dk-tm4c129x\boot_demo_emac_flash
-
-Documentation:
-For documentation, the project use the following doxy-style footers and headers:
-// =============================================================================
-//! \file
-//! \brief
-//! \author         Norbert Toth
-//! \date			22.12.2014.
-//! \note
-// =============================================================================
-
-// =============================================================================
-//! \file
-//! \copyright
-// ================== end of file:  =======================
-
-Furthermore, create function and property description for each declaration is a MUST!!!
-Put into separate blocks each logical units of function and macro declaration is highly recommended.
 
 // =============================================================================
 //! \file

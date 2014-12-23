@@ -12,12 +12,12 @@
 //!	Welcome to the Samutronics documentation page! In this documentation you can find anything related to the project's
 //! architecture, known bugs or even of the user guide.
 //!
-//! \section abb Terms and Abbrevations
+//! \section abb Terms and abbrevations
 //! IaaT: Interrupt as a Task<br>
 //! TaaT: Thread as a Task<br>
-//! THBH: Top Halve Bottom Halve interrupt model, where:<br>
-//!     * top halve: IaaT<br>
-//!     * bottom halve: TaaT<br>
+//! THBH: Top halve Bottom halve interrupt model, where:<br>
+//!     * top halve can be: IaaT<br>
+//!     * bottom halve can be: TaaT<br>
 
 // =============================================================================
 //! \file

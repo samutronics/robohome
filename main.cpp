@@ -25,7 +25,8 @@ using namespace manager::networkTask;
 using namespace manager::outboundTask;
 
 //! =============================================================================
-//! \function main is responsible for:
+//! \fn
+//! The main method is responsible for:
 //!		* Setup system wide availeble stuffs, that are not relating to another
 //!			modules, like system clock
 //!		* Create and deploy user threads
