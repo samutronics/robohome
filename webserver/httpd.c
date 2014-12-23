@@ -86,6 +86,9 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
+
+#include "uartstdio.h"
 
 #if LWIP_TCP
 
@@ -352,6 +355,8 @@ static err_t http_init_file(struct http_state *hs, FIL* file, int is_09, const c
 static err_t http_poll(void *arg, struct tcp_pcb *pcb);
 static int fs_bytes_left(FIL* file) {return (file->fsize - file->fptr);}
 
+static FATFS fileSystemMountPoint;
+
 #if LWIP_HTTPD_SSI
 /* SSI insert handler function pointer. */
 tSSIHandler g_pfnSSIHandler = NULL;
@@ -426,6 +431,7 @@ http_state_free(struct http_state *hs)
         ms_needed, hs->handle->len, ((((u32_t)hs->handle->len) * 10) / needed)));
 #endif /* LWIP_HTTPD_TIMING */
       f_close(hs->handle);
+      mem_free(hs->handle);
       hs->handle = NULL;
     }
 #if LWIP_HTTPD_SSI || LWIP_HTTPD_DYNAMIC_HEADERS
@@ -1341,31 +1347,29 @@ http_find_error_file(struct http_state *hs, u16_t error_nr)
  * @param uri pointer that receives the actual file name URI
  * @return file struct for the error page or NULL no matching file was found
  */
-static FIL *
+static FIL*
 http_get_404_file(const char **uri)
 {
-	FIL* file = NULL;
+	FIL* file = mem_malloc(sizeof(FIL));
 
-  *uri = "/404.html";
-  f_open(file, *uri, FA_READ);
-  if(file == NULL) {
-    /* 404.html doesn't exist. Try 404.htm instead. */
-    *uri = "/404.htm";
-    f_open(file, *uri, FA_READ);
-    if(file == NULL) {
-      /* 404.htm doesn't exist either. Try 404.shtml instead. */
-      *uri = "/404.shtml";
-      f_open(file, *uri, FA_READ);
-      if(file == NULL) {
-        /* 404.htm doesn't exist either. Indicate to the caller that it should
-         * send back a default 404 page.
-         */
-        *uri = NULL;
-      }
-    }
-  }
+	*uri = "/404.html";
+	if(FR_OK != f_open(file, *uri, FA_READ)) {
+		/* 404.html doesn't exist. Try 404.htm instead. */
+		*uri = "/404.htm";
+		if(FR_OK != f_open(file, *uri, FA_READ)) {
+			/* 404.htm doesn't exist either. Try 404.shtml instead. */
+			*uri = "/404.shtml";
+			if(FR_OK != f_open(file, *uri, FA_READ)) {
+				/* 404.htm doesn't exist either. Indicate to the caller that it should
+				 * send back a default 404 page.
+				 */
+				mem_free(file);
+				*uri = NULL;
+			}
+		}
+	}
 
-  return file;
+	return file;
 }
 
 #if LWIP_HTTPD_SUPPORT_POST
@@ -1738,7 +1742,7 @@ static err_t
 http_find_file(struct http_state *hs, const char *uri, int is_09)
 {
   size_t loop;
-  FIL* file = NULL;
+  FIL* file = mem_malloc(sizeof(FIL));
   char *params;
 #if LWIP_HTTPD_CGI
   int i;
@@ -1757,19 +1761,20 @@ http_find_file(struct http_state *hs, const char *uri, int is_09)
   if((uri[0] == '/') &&  (uri[1] == 0)) {
     /* Try each of the configured default filenames until we find one
        that exists. */
-    for (loop = 0; loop < NUM_DEFAULT_FILENAMES; loop++) {
-      LWIP_DEBUGF(HTTPD_DEBUG | LWIP_DBG_TRACE, ("Looking for %s...\n", g_psDefaultFilenames[loop].name));
-      f_open(file, (char *)g_psDefaultFilenames[loop].name, FA_READ);
-      uri = (char *)g_psDefaultFilenames[loop].name;
-      if(file != NULL) {
-        LWIP_DEBUGF(HTTPD_DEBUG | LWIP_DBG_TRACE, ("Opened.\n"));
+	  FRESULT fileOpeningResoult = FR_OK;
+	  for (loop = 0; loop < NUM_DEFAULT_FILENAMES; loop++) {
+		  LWIP_DEBUGF(HTTPD_DEBUG | LWIP_DBG_TRACE, ("Looking for %s...\n", g_psDefaultFilenames[loop].name));
+		  uri = (char *)g_psDefaultFilenames[loop].name;
+		  fileOpeningResoult = f_open(file, uri, FA_READ);
+		  if(FR_OK == fileOpeningResoult) {
+			  LWIP_DEBUGF(HTTPD_DEBUG | LWIP_DBG_TRACE, ("Opened.\n"));
 #if LWIP_HTTPD_SSI
         hs->tag_check = g_psDefaultFilenames[loop].shtml;
 #endif /* LWIP_HTTPD_SSI */
         break;
       }
     }
-    if (file == NULL) {
+    if (FR_OK != fileOpeningResoult) {
       /* None of the default filenames exist so send back a 404 page */
       file = http_get_404_file(&uri);
 #if LWIP_HTTPD_SSI
@@ -1806,8 +1811,7 @@ http_find_file(struct http_state *hs, const char *uri, int is_09)
 
     LWIP_DEBUGF(HTTPD_DEBUG | LWIP_DBG_TRACE, ("Opening %s\n", uri));
 
-    f_open(file, uri, FA_READ);
-    if (file == NULL) {
+    if (FR_OK != f_open(file, uri, FA_READ)) {
       file = http_get_404_file(&uri);
     }
 #if LWIP_HTTPD_SSI
@@ -2144,6 +2148,8 @@ httpd_init(void)
      memp_sizes[MEMP_HTTPD_STATE] >= sizeof(http_state));
 #endif
   LWIP_DEBUGF(HTTPD_DEBUG, ("httpd_init\n"));
+
+  if(FR_OK != f_mount(0, &fileSystemMountPoint)) {UARTprintf("fs cannot be mounted\n"); while(1);}
 
   httpd_init_addr(IP_ADDR_ANY);
 }
