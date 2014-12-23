@@ -20,9 +20,14 @@
 
 #include "lwiplib.h"
 
+#include "fatfs/src/ff.h"
+
 using namespace manager::inboundTask;
 using namespace manager::networkTask;
 using namespace manager::outboundTask;
+
+static FATFS fs;
+static FIL f;
 
 //! =============================================================================
 //! \function main is responsible for:
@@ -35,22 +40,6 @@ int main(void) {
 	SysCtlMOSCConfigSet(SYSCTL_MOSC_HIGHFREQ);
 	system::currentSystemClockFrequency = SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN | SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480), 120000000);
 
-
-/*    ROM_GPIOPinConfigure(GPIO_PQ3_SSI3XDAT1);
-
-    ROM_GPIOPinConfigure(GPIO_PQ0_SSI3CLK);
-
-    ROM_GPIOPinConfigure(GPIO_PQ2_SSI3XDAT0);
-
-    ROM_GPIOPinConfigure(GPIO_PQ1_SSI3FSS);
-
-    ROM_GPIOPinTypeSSI(GPIO_PORTF_BASE, GPIO_PIN_4 | GPIO_PIN_5);
-
-    ROM_GPIOPinTypeSSI(GPIO_PORTQ_BASE, GPIO_PIN_0 |GPIO_PIN_1 | GPIO_PIN_2|GPIO_PIN_3);
-
-    ROM_GPIOPinWrite(GPIO_PORTQ_BASE, GPIO_PIN_1, GPIO_PIN_1);
-*/
-
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
 	GPIOPinConfigure(GPIO_PA0_U0RX);
 	GPIOPinConfigure(GPIO_PA1_U0TX);
@@ -58,6 +47,30 @@ int main(void) {
 
 	UARTStdioConfig(0, 115200, system::currentSystemClockFrequency);
 	UARTprintf("application starts\n");
+
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_SSI3);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOQ);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+    GPIOPinConfigure(GPIO_PQ3_SSI3XDAT1);
+    GPIOPinConfigure(GPIO_PQ0_SSI3CLK);
+    GPIOPinConfigure(GPIO_PQ2_SSI3XDAT0);
+    GPIOPinConfigure(GPIO_PQ1_SSI3FSS);
+    GPIOPinTypeSSI(GPIO_PORTF_BASE, GPIO_PIN_4 | GPIO_PIN_5);
+    GPIOPinTypeSSI(GPIO_PORTQ_BASE, GPIO_PIN_0 |GPIO_PIN_1 | GPIO_PIN_2|GPIO_PIN_3);
+    GPIOPinWrite(GPIO_PORTQ_BASE, GPIO_PIN_1, GPIO_PIN_1); //select SD on the baseboard!!!
+	UARTprintf("SSI for reading SD card is ready\n");
+
+    if(FR_OK != f_mount(0, &fs)) {UARTprintf("fs cannot be mounted\n"); while(1);}
+
+    if(FR_OK != f_open(&f, "/index.htm", FA_READ)) {UARTprintf("cannot open the htm file\n"); while(1);}
+    UARTprintf("file size is %d\n", f_size(&f));
+
+    void* pbuf = pvPortMalloc(f_size(&f));
+    u32 count = 0;
+    f_read(&f, (void*)pbuf, f_size(&f), &count);
+    if(count) {
+    	UARTwrite(reinterpret_cast<const char*>(pbuf), count);
+    }
 
 	if(pdPASS != xTaskCreate(&inputManager::start,		"TaaT_TBHB_Input",	configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
 	if(pdPASS != xTaskCreate(&outputManager::start,		"TaaT_Output",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
