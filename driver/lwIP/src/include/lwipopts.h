@@ -42,7 +42,7 @@
 //#define DHCP_EXPIRE_TIMER_MSECS         (60 * 1000)
 //#define LWIP_HTTPD_SSI                  1
 //#define LWIP_HTTPD_CGI                  1
-#define LWIP_HTTPD_DYNAMIC_HEADERS      1
+#define LWIP_HTTPD_DYNAMIC_HEADERS      0
 //#define HTTPD_DEBUG                     LWIP_DBG_ON
 #define EMAC_PHY_CONFIG (EMAC_PHY_TYPE_INTERNAL | EMAC_PHY_INT_MDIX_EN |      \
                          EMAC_PHY_AN_100B_T_FULL_DUPLEX)

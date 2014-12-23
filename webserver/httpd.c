@@ -82,7 +82,7 @@
 #include "httpd.h"
 #include "httpd_structs.h"
 #include "lwip/tcp.h"
-#include "fs.h"
+#include "ff.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -148,7 +148,7 @@
 
 /** Set this to 0 to drop support for HTTP/0.9 clients (to save some bytes) */
 #ifndef LWIP_HTTPD_SUPPORT_V09
-#define LWIP_HTTPD_SUPPORT_V09              1
+#define LWIP_HTTPD_SUPPORT_V09              0
 #endif
 
 /** Set this to 1 to support HTTP request coming in in multiple packets/pbufs */
@@ -212,6 +212,7 @@
 
 /** These defines check whether tcp_write has to copy data or not */
 
+#define HTTP_IS_DATA_VOLATILE(hs) 1
 /** This was TI's check whether to let TCP copy data or not
 #define HTTP_IS_DATA_VOLATILE(hs) ((hs->file < (char *)0x20000000) ? 0 : TCP_WRITE_FLAG_COPY)*/
 #ifndef HTTP_IS_DATA_VOLATILE
@@ -292,8 +293,8 @@ enum tag_check_state {
 #endif /* LWIP_HTTPD_SSI */
 
 struct http_state {
-  struct fs_file *handle;
-  char *file;       /* Pointer to first unsent byte in buf. */
+  FIL* handle;
+  DWORD file;       /* Pointer to first unsent byte in buf. */
 
 #if LWIP_HTTPD_SUPPORT_REQUESTLIST
   struct pbuf *req;
@@ -347,8 +348,9 @@ struct http_state {
 };
 
 static err_t http_find_file(struct http_state *hs, const char *uri, int is_09);
-static err_t http_init_file(struct http_state *hs, struct fs_file *file, int is_09, const char *uri);
+static err_t http_init_file(struct http_state *hs, FIL* file, int is_09, const char *uri);
 static err_t http_poll(void *arg, struct tcp_pcb *pcb);
+static int fs_bytes_left(FIL* file) {return (file->fsize - file->fptr);}
 
 #if LWIP_HTTPD_SSI
 /* SSI insert handler function pointer. */
@@ -423,7 +425,7 @@ http_state_free(struct http_state *hs)
       LWIP_DEBUGF(HTTPD_DEBUG_TIMING, ("httpd: needed %"U32_F" ms to send file of %d bytes -> %"U32_F" bytes/sec\n",
         ms_needed, hs->handle->len, ((((u32_t)hs->handle->len) * 10) / needed)));
 #endif /* LWIP_HTTPD_TIMING */
-      fs_close(hs->handle);
+      f_close(hs->handle);
       hs->handle = NULL;
     }
 #if LWIP_HTTPD_SSI || LWIP_HTTPD_DYNAMIC_HEADERS
@@ -889,8 +891,8 @@ http_send_data(struct tcp_pcb *pcb, struct http_state *hs)
     /* Read a block of data from the file. */
     LWIP_DEBUGF(HTTPD_DEBUG, ("Trying to read %d bytes.\n", count));
 
-    count = fs_read(hs->handle, hs->buf, count);
-    if(count < 0) {
+    f_read(hs->handle, hs->buf, ((unsigned int)(count)), ((unsigned int*)(&count)));
+    if(count <= 0) {
       /* We reached the end of the file so this request is done.
        * @todo: don't close here for HTTP/1.1? */
       LWIP_DEBUGF(HTTPD_DEBUG, ("End of file.\n"));
@@ -1273,6 +1275,7 @@ http_send_data(struct tcp_pcb *pcb, struct http_state *hs)
   }
 #endif /* LWIP_HTTPD_SSI */
 
+//#error "fs_ API is in use"
   if((hs->left == 0) && (fs_bytes_left(hs->handle) <= 0)) {
     /* We reached the end of the file so this request is done.
      * This adds the FIN flag right into the last data segment.
@@ -1297,6 +1300,7 @@ static err_t
 http_find_error_file(struct http_state *hs, u16_t error_nr)
 {
   const char *uri1, *uri2, *uri3;
+#error "fs_ API is in use"
   struct fs_file *file;
 
   if (error_nr == 501) {
@@ -1309,10 +1313,13 @@ http_find_error_file(struct http_state *hs, u16_t error_nr)
     uri2 = "/400.htm";
     uri3 = "/400.shtml";
   }
+#error "fs_ API is in use"
   file = fs_open(uri1);
   if (file == NULL) {
+#error "fs_ API is in use"
     file = fs_open(uri2);
     if (file == NULL) {
+#error "fs_ API is in use"
       file = fs_open(uri3);
       if (file == NULL) {
         LWIP_DEBUGF(HTTPD_DEBUG, ("Error page for error %"U16_F" not found\n",
@@ -1334,21 +1341,21 @@ http_find_error_file(struct http_state *hs, u16_t error_nr)
  * @param uri pointer that receives the actual file name URI
  * @return file struct for the error page or NULL no matching file was found
  */
-static struct fs_file *
+static FIL *
 http_get_404_file(const char **uri)
 {
-  struct fs_file *file;
+	FIL* file = NULL;
 
   *uri = "/404.html";
-  file = fs_open(*uri);
+  f_open(file, *uri, FA_READ);
   if(file == NULL) {
     /* 404.html doesn't exist. Try 404.htm instead. */
     *uri = "/404.htm";
-    file = fs_open(*uri);
+    f_open(file, *uri, FA_READ);
     if(file == NULL) {
       /* 404.htm doesn't exist either. Try 404.shtml instead. */
       *uri = "/404.shtml";
-      file = fs_open(*uri);
+      f_open(file, *uri, FA_READ);
       if(file == NULL) {
         /* 404.htm doesn't exist either. Indicate to the caller that it should
          * send back a default 404 page.
@@ -1578,7 +1585,7 @@ http_parse_request(struct pbuf **inp, struct http_state *hs, struct tcp_pcb *pcb
   LWIP_ASSERT("p != NULL", p != NULL);
   LWIP_ASSERT("hs != NULL", hs != NULL);
 
-  if ((hs->handle != NULL) || (hs->file != NULL)) {
+  if ((hs->handle != NULL) || (hs->file != 0)) {
     LWIP_DEBUGF(HTTPD_DEBUG, ("Received data while sending a file\n"));
     /* already sending a file */
     /* @todo: abort? */
@@ -1731,7 +1738,7 @@ static err_t
 http_find_file(struct http_state *hs, const char *uri, int is_09)
 {
   size_t loop;
-  struct fs_file *file = NULL;
+  FIL* file = NULL;
   char *params;
 #if LWIP_HTTPD_CGI
   int i;
@@ -1752,7 +1759,7 @@ http_find_file(struct http_state *hs, const char *uri, int is_09)
        that exists. */
     for (loop = 0; loop < NUM_DEFAULT_FILENAMES; loop++) {
       LWIP_DEBUGF(HTTPD_DEBUG | LWIP_DBG_TRACE, ("Looking for %s...\n", g_psDefaultFilenames[loop].name));
-      file = fs_open((char *)g_psDefaultFilenames[loop].name);
+      f_open(file, (char *)g_psDefaultFilenames[loop].name, FA_READ);
       uri = (char *)g_psDefaultFilenames[loop].name;
       if(file != NULL) {
         LWIP_DEBUGF(HTTPD_DEBUG | LWIP_DBG_TRACE, ("Opened.\n"));
@@ -1799,7 +1806,7 @@ http_find_file(struct http_state *hs, const char *uri, int is_09)
 
     LWIP_DEBUGF(HTTPD_DEBUG | LWIP_DBG_TRACE, ("Opening %s\n", uri));
 
-    file = fs_open(uri);
+    f_open(file, uri, FA_READ);
     if (file == NULL) {
       file = http_get_404_file(&uri);
     }
@@ -1833,7 +1840,7 @@ http_find_file(struct http_state *hs, const char *uri, int is_09)
  *         another err_t otherwise
  */
 static err_t
-http_init_file(struct http_state *hs, struct fs_file *file, int is_09, const char *uri)
+http_init_file(struct http_state *hs, FIL *file, int is_09, const char *uri)
 {
   if (file != NULL) {
     /* file opened, initialise struct http_state */
@@ -1845,15 +1852,15 @@ http_init_file(struct http_state *hs, struct fs_file *file, int is_09, const cha
     hs->tag_end = file->data;
 #endif /* LWIP_HTTPD_SSI */
     hs->handle = file;
-    hs->file = (char*)file->data;
-    LWIP_ASSERT("File length must be positive!", (file->len >= 0));
-    hs->left = file->len;
+    hs->file = file->fptr;
+    LWIP_ASSERT("File length must be positive!", (file->fsize > 0));
+    hs->left = file->fsize;
     hs->retries = 0;
 #if LWIP_HTTPD_TIMING
     hs->time_started = sys_now();
 #endif /* LWIP_HTTPD_TIMING */
 #if !LWIP_HTTPD_DYNAMIC_HEADERS
-    LWIP_ASSERT("HTTP headers not included in file system", hs->handle->http_header_included);
+//    LWIP_ASSERT("HTTP headers not included in file system", hs->handle->http_header_included);
 #endif /* !LWIP_HTTPD_DYNAMIC_HEADERS */
 #if LWIP_HTTPD_SUPPORT_V09
     if (hs->handle->http_header_included && is_09) {
@@ -1869,14 +1876,15 @@ http_init_file(struct http_state *hs, struct fs_file *file, int is_09, const cha
 #endif /* LWIP_HTTPD_SUPPORT_V09*/
   } else {
     hs->handle = NULL;
-    hs->file = NULL;
+    hs->file = 0;
     hs->left = 0;
     hs->retries = 0;
   }
 #if LWIP_HTTPD_DYNAMIC_HEADERS
     /* Determine the HTTP headers to send based on the file extension of
    * the requested URI. */
-  if ((hs->handle == NULL) || !hs->handle->http_header_included) {
+  //  if ((hs->handle == NULL) || !hs->handle->http_header_included) {
+  if ((hs->handle == NULL)) {
     get_http_headers(hs, (char*)uri);
   }
 #else /* LWIP_HTTPD_DYNAMIC_HEADERS */
