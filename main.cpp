@@ -44,17 +44,7 @@ int main(void) {
 
 	UARTStdioConfig(0, 115200, system::currentSystemClockFrequency);
 	UARTprintf("application starts\n");
-/*
-    if(FR_OK != f_open(&f, "/index.htm", FA_READ)) {UARTprintf("cannot open the htm file\n"); while(1);}
-    UARTprintf("file size is %d\n", f_size(&f));
 
-    void* pbuf = pvPortMalloc(f_size(&f));
-    u32 count = 0;
-    f_read(&f, (void*)pbuf, f_size(&f), &count);
-    if(count) {
-    	UARTwrite(reinterpret_cast<const char*>(pbuf), count);
-    }
-*/
 	if(pdPASS != xTaskCreate(&inputManager::start,		"TaaT_TBHB_Input",	configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
 	if(pdPASS != xTaskCreate(&outputManager::start,		"TaaT_Output",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
 	if(pdPASS != xTaskCreate(&networkManager::start,	"TaaT_THBH_NP",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}

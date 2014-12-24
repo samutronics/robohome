@@ -458,21 +458,24 @@ http_state_free(struct http_state *hs)
  * @return the return value of tcp_write
  */
 static err_t
-http_write(struct tcp_pcb *pcb, const void* ptr, u16_t *length, u8_t apiflags)
+http_write(struct tcp_pcb *pcb, FIL* file, u16_t *length, u8_t apiflags)
 {
    u16_t len;
    err_t err;
    LWIP_ASSERT("length != NULL", length != NULL);
    len = *length;
+   unsigned char* buf = mem_malloc(len);
+   unsigned int readLength = 0;
+   f_read(file, buf, len, &readLength);
    do {
      LWIP_DEBUGF(HTTPD_DEBUG | LWIP_DBG_TRACE, ("Trying to send %d bytes\n", len));
-     err = tcp_write(pcb, ptr, len, apiflags);
+     err = tcp_write(pcb, buf, readLength, apiflags);
      if (err == ERR_MEM) {
-       if ((tcp_sndbuf(pcb) == 0) ||
-           (tcp_sndqueuelen(pcb) >= TCP_SND_QUEUELEN)) {
+       if ((tcp_sndbuf(pcb) == 0) || (tcp_sndqueuelen(pcb) >= TCP_SND_QUEUELEN)) {
          /* no need to try smaller sizes */
          len = 1;
-       } else {
+       }
+       else {
          len /= 2;
        }
        LWIP_DEBUGF(HTTPD_DEBUG | LWIP_DBG_TRACE,
@@ -486,7 +489,8 @@ http_write(struct tcp_pcb *pcb, const void* ptr, u16_t *length, u8_t apiflags)
      LWIP_DEBUGF(HTTPD_DEBUG | LWIP_DBG_TRACE, ("Send failed with err %d (\"%s\")\n", err, lwip_strerr(err)));
    }
 
-   *length = len;
+   *length = readLength;
+   mem_free(buf);
    return err;
 }
 
@@ -938,7 +942,7 @@ http_send_data(struct tcp_pcb *pcb, struct http_state *hs)
       len = 2 * mss;
     }
 
-    err = http_write(pcb, hs->file, &len, HTTP_IS_DATA_VOLATILE(hs));
+    err = http_write(pcb, hs->handle, &len, HTTP_IS_DATA_VOLATILE(hs));
     if (err == ERR_OK) {
       data_to_send = true;
       hs->file += len;
@@ -1775,6 +1779,10 @@ http_find_file(struct http_state *hs, const char *uri, int is_09)
       }
     }
     if (FR_OK != fileOpeningResoult) {
+    	if(file) {
+    		mem_free(file);
+    		file = NULL;
+    	}
       /* None of the default filenames exist so send back a 404 page */
       file = http_get_404_file(&uri);
 #if LWIP_HTTPD_SSI
