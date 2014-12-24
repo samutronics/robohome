@@ -96,6 +96,8 @@ static
 BYTE PowerFlag = 0;     /* indicates if "power" is on */
 
 static void intializeFSTimer() {
+	static int intialized = 0;
+	if(0 == intialized) {
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER7);
 	TimerConfigure(TIMER7_BASE, TIMER_CFG_PERIODIC);
 
@@ -104,6 +106,8 @@ static void intializeFSTimer() {
 	TimerIntRegister(TIMER7_BASE, TIMER_A, &disk_timerproc);
 	TimerIntEnable(TIMER7_BASE, TIMER_TIMA_TIMEOUT);
 	TimerEnable(TIMER7_BASE, TIMER_A);
+	intialized = 1;
+	}
 }
 
 /*-----------------------------------------------------------------------*/
