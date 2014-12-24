@@ -18,10 +18,6 @@
 #include "networkManager.hpp"
 #include "projectconfiguration.hpp"
 
-#include "lwiplib.h"
-
-#include "fatfs/src/ff.h"
-
 using namespace manager::inboundTask;
 using namespace manager::networkTask;
 using namespace manager::outboundTask;

@@ -1285,7 +1285,6 @@ http_send_data(struct tcp_pcb *pcb, struct http_state *hs)
   }
 #endif /* LWIP_HTTPD_SSI */
 
-//#error "fs_ API is in use"
   if((hs->left == 0) && (fs_bytes_left(hs->handle) <= 0)) {
     /* We reached the end of the file so this request is done.
      * This adds the FIN flag right into the last data segment.
