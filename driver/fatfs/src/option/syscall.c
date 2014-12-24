@@ -5,6 +5,8 @@
 
 #include <stdlib.h>		/* ANSI memory controls */
 
+#include "FreeRTOS.h"
+#include "semphr.h"
 #include "../ff.h"
 
 
@@ -23,11 +25,11 @@ int ff_cre_syncobj (	/* 1:Function succeeded, 0:Could not create due to any erro
 )
 {
 	int ret;
-//	static _SYNC_t sem[_VOLUMES];	/* FreeRTOS */
+	static _SYNC_t sem[_VOLUMES];	/* FreeRTOS */
 
 
-	*sobj = CreateMutex(NULL, FALSE, NULL);		/* Win32 */
-	ret = (*sobj != INVALID_HANDLE_VALUE);
+//	*sobj = CreateMutex(NULL, FALSE, NULL);		/* Win32 */
+//	ret = (*sobj != INVALID_HANDLE_VALUE);
 
 //	*sobj = SyncObjects[vol];		/* uITRON (give a static created sync object) */
 //	ret = 1;						/* The initial value of the semaphore must be 1. */
@@ -35,10 +37,10 @@ int ff_cre_syncobj (	/* 1:Function succeeded, 0:Could not create due to any erro
 //	*sobj = OSMutexCreate(0, &err);	/* uC/OS-II */
 //	ret = (err == OS_NO_ERR);
 
-//  if (!sem[vol])					/* FreeRTOS */
-//		sem[vol] = xSemaphoreCreateMutex();
-//	*sobj = sem[vol];
-//	ret = (*sobj != NULL);
+  if (!sem[vol])					/* FreeRTOS */
+		sem[vol] = xSemaphoreCreateMutex();
+	*sobj = sem[vol];
+	ret = (*sobj != NULL);
 
 	return ret;
 }
@@ -60,14 +62,14 @@ int ff_del_syncobj (	/* 1:Function succeeded, 0:Could not delete due to any erro
 	int ret;
 
 
-	ret = CloseHandle(sobj);	/* Win32 */
+//	ret = CloseHandle(sobj);	/* Win32 */
 
 //	ret = 1;					/* uITRON (nothing to do) */
 
 //	OSMutexDel(sobj, OS_DEL_ALWAYS, &err);	/* uC/OS-II */
 //	ret = (err == OS_NO_ERR);
 
-//	ret = 1;					/* FreeRTOS (nothing to do) */
+	ret = 1;					/* FreeRTOS (nothing to do) */
 
 	return ret;
 }
@@ -87,14 +89,14 @@ int ff_req_grant (	/* TRUE:Got a grant to access the volume, FALSE:Could not get
 {
 	int ret;
 
-	ret = (WaitForSingleObject(sobj, _FS_TIMEOUT) == WAIT_OBJECT_0);	/* Win32 */
+//	ret = (WaitForSingleObject(sobj, _FS_TIMEOUT) == WAIT_OBJECT_0);	/* Win32 */
 
 //	ret = (wai_sem(sobj) == E_OK);				/* uITRON */
 
 //	OSMutexPend(sobj, _FS_TIMEOUT, &err));		/* uC/OS-II */
 //	ret = (err == OS_NO_ERR);
 
-//	ret = (xSemaphoreTake(sobj, _FS_TIMEOUT) == pdTRUE);	/* FreeRTOS */
+	ret = (xSemaphoreTake(sobj, _FS_TIMEOUT) == pdTRUE);	/* FreeRTOS */
 
 	return ret;
 }
@@ -111,13 +113,13 @@ void ff_rel_grant (
 	_SYNC_t sobj	/* Sync object to be signaled */
 )
 {
-	ReleaseMutex(sobj);		/* Win32 */
+//	ReleaseMutex(sobj);		/* Win32 */
 
 //	sig_sem(sobj);			/* uITRON */
 
 //	OSMutexPost(sobj);		/* uC/OS-II */
 
-//	xSemaphoreGive(sobj);	/* FreeRTOS */
+	xSemaphoreGive(sobj);	/* FreeRTOS */
 }
 
 #endif

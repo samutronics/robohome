@@ -158,7 +158,7 @@ BYTE wait_ready (void)
     BYTE res;
 
 
-    Timer2 = 50;    /* Wait for ready in timeout of 500ms */
+    Timer2 = 100;    /* Wait for ready in timeout of 500ms */
     rcvr_spi();
     do
         res = rcvr_spi();
@@ -228,7 +228,32 @@ void power_on (void)
 
     /* Enable the peripherals used to drive the SDC on SSI */
     MAP_SysCtlPeripheralEnable(SDC_SSI_SYSCTL_PERIPH);
+    MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOQ);
+    MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+    MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOH);
 
+    /*
+     * Configure the appropriate pins to be SSI instead of GPIO. The FSS (CS)
+     * signal is directly driven to ensure that we can hold it low through a
+     * complete transaction with the SD card.
+     */
+    MAP_GPIOPinTypeSSI(SDC_SSI_TX_GPIO_PORT_BASE, SDC_SSI_TX);
+    MAP_GPIOPinTypeSSI(SDC_SSI_RX_GPIO_PORT_BASE, SDC_SSI_RX);
+    MAP_GPIOPinTypeSSI(SDC_SSI_CLK_GPIO_PORT_BASE, SDC_SSI_CLK);
+    MAP_GPIOPinTypeGPIOOutput(SDC_SSI_FSS_GPIO_PORT_BASE, SDC_SSI_FSS);
+
+    /*
+     * Set the SSI output pins to 4MA drive strength and engage the
+     * pull-up on the receive line.
+     */
+    MAP_GPIOPadConfigSet(SDC_SSI_RX_GPIO_PORT_BASE, SDC_SSI_RX,
+                         GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPU);
+    MAP_GPIOPadConfigSet(SDC_SSI_CLK_GPIO_PORT_BASE, SDC_SSI_CLK,
+                         GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD);
+    MAP_GPIOPadConfigSet(SDC_SSI_TX_GPIO_PORT_BASE, SDC_SSI_TX,
+                         GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD);
+    MAP_GPIOPadConfigSet(SDC_SSI_FSS_GPIO_PORT_BASE, SDC_SSI_FSS,
+                         GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD);
     /* Configure the SSI3 port */
     MAP_SSIConfigSetExpClk(SDC_SSI_BASE, g_ui32SysClock,
                            SSI_FRF_MOTO_MODE_0, SSI_MODE_MASTER, 400000, 8);
@@ -445,13 +470,15 @@ DSTATUS disk_initialize (
 {
     BYTE n, ty, ocr[4];
 
-    intializeFSTimer();
+//    intializeFSTimer();
 
     if (drv) return STA_NOINIT;            /* Supports only single drive */
     if (Stat & STA_NODISK) return Stat;    /* No card in the socket */
 
     power_on();                            /* Force socket power on */
     send_initial_clock_train();            /* Ensure the card is in SPI mode */
+
+    intializeFSTimer();
 
     SELECT();                /* CS = L */
     ty = 0;
@@ -491,6 +518,8 @@ DSTATUS disk_initialize (
     } else {            /* Initialization failed */
         power_off();
     }
+
+//    intializeFSTimer();
 
     return Stat;
 }

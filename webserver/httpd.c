@@ -82,6 +82,8 @@
 #include "httpd.h"
 #include "httpd_structs.h"
 #include "lwip/tcp.h"
+#include "FreeRTOS.h"
+#include "semphr.h"
 #include "ff.h"
 
 #include <string.h>
