@@ -97,12 +97,11 @@ BYTE PowerFlag = 0;     /* indicates if "power" is on */
 
 static void intializeFSTimer() {
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER7);
-	TimerConfigure(TIMER7_BASE, TIMER_CFG_PERIODIC_UP);
+	TimerConfigure(TIMER7_BASE, TIMER_CFG_PERIODIC);
 
-	TimerLoadSet(TIMER7_BASE, TIMER_A, 0);
-	TimerMatchSet(TIMER7_BASE, TIMER_A, 1200000);
+	TimerLoadSet(TIMER7_BASE, TIMER_A, 1200000);
 
-	TimerIntRegister(TIMER7_BASE, TIMER_BOTH, &disk_timerproc);
+	TimerIntRegister(TIMER7_BASE, TIMER_A, &disk_timerproc);
 	TimerIntEnable(TIMER7_BASE, TIMER_TIMA_TIMEOUT);
 	TimerEnable(TIMER7_BASE, TIMER_A);
 }
