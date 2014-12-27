@@ -9,3 +9,4 @@ Debug/*
 *.files
 *.includes
 *.config
+*.orig
