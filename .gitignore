@@ -5,3 +5,9 @@ Debug/*
 /Release
 .launches/homeAutomation.launch
 /html
+*.creator
+*.creator.user
+*.files
+*.includes
+*.config
+*.orig

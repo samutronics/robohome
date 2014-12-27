@@ -1,14 +1,12 @@
-//! =============================================================================
-//! \copyright
-//! \section		API documentation
-//! \subsection
+// =============================================================================
+//! \file
 //! \brief			Task definition interface file
 //! \author         Norbert Toth
 //! \date			03.12.2014.
 //! \details		This file define the interface, and the macros for the
 //!						implementation, that are used for TaaT.
 //! \note			For abbrevation see SDS
-//! =============================================================================
+// =============================================================================
 #ifndef _IMANAGER_H_
 #define _IMANAGER_H_
 
@@ -35,6 +33,7 @@ class IManager {
 		xQueueHandle derived::_THQueue;
 
 #endif //_IMANAGER_H_
-//! =============================================================================
+// =============================================================================
+//! \file
 //! \copyright
-//! ========================= end of file: imanager.h ============================
+// ========================= end of file: imanager.h ============================

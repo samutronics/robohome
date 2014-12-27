@@ -1,7 +1,5 @@
-//! =============================================================================
-//! \copyright
-//! \section		API documentation
-//! \subsection
+// =============================================================================
+//! \file
 //! \brief			This file contains the core settings, that are relating to
 //!					the project, but not to the hardware or the operation system.
 //! \author         Norbert Toth
@@ -19,7 +17,7 @@
 //! \note
 //!	\warning		Change this settings could highly affects the system
 //!						performance and / or memory consuption
-//! =============================================================================
+// =============================================================================
 #ifndef _PROJECTCONFIGURATION_HPP_
 #define _PROJECTCONFIGURATION_HPP_
 
@@ -55,9 +53,11 @@
 // =============================================================================
 #include "gpio.h"
 #include "flash.h"
+#include "timer.h"
 #include "sysctl.h"
 #include "pin_map.h"
 #include "interrupt.h"
+#include "hibernate.h"
 
 // =============================================================================
 // networking related includes
@@ -119,22 +119,20 @@ const u32 IPGatheringStrategie = IPADDR_USE_DHCP;
 }  // configuration
 }  // inboundTask
 
-}  // manager
-
-namespace communication {
-
-namespace ipc {
+namespace rtcTask {
 
 namespace configuration {
 
-const u32 ipcQueueCount = 12;
+const u32 rtcQueueLength = 1;
+const u32 rtcQueueWidth = sizeof(u32);
 
 }  // configuration
-}  // ipc
+}  // inboundTask
 
-}  // communication
+}  // manager
 
 #endif // _PROJECTCONFIGURATION_HPP_
-//! =============================================================================
+// =============================================================================
+//! \file
 //! \copyright
-//! ================= end of file: projectconfiguration.hpp =====================
+// ================= end of file: projectconfiguration.hpp =====================

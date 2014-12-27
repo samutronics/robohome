@@ -2,32 +2,32 @@
 //! \file
 //! \brief
 //! \author         Norbert Toth
-//! \date			03.12.2014.
+//! \date			15.12.2014.
 //! \note
 // =============================================================================
-#ifndef _LED_MANAGER_H_
-#define _LED_MANAGER_H_
+#ifndef _RTCMANAGER_H_
+#define _RTCMANAGER_H_
 
 #include "imanager.hpp"
 #include "../projectconfiguration.hpp"
 
 namespace manager {
+namespace rtcTask {
 
-namespace inboundTask {
-
-class inputManager: public IManager {
-private: inputManager();
+class rtcManager: public IManager {
+private: rtcManager();
 private: virtual void task(void *pvParameters);
-TO_BE_RUNABLE(inputManager)
+private: static void delegateProcessSNTPTime(u32 time);
+TO_BE_RUNABLE(rtcManager)
 DEFINE_TH
 };
 
-}  // inboundTask
+} // rtcTask
 
-}  // manager
+} // manager
 
-#endif //_LED_MANAGER_H_
+#endif // _RTCMANAGER_H_
 // =============================================================================
 //! \file
 //! \copyright
-// ==================== end of file: inputmanager.hpp ==========================
+// ====================== end of file: rtcmanager.hpp ==========================
