@@ -4,3 +4,8 @@ Debug/*
 /Debug
 .launches/homeAutomation.launch
 /html
+*.creator
+*.creator.user
+*.files
+*.includes
+*.config

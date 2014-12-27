@@ -1,9 +1,25 @@
-Abbreviation:
-	IaaT: Interrupt as a Task
-	TaaT: Thread as a Task
-	THBH: Top Halve Bottom Halve interrupt model, where:
-		* top halve: IaaT 
-		* bottom halve: TaaT 
+// =============================================================================
+//! \file
+//! \brief			Documentation page
+//! \author         Norbert Toth
+//! \date			22.12.2014.
+//! \note
+// =============================================================================
+
+//! \page sds SDS
+//! \tableofcontents
+//! \section requirement Requirements
+//!
+//!	\section designconstraints Design constraints
+//! There are several design rules and contrains for developing embedded systems, so we can discuss only about the
+//! most importants.
+//!
+//!
+//!
+
+
+
+
 
 Specification:
 	Healt signal LED
@@ -28,6 +44,7 @@ Specification:
 	Current time is updated via SNTP:
 		* power-up
 		* 1h period --> RTC is setup accordingly (without losing clock ticks e.g. speedup or slowdown)
+		* Hibernate module will provide the RTC functionality in the system.
 	Web interface is located on an SD card with FAT32 FS
 
 Threading model:
@@ -76,22 +93,7 @@ Useful examples:
 	Exosite IoT *TivaWare*\examples\boards\ek-tm4c1294xl\qs_iot
 	Flashing over Ethernet (Warning this is for c129x board) *TivaWare*\examples\boards\dk-tm4c129x\boot_demo_emac_flash
 
-Documentation:
-For documentation, the project use the following doxy-style footers and headers:
-//! =============================================================================
+// =============================================================================
+//! \file
 //! \copyright
-//! \section
-//! \subsection
-//! \brief
-//! \author         Norbert Toth
-//! \date
-//! \details
-//! \note
-//! =============================================================================
-
-//! =============================================================================
-//! \copyright
-//! ================== end of file:  =======================
-
-Furthermore, create function and property description for each declaration is a MUST!!!
-Put into separate blocks each logical units of function and macro declaration is highly recommended.
+// ========================= end of file: SDS.hpp ==============================

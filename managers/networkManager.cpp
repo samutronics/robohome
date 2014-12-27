@@ -1,16 +1,14 @@
-//! =============================================================================
-//! \copyright
-//! \section
-//! \subsection
+// =============================================================================
+//! \file
 //! \brief
 //! \author         Norbert Toth
 //! \date			03.12.2014.
-//! \details
 //! \note
-//! =============================================================================
+// =============================================================================
 
-#include "networkManager.hpp"
+#include "sntp.h"
 #include "httpd.h"
+#include "networkManager.hpp"
 
 using namespace manager::networkTask;
 using namespace manager::networkTask::configuration;
@@ -53,6 +51,7 @@ void networkManager::handlerTH() {
 
 }
 
-//! =============================================================================
+// =============================================================================
+//! \file
 //! \copyright
-//! =================== end of file: netwoorkmanager.cpp ========================
+// =================== end of file: netwoorkmanager.cpp ========================
