@@ -158,7 +158,7 @@ BYTE wait_ready (void)
     BYTE res;
 
 
-    Timer2 = 100;    /* Wait for ready in timeout of 500ms */
+    Timer2 = 100;    /* Wait for ready in timeout of 1000ms */
     rcvr_spi();
     do
         res = rcvr_spi();
@@ -470,8 +470,6 @@ DSTATUS disk_initialize (
 {
     BYTE n, ty, ocr[4];
 
-//    intializeFSTimer();
-
     if (drv) return STA_NOINIT;            /* Supports only single drive */
     if (Stat & STA_NODISK) return Stat;    /* No card in the socket */
 
@@ -518,8 +516,6 @@ DSTATUS disk_initialize (
     } else {            /* Initialization failed */
         power_off();
     }
-
-//    intializeFSTimer();
 
     return Stat;
 }
