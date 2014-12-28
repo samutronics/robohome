@@ -23,15 +23,15 @@
 //*****************************************************************************
 #include <stdint.h>
 #include <stdbool.h>
-#include "inc/hw_memmap.h"
-#include "inc/hw_types.h"
-#include "driverlib/flash.h"
-#include "driverlib/gpio.h"
-#include "driverlib/interrupt.h"
-#include "driverlib/sysctl.h"
-#include "utils/lwiplib.h"
-#include "lwip/dns.h"
-#include "driverlib/systick.h"
+
+#include "hw_memmap.h"
+#include "hw_types.h"
+#include "flash.h"
+#include "gpio.h"
+#include "interrupt.h"
+#include "sysctl.h"
+#include "lwiplib.h"
+#include "systick.h"
 #include "lwip/dns.h"
 #include "eth_client.h"
 #include "json.h"
@@ -116,7 +116,7 @@ g_sEnet;
 //*****************************************************************************
 #define MAX_REQUEST             256
 
-extern uint32_t g_ui32SysClock;
+static const uint32_t g_ui32SysClock = 120000000;
 
 //*****************************************************************************
 //
@@ -944,7 +944,7 @@ EthClientTick(uint32_t ui32TickMS)
 
     if(HWREGBITW(&g_sEnet.ui32Flags, FLAG_TIMER_DHCP_EN))
     {
-        lwIPTimer(ui32TickMS);
+//        lwIPTimer(ui32TickMS);
     }
 
     if(HWREGBITW(&g_sEnet.ui32Flags, FLAG_TIMER_DNS_EN))

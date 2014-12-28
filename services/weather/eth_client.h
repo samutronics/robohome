@@ -24,6 +24,8 @@
 #ifndef ETH_CLIENT_H_
 #define ETH_CLIENT_H_
 
+#include <stdint.h>
+
 //*****************************************************************************
 //
 // If building with a C++ compiler, make all of the definitions in this header
