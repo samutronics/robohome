@@ -54,11 +54,6 @@
 struct
 {
     //
-    // Array to hold the MAC addresses.
-    //
-    uint8_t pui8MACAddr[8];
-
-    //
     // Global define of the TCP structure used.
     //
     struct tcp_pcb *psTCP;
@@ -648,82 +643,6 @@ EthClientSend(char *pcRequest, uint32_t ui32Size)
 
 //*****************************************************************************
 //
-// DHCP connect
-//
-// This function obtains the MAC address from the User registers, starts the
-// DHCP timer and blocks until an IP address is obtained.
-//
-// \return None.
-//
-//*****************************************************************************
-err_t
-EthClientDHCPConnect(void)
-{
-	//
-	// If DHCP has already been started, we need to clear the IPs and
-	// switch to static.  This forces the LWIP to get new IP address
-	// and retry the DHCP connection.
-	//
-	lwIPNetworkConfigChange(0, 0, 0, IPADDR_USE_STATIC);
-
-	//
-	// Restart the DHCP connection.
-	//
-	lwIPNetworkConfigChange(0, 0, 0, IPADDR_USE_DHCP);
-
-	return ERR_OK;
-}
-
-//*****************************************************************************
-//
-// Handler function when the DNS server gets a response or times out.
-//
-// \param pcName is DNS server name.
-//
-// This function is called when the DNS server resolves an IP or times out.
-// If the DNS server returns an IP structure that is not NULL, add the IP to
-// to the g_sEnet.sServerIP IP structure.
-//
-// \return None.
-//
-//*****************************************************************************
-int32_t
-EthClientDNSResolve(const char *pcName)
-{
-    err_t iRet;
-
-    //
-    // Resolve host name.
-    //
-    iRet = dns_gethostbyname(pcName, &g_sEnet.sServerIP, DNSServerFound, 0);
-
-    //
-    // Return host name not found.
-    //
-    return(iRet);
-}
-
-//*****************************************************************************
-//
-// Returns the IP address for this interface.
-//
-// This function will read and return the currently assigned IP address for
-// the Tiva Ethernet interface.
-//
-// \return Returns the assigned IP address for this interface.
-//
-//*****************************************************************************
-uint32_t
-EthClientAddrGet(void)
-{
-    //
-    // Return IP.
-    //
-    return(lwIPLocalIPAddrGet());
-}
-
-//*****************************************************************************
-//
 // Returns the weather server IP address for this interface.
 //
 // This function will read and return the weather server IP address that is
@@ -740,30 +659,6 @@ EthClientServerAddrGet(void)
     // Return IP.
     //
     return((uint32_t)g_sEnet.sServerIP.addr);
-}
-
-//*****************************************************************************
-//
-// Returns the MAC address for the Tiva Ethernet controller.
-//
-// \param pui8MACAddr is the 6 byte MAC address assigned to the Ethernet
-// controller.
-//
-// This function will read and return the MAC address for the Ethernet
-// controller.
-//
-// \return Returns the weather server IP address for this interface.
-//
-//*****************************************************************************
-void
-EthClientMACAddrGet(uint8_t *pui8MACAddr)
-{
-    int32_t iIdx;
-
-    for(iIdx = 0; iIdx < 6; iIdx++)
-    {
-        pui8MACAddr[iIdx] = g_sEnet.pui8MACAddr[iIdx];
-    }
 }
 
 //*****************************************************************************
@@ -794,38 +689,6 @@ EthClientProxySet(const char *pcProxyName)
     // Reset the connection on any change to the proxy.
     //
     EthClientReset();
-}
-
-//*****************************************************************************
-//
-// Initialize the Ethernet client
-//
-// This function initializes all the Ethernet components to not configured.
-// This tells the SysTick interrupt which timer modules to call.
-//
-// \return None.
-//
-//*****************************************************************************
-void
-EthClientInit()
-{
-    uint32_t ui32User0, ui32User1;
-
-    g_sEnet.eState = iEthNoConnection;
-
-    //
-    // Convert the 24/24 split MAC address from NV ram into a 32/16 split MAC
-    // address needed to program the hardware registers, then program the MAC
-    // address into the Ethernet Controller registers.
-    //
-    FlashUserGet(&ui32User0, &ui32User1);
-
-    g_sEnet.pui8MACAddr[0] = ((ui32User0 >> 0) & 0xff);
-    g_sEnet.pui8MACAddr[1] = ((ui32User0 >> 8) & 0xff);
-    g_sEnet.pui8MACAddr[2] = ((ui32User0 >> 16) & 0xff);
-    g_sEnet.pui8MACAddr[3] = ((ui32User1 >> 0) & 0xff);
-    g_sEnet.pui8MACAddr[4] = ((ui32User1 >> 8) & 0xff);
-    g_sEnet.pui8MACAddr[5] = ((ui32User1 >> 16) & 0xff);
 }
 
 //*****************************************************************************

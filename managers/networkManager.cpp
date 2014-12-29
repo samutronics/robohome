@@ -40,8 +40,6 @@ networkManager::networkManager() {
     lwIPInit(system::currentSystemClockFrequency, mac, 0, 0, 0, IPGatheringStrategie);
 
     httpd_init();
-
-    EthClientInit();
 }
 
 void networkManager::task(void *pvParameters) {
