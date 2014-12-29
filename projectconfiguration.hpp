@@ -79,6 +79,9 @@ typedef short			s16;
 typedef unsigned char	u8;
 typedef char			s8;
 
+typedef unsigned char*	up8;
+typedef char*			sp8;
+
 #define DECLARE_LAST_ENUM(enumName) last_##enumName##_element
 
 // =============================================================================
@@ -117,17 +120,26 @@ namespace configuration {
 const u32 IPGatheringStrategie = IPADDR_USE_DHCP;
 
 }  // configuration
-}  // inboundTask
+}  // networkTask
 
 namespace rtcTask {
-
 namespace configuration {
 
 const u32 rtcQueueLength = 1;
 const u32 rtcQueueWidth = sizeof(u32);
 
 }  // configuration
-}  // inboundTask
+}  // rtcTask
+
+namespace weatherTask {
+namespace configuration {
+
+const char* weatherServerURL = "api.openweathermap.org";
+const u32 weatherServerPort = 80;
+const u32 requestSize = 256;
+
+}  // configuration
+}  // weatherTask
 
 }  // manager
 
