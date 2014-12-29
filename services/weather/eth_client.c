@@ -234,11 +234,6 @@ TCPReceive(void *pvArg, struct tcp_pcb *psPcb, struct pbuf *psBuf, err_t iErr)
 
 	if(g_sEnet.ulRequest == WEATHER_CURRENT)
 	{
-		struct pbuf* buf = NULL;
-		for(buf = psBuf; buf; buf = buf->next) {
-			UARTwrite(buf->payload, buf->len);
-		}
-
 		//
 		// Read items from the buffer.
 		//
