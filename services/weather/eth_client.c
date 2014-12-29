@@ -24,16 +24,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "hw_memmap.h"
-#include "hw_types.h"
-#include "flash.h"
-#include "gpio.h"
-#include "interrupt.h"
-#include "sysctl.h"
-#include "lwiplib.h"
-#include "systick.h"
 #include "lwip/opt.h"
 #include "lwip/dns.h"
+#include "lwiplib.h"
 #include "eth_client.h"
 #include "json.h"
 
