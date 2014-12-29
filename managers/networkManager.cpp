@@ -45,7 +45,7 @@ networkManager::networkManager() {
 void networkManager::task(void *pvParameters) {
     static tWeatherReport sReport;
 
-	WeatherCurrent(iWSrcOpenWeatherMap, "Budapest", &sReport, &networkManager::cbWetherMethod);
+	WeatherCurrent(iWSrcOpenWeatherMap, "Budapest, HU", &sReport, &networkManager::cbWetherMethod);
 
     while(1) {
 		taskYIELD();
