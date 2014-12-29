@@ -25,7 +25,6 @@ private: static tWeatherReport _weatherReport;
 private: static void cbWetherMethod(uint32_t ui32Event, void* pvData, uint32_t ui32Param);
 
 TO_BE_RUNABLE(networkManager)
-DEFINE_TH
 };
 
 } // networkTask

@@ -15,8 +15,6 @@ using namespace manager::networkTask::configuration;
 
 tWeatherReport networkManager::_weatherReport;
 
-DECLARE_TH(networkManager)
-
 networkManager::networkManager() {
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
 	GPIOPinConfigure(GPIO_PF0_EN0LED0);
@@ -49,10 +47,6 @@ void networkManager::task(void *pvParameters) {
     while(1) {
 		taskYIELD();
 	}
-}
-
-void networkManager::handlerTH() {
-
 }
 
 void networkManager::cbWetherMethod(uint32_t ui32Event, void* pvData, uint32_t ui32Param) {
