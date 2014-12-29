@@ -134,9 +134,8 @@ typedef void (* tEventFunction)(uint32_t ui32Event, void* pvData,
 // Exported Ethernet function prototypes.
 //
 //*****************************************************************************
-extern void EthClientInit(tEventFunction pfnEvent);
+extern void EthClientInit();
 extern void EthClientProxySet(const char *pcProxyName);
-extern void EthClientTick(uint32_t ui32TickMS);
 extern uint32_t EthClientAddrGet(void);
 extern void EthClientMACAddrGet(uint8_t *pui8Addr);
 extern uint32_t EthClientServerAddrGet(void);

@@ -32,20 +32,10 @@
 #include "sysctl.h"
 #include "lwiplib.h"
 #include "systick.h"
+#include "lwip/opt.h"
 #include "lwip/dns.h"
 #include "eth_client.h"
 #include "json.h"
-
-//*****************************************************************************
-//
-// Flag indexes for g_sEnet.ui32Flags
-//
-//*****************************************************************************
-#define FLAG_TIMER_DHCP_EN      0
-#define FLAG_TIMER_DNS_EN       1
-#define FLAG_TIMER_TCP_EN       2
-#define FLAG_DHCP_STARTED       3
-#define FLAG_DNS_ADDRFOUND      4
 
 //*****************************************************************************
 //
@@ -63,8 +53,6 @@
 //*****************************************************************************
 struct
 {
-    volatile uint32_t ui32Flags;
-
     //
     // Array to hold the MAC addresses.
     //
@@ -74,11 +62,6 @@ struct
     // Global define of the TCP structure used.
     //
     struct tcp_pcb *psTCP;
-
-    //
-    // Global IP structure to hold a copy of the IP address.
-    //
-    struct ip_addr sLocalIP;
 
     //
     // Global IP structure to hold a copy of the DNS resolved address.
@@ -104,8 +87,6 @@ struct
     } eState;
 
     unsigned long ulRequest;
-
-    tEventFunction pfnEvent;
 }
 g_sEnet;
 
@@ -116,23 +97,16 @@ g_sEnet;
 //*****************************************************************************
 #define MAX_REQUEST             256
 
-static const uint32_t g_ui32SysClock = 120000000;
-
 //*****************************************************************************
 //
 // Various strings used to access weather information on the web.
 //
 //*****************************************************************************
-static const char g_cWeatherRequest[] =
-    "GET http://api.openweathermap.org/data/2.5/weather?q=";
-
-static const char g_cWeatherRequestForecast[] =
-    "GET http://api.openweathermap.org/data/2.5/forecast/daily?q=";
+static const char g_cWeatherRequest[] = "GET http://api.openweathermap.org/data/2.5/weather?q=";
+static const char g_cWeatherRequestForecast[] = "GET http://api.openweathermap.org/data/2.5/forecast/daily?q=";
 static const char g_cMode[] = "&mode=json&units=metric";
-
-static char g_cAPPIDOpenWeather[] =
-    "&APIID=afc5370fef1dfec1666a5676346b163b";
-static char g_cHTTP11[] = " HTTP/1.0\r\n\r\n";
+static const char g_cAPPIDOpenWeather[] = "&APIID=afc5370fef1dfec1666a5676346b163b";
+static const char g_cHTTP11[] = " HTTP/1.0\r\n\r\n";
 
 //*****************************************************************************
 //
@@ -177,6 +151,8 @@ struct
 }
 g_sWeather;
 
+static void DNSServerFound(const char *pcName, struct ip_addr *psIPAddr, void *vpArg);
+
 //*****************************************************************************
 //
 // Close an active connection.
@@ -191,14 +167,8 @@ EthClientReset(void)
     g_sEnet.eState = iEthNoConnection;
 
     //
-    // Reset the flags to just enable the lwIP timer.
-    //
-    g_sEnet.ui32Flags = (1 << FLAG_TIMER_DHCP_EN);
-
-    //
     // Reset the addresses.
     //
-    g_sEnet.sLocalIP.addr = 0;
     g_sEnet.sServerIP.addr = 0;
 
     //
@@ -521,11 +491,6 @@ EthClientTCPConnect(uint32_t ui32Port)
 {
     err_t eTCPReturnCode;
 
-    //
-    // Enable the TCP timer function calls.
-    //
-    HWREGBITW(&g_sEnet.ui32Flags, FLAG_TIMER_TCP_EN) = 1;
-
     if(g_sEnet.psTCP)
     {
         //
@@ -539,6 +504,11 @@ EthClientTCPConnect(uint32_t ui32Port)
         // Make sure there is no lingering TCP connection.
         //
         tcp_close(g_sEnet.psTCP);
+    }
+
+    if(0 == g_sEnet.sServerIP.addr || 0xFFFFFFFF == g_sEnet.sServerIP.addr) {
+        dns_gethostbyname("api.openweathermap.org", &g_sEnet.sServerIP, DNSServerFound, 0);
+    	while(0 == g_sEnet.sServerIP.addr || 0xFFFFFFFF == g_sEnet.sServerIP.addr);
     }
 
     //
@@ -626,18 +596,9 @@ DNSServerFound(const char *pcName, struct ip_addr *psIPAddr, void *vpArg)
         // Copy the returned IP address into a global IP address.
         //
         g_sEnet.sServerIP = *psIPAddr;
-
-        //
-        // Tell the main program that a DNS address was found.
-        //
-        HWREGBITW(&g_sEnet.ui32Flags, FLAG_DNS_ADDRFOUND) = 1;
     }
     else
     {
-        //
-        // Disable the DNS timer.
-        //
-        HWREGBITW(&g_sEnet.ui32Flags, FLAG_TIMER_DNS_EN) = 0;
     }
 }
 
@@ -669,8 +630,7 @@ EthClientSend(char *pcRequest, uint32_t ui32Size)
 {
     err_t eError;
 
-    eError = tcp_write(g_sEnet.psTCP, pcRequest, ui32Size,
-                       TCP_WRITE_FLAG_COPY);
+    eError = tcp_write(g_sEnet.psTCP, pcRequest, ui32Size, TCP_WRITE_FLAG_COPY);
 
     //
     //  Write data for sending (but does not send it immediately).
@@ -699,32 +659,19 @@ EthClientSend(char *pcRequest, uint32_t ui32Size)
 err_t
 EthClientDHCPConnect(void)
 {
-    //
-    // Check if the DHCP has already been started.
-    //
-    if(HWREGBITW(&g_sEnet.ui32Flags, FLAG_DHCP_STARTED) == 0)
-    {
-        //
-        // Set the DCHP started flag.
-        //
-        HWREGBITW(&g_sEnet.ui32Flags, FLAG_DHCP_STARTED) = 1;
-    }
-    else
-    {
-        //
-        // If DHCP has already been started, we need to clear the IPs and
-        // switch to static.  This forces the LWIP to get new IP address
-        // and retry the DHCP connection.
-        //
-        lwIPNetworkConfigChange(0, 0, 0, IPADDR_USE_STATIC);
+	//
+	// If DHCP has already been started, we need to clear the IPs and
+	// switch to static.  This forces the LWIP to get new IP address
+	// and retry the DHCP connection.
+	//
+	lwIPNetworkConfigChange(0, 0, 0, IPADDR_USE_STATIC);
 
-        //
-        // Restart the DHCP connection.
-        //
-        lwIPNetworkConfigChange(0, 0, 0, IPADDR_USE_DHCP);
-    }
+	//
+	// Restart the DHCP connection.
+	//
+	lwIPNetworkConfigChange(0, 0, 0, IPADDR_USE_DHCP);
 
-    return ERR_OK;
+	return ERR_OK;
 }
 
 //*****************************************************************************
@@ -745,38 +692,10 @@ EthClientDNSResolve(const char *pcName)
 {
     err_t iRet;
 
-    if(HWREGBITW(&g_sEnet.ui32Flags, FLAG_TIMER_DNS_EN))
-    {
-        return(ERR_INPROGRESS);
-    }
-
-    //
-    // Set DNS config timer to true.
-    //
-    HWREGBITW(&g_sEnet.ui32Flags, FLAG_TIMER_DNS_EN) = 1;
-
-    //
-    // Initialize the host name IP address found flag to false.
-    //
-    HWREGBITW(&g_sEnet.ui32Flags, FLAG_DNS_ADDRFOUND) = 0;
-
     //
     // Resolve host name.
     //
     iRet = dns_gethostbyname(pcName, &g_sEnet.sServerIP, DNSServerFound, 0);
-
-    //
-    // If ERR_OK is returned, the local DNS table resolved the host name.  If
-    // ERR_INPROGRESS is returned, the DNS request has been queued and will be
-    // sent to the DNS server.
-    //
-    if(iRet == ERR_OK)
-    {
-        //
-        // Stop calling the DNS timer function.
-        //
-        HWREGBITW(&g_sEnet.ui32Flags, FLAG_TIMER_DNS_EN) = 0;
-    }
 
     //
     // Return host name not found.
@@ -888,21 +807,11 @@ EthClientProxySet(const char *pcProxyName)
 //
 //*****************************************************************************
 void
-EthClientInit(tEventFunction pfnEvent)
+EthClientInit()
 {
     uint32_t ui32User0, ui32User1;
 
-    //
-    // Initialize all the Ethernet components to not configured.  This tells
-    // the SysTick interrupt which timer modules to call.
-    //
-    HWREGBITW(&g_sEnet.ui32Flags, FLAG_TIMER_DHCP_EN) = 0;
-    HWREGBITW(&g_sEnet.ui32Flags, FLAG_TIMER_DNS_EN) = 0;
-    HWREGBITW(&g_sEnet.ui32Flags, FLAG_TIMER_TCP_EN) = 0;
-
     g_sEnet.eState = iEthNoConnection;
-
-    g_sEnet.pfnEvent = pfnEvent;
 
     //
     // Convert the 24/24 split MAC address from NV ram into a 32/16 split MAC
@@ -917,181 +826,6 @@ EthClientInit(tEventFunction pfnEvent)
     g_sEnet.pui8MACAddr[3] = ((ui32User1 >> 0) & 0xff);
     g_sEnet.pui8MACAddr[4] = ((ui32User1 >> 8) & 0xff);
     g_sEnet.pui8MACAddr[5] = ((ui32User1 >> 16) & 0xff);
-
-    lwIPInit(g_ui32SysClock, g_sEnet.pui8MACAddr, 0, 0, 0, IPADDR_USE_DHCP);
-
-    //
-    // Start lwIP tick interrupt.
-    //
-    HWREGBITW(&g_sEnet.ui32Flags, FLAG_TIMER_DHCP_EN) = 1;
-}
-
-//*****************************************************************************
-//
-// Periodic Tick for the Ethernet client
-//
-// This function is the needed periodic tick for the Ethernet client. It needs
-// to be called periodically through the use of a timer or systick.
-//
-// \return None.
-//
-//*****************************************************************************
-void
-EthClientTick(uint32_t ui32TickMS)
-{
-    uint32_t ui32IPAddr;
-    int32_t i32Ret;
-
-    if(HWREGBITW(&g_sEnet.ui32Flags, FLAG_TIMER_DHCP_EN))
-    {
-//        lwIPTimer(ui32TickMS);
-    }
-
-    if(HWREGBITW(&g_sEnet.ui32Flags, FLAG_TIMER_DNS_EN))
-    {
-        dns_tmr();
-    }
-
-    if(HWREGBITW(&g_sEnet.ui32Flags, FLAG_TIMER_TCP_EN))
-    {
-        tcp_tmr();
-    }
-
-    //
-    // Check for loss of link.
-    //
-    if((g_sEnet.eState != iEthNoConnection) &&
-       (lwIPLocalIPAddrGet() == 0xffffffff))
-    {
-        //
-        // Reset the connection due to a loss of link.
-        //
-        EthClientReset();
-
-        //
-        // Signal a disconnect event.
-        //
-        g_sEnet.pfnEvent(ETH_EVENT_DISCONNECT, 0, 0);
-    }
-    else if(g_sEnet.eState == iEthNoConnection)
-    {
-        //
-        // Once link is detected start DHCP.
-        //
-        if(lwIPLocalIPAddrGet() != 0xffffffff)
-        {
-            EthClientDHCPConnect();
-
-            g_sEnet.eState = iEthDHCPWait;
-        }
-    }
-    else if(g_sEnet.eState == iEthDHCPWait)
-    {
-        //
-        // Get IP address.
-        //
-        ui32IPAddr = lwIPLocalIPAddrGet();
-
-        //
-        // If IP Address has not yet been assigned, update the display
-        // accordingly.
-        //
-        if((ui32IPAddr != 0xffffffff) && (ui32IPAddr != 0))
-        {
-            //
-            // Update the DHCP IP address.
-            //
-            g_sEnet.sLocalIP.addr = ui32IPAddr;
-
-            g_sEnet.eState = iEthDHCPComplete;
-
-            //
-            // Stop DHCP timer since an address has been provided.
-            //
-            HWREGBITW(&g_sEnet.ui32Flags, FLAG_DHCP_STARTED) = 0;
-        }
-    }
-    else if(g_sEnet.eState == iEthDHCPComplete)
-    {
-        if(g_sEnet.pcProxyName == 0)
-        {
-            //
-            // Resolve the host by name.
-            //
-            i32Ret = EthClientDNSResolve("api.openweathermap.org");
-        }
-        else
-        {
-            //
-            // Resolve the proxy by name.
-            //
-            i32Ret = EthClientDNSResolve(g_sEnet.pcProxyName);
-        }
-
-        if(i32Ret == ERR_OK)
-        {
-            //
-            // If the address was already returned then go to idle.
-            //
-            g_sEnet.eState = iEthIdle;
-
-            //
-            // Notify the main routine of the new Ethernet connection.
-            //
-            g_sEnet.pfnEvent(ETH_EVENT_CONNECT, &g_sEnet.sLocalIP.addr, 4);
-        }
-        else if(i32Ret == ERR_INPROGRESS)
-        {
-            //
-            // If the request is pending the go to the iEthDNSWait state.
-            //
-            g_sEnet.eState = iEthDNSWait;
-        }
-    }
-    else if(g_sEnet.eState == iEthDNSWait)
-    {
-        //
-        // Check if the host name was resolved.
-        //
-        if(HWREGBITW(&g_sEnet.ui32Flags, FLAG_DNS_ADDRFOUND))
-        {
-            //
-            // Stop calling the DNS timer function.
-            //
-            HWREGBITW(&g_sEnet.ui32Flags, FLAG_TIMER_DNS_EN) = 0;
-
-            g_sEnet.eState = iEthIdle;
-
-            //
-            // Notify the main routine of the new Ethernet connection.
-            //
-            g_sEnet.pfnEvent(ETH_EVENT_CONNECT, &g_sEnet.sLocalIP.addr, 4);
-        }
-    }
-    else if(g_sEnet.eState == iEthTCPConnectWait)
-    {
-    }
-    else if(g_sEnet.eState == iEthTCPConnectComplete)
-    {
-        err_t eError;
-
-        g_sEnet.eState = iEthTCPOpen;
-
-        eError = EthClientSend(g_sWeather.pcRequest,
-                               g_sWeather.ui32RequestSize);
-
-        if(eError == ERR_OK)
-        {
-            //
-            // Waiting on a query response.
-            //
-            g_sEnet.eState = iEthQueryWait;
-        }
-        else
-        {
-            g_sEnet.eState = iEthIdle;
-        }
-    }
 }
 
 //*****************************************************************************
@@ -1304,6 +1038,10 @@ WeatherCurrent(tWeatherSource eWeatherSource, const char *pcQuery,
     {
         return(-1);
     }
+
+    while(g_sEnet.psTCP->state != ESTABLISHED);
+
+    EthClientSend(g_sWeather.pcRequest, g_sWeather.ui32RequestSize);
 
     return(0);
 }

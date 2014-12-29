@@ -18,6 +18,9 @@ namespace networkTask {
 class networkManager: public IManager {
 private: networkManager();
 private: virtual void task(void *pvParameters);
+
+private: static void cbWetherMethod(uint32_t ui32Event, void* pvData, uint32_t ui32Param);
+
 TO_BE_RUNABLE(networkManager)
 DEFINE_TH
 };

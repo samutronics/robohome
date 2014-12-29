@@ -8,6 +8,7 @@
 
 #include "sntp.h"
 #include "httpd.h"
+#include "eth_client.h"
 #include "networkManager.hpp"
 
 using namespace manager::networkTask;
@@ -39,10 +40,16 @@ networkManager::networkManager() {
     lwIPInit(system::currentSystemClockFrequency, mac, 0, 0, 0, IPGatheringStrategie);
 
     httpd_init();
+
+    EthClientInit();
 }
 
 void networkManager::task(void *pvParameters) {
-	while(1) {
+    static tWeatherReport sReport;
+
+	WeatherCurrent(iWSrcOpenWeatherMap, "Budapest", &sReport, &networkManager::cbWetherMethod);
+
+    while(1) {
 		taskYIELD();
 	}
 }
@@ -50,6 +57,11 @@ void networkManager::task(void *pvParameters) {
 void networkManager::handlerTH() {
 
 }
+
+void networkManager::cbWetherMethod(uint32_t ui32Event, void* pvData, uint32_t ui32Param) {
+
+}
+
 
 // =============================================================================
 //! \file
