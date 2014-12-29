@@ -68,19 +68,6 @@ struct
     //
     const char *pcProxyName;
 
-    volatile enum
-    {
-        iEthNoConnection,
-        iEthDHCPWait,
-        iEthDHCPComplete,
-        iEthDNSWait,
-        iEthTCPConnectWait,
-        iEthTCPConnectComplete,
-        iEthQueryWait,
-        iEthTCPOpen,
-        iEthIdle
-    } eState;
-
     unsigned long ulRequest;
 }
 g_sEnet;
@@ -157,11 +144,6 @@ void
 EthClientReset(void)
 {
     //
-    // No longer have a link.
-    //
-    g_sEnet.eState = iEthNoConnection;
-
-    //
     // Reset the addresses.
     //
     g_sEnet.sServerIP.addr = 0;
@@ -223,159 +205,137 @@ TCPError(void *vPArg, err_t iErr)
 static err_t
 TCPReceive(void *pvArg, struct tcp_pcb *psPcb, struct pbuf *psBuf, err_t iErr)
 {
-    struct pbuf *psBufCur;
-    int32_t i32Items;
+	struct pbuf *psBufCur;
+	int32_t i32Items;
 
-    if(psBuf == 0)
-    {
-        //
-        // Tell the application that the connection was closed.
-        //
-        if(g_sWeather.pfnEvent)
-        {
-            g_sWeather.pfnEvent(ETH_EVENT_CLOSE, 0, 0);
-            g_sWeather.pfnEvent = 0;
-        }
+	if(psBuf == 0)
+	{
+		//
+		// Tell the application that the connection was closed.
+		//
+		if(g_sWeather.pfnEvent)
+		{
+			g_sWeather.pfnEvent(ETH_EVENT_CLOSE, 0, 0);
+			g_sWeather.pfnEvent = 0;
+		}
 
-        //
-        // Close out the port.
-        //
-        tcp_close(psPcb);
+		//
+		// Close out the port.
+		//
+		tcp_close(psPcb);
 
-        if(psPcb == g_sEnet.psTCP)
-        {
-            g_sEnet.psTCP = 0;
-        }
+		if(psPcb == g_sEnet.psTCP)
+		{
+			g_sEnet.psTCP = 0;
+		}
 
-        g_sEnet.eState = iEthIdle;
+		return(ERR_OK);
+	}
 
-        return(ERR_OK);
-    }
+	if(g_sEnet.ulRequest == WEATHER_CURRENT)
+	{
+		struct pbuf* buf = NULL;
+		for(buf = psBuf; buf; buf = buf->next) {
+			UARTwrite(buf->payload, buf->len);
+		}
 
-    if(g_sEnet.eState == iEthQueryWait)
-    {
-        if(g_sEnet.ulRequest == WEATHER_CURRENT)
-        {
-            //
-            // Read items from the buffer.
-            //
-            i32Items = JSONParseCurrent(0, g_sWeather.psWeatherReport, psBuf);
+		//
+		// Read items from the buffer.
+		//
+		i32Items = JSONParseCurrent(0, g_sWeather.psWeatherReport, psBuf);
 
-            //
-            // Make sure some items were found.
-            //
-            if(i32Items > 0)
-            {
-                if(g_sWeather.pfnEvent)
-                {
-                    g_sWeather.pfnEvent(ETH_EVENT_RECEIVE,
-                                        (void *)g_sWeather.psWeatherReport, 0);
+		//
+		// Make sure some items were found.
+		//
+		if(i32Items > 0)
+		{
+			if(g_sWeather.pfnEvent)
+			{
+				g_sWeather.pfnEvent(ETH_EVENT_RECEIVE,
+						(void *)g_sWeather.psWeatherReport, 0);
 
-                    //
-                    // Clear the event function and return to the idle state.
-                    //
-                    g_sEnet.eState = iEthIdle;
-                }
-            }
-            else if(i32Items < 0)
-            {
-                if(g_sWeather.pfnEvent)
-                {
-                    //
-                    // This was not a valid request.
-                    //
-                    g_sWeather.pfnEvent(ETH_EVENT_INVALID_REQ, 0, 0);
+			}
+		}
+		else if(i32Items < 0)
+		{
+			if(g_sWeather.pfnEvent)
+			{
+				//
+				// This was not a valid request.
+				//
+				g_sWeather.pfnEvent(ETH_EVENT_INVALID_REQ, 0, 0);
 
-                    //
-                    // Clear the event function and return to the idle state.
-                    //
-                    g_sEnet.eState = iEthIdle;
-                }
-            }
-        }
-        else if(g_sEnet.ulRequest == WEATHER_FORECAST)
-        {
-            //
-            // Read items from the buffer.
-            //
-            i32Items = JSONParseForecast(0, g_sWeather.psWeatherReport, psBuf);
+				//
+				// Clear the event function and return to the idle state.
+				//
+			}
+		}
+	}
+	else if(g_sEnet.ulRequest == WEATHER_FORECAST)
+	{
+		//
+		// Read items from the buffer.
+		//
+		i32Items = JSONParseForecast(0, g_sWeather.psWeatherReport, psBuf);
 
-            if(i32Items > 0)
-            {
-                if(g_sWeather.pfnEvent)
-                {
-                    g_sWeather.pfnEvent(ETH_EVENT_RECEIVE,
-                                        (void *)g_sWeather.psWeatherReport, 0);
+		if(i32Items > 0)
+		{
+			if(g_sWeather.pfnEvent)
+			{
+				g_sWeather.pfnEvent(ETH_EVENT_RECEIVE,
+						(void *)g_sWeather.psWeatherReport, 0);
+			}
+		}
+		else if(i32Items < 0)
+		{
+			if(g_sWeather.pfnEvent)
+			{
+				//
+				// This was not a valid request.
+				//
+				g_sWeather.pfnEvent(ETH_EVENT_INVALID_REQ, 0, 0);
+			}
+		}
+	}
 
-                    //
-                    // Clear the event function and return to the idle state.
-                    //
-                    g_sEnet.eState = iEthIdle;
-                }
-            }
-            else if(i32Items < 0)
-            {
-                if(g_sWeather.pfnEvent)
-                {
-                    //
-                    // This was not a valid request.
-                    //
-                    g_sWeather.pfnEvent(ETH_EVENT_INVALID_REQ, 0, 0);
+	//
+	// Initialize the linked list pointer to parse.
+	//
+	psBufCur = psBuf;
 
-                    //
-                    // Clear the event function and return to the idle state.
-                    //
-                    g_sEnet.eState = iEthIdle;
-                }
-            }
-        }
-    }
-    else
-    {
-        //
-        // Go to idle state.
-        //
-        g_sEnet.eState = iEthIdle;
-    }
+	//
+	// Free the buffers used since they have been processed.
+	//
+	while(psBufCur->len != 0)
+	{
+		//
+		// Indicate that you have received and processed this set of TCP data.
+		//
+		tcp_recved(psPcb, psBufCur->len);
 
-    //
-    // Initialize the linked list pointer to parse.
-    //
-    psBufCur = psBuf;
+		//
+		// Go to the next buffer.
+		//
+		psBufCur = psBufCur->next;
 
-    //
-    // Free the buffers used since they have been processed.
-    //
-    while(psBufCur->len != 0)
-    {
-        //
-        // Indicate that you have received and processed this set of TCP data.
-        //
-        tcp_recved(psPcb, psBufCur->len);
+		//
+		// Terminate if there are no more buffers.
+		//
+		if(psBufCur == 0)
+		{
+			break;
+		}
+	}
 
-        //
-        // Go to the next buffer.
-        //
-        psBufCur = psBufCur->next;
+	//
+	// Free the memory space allocated for this receive.
+	//
+	pbuf_free(psBuf);
 
-        //
-        // Terminate if there are no more buffers.
-        //
-        if(psBufCur == 0)
-        {
-            break;
-        }
-    }
-
-    //
-    // Free the memory space allocated for this receive.
-    //
-    pbuf_free(psBuf);
-
-    //
-    // Return.
-    //
-    return(ERR_OK);
+	//
+	// Return.
+	//
+	return(ERR_OK);
 }
 
 //*****************************************************************************
@@ -462,11 +422,6 @@ TCPConnected(void *pvArg, struct tcp_pcb *psPcb, err_t iErr)
     tcp_sent(psPcb, TCPSent);
 
     //
-    // Connection is complete.
-    //
-    g_sEnet.eState = iEthTCPConnectComplete;
-
-    //
     // Return a success code.
     //
     return(ERR_OK);
@@ -546,11 +501,6 @@ EthClientTCPConnect(uint32_t ui32Port)
 void
 EthClientTCPDisconnect(void)
 {
-    //
-    // No longer have a link.
-    //
-    g_sEnet.eState = iEthNoConnection;
-
     //
     // Deallocate the TCP structure if it was already allocated.
     //
@@ -774,11 +724,6 @@ WeatherForecast(tWeatherSource eWeatherSource, const char *pcQuery,
     g_sWeather.psWeatherReport = psWeatherReport;
 
     //
-    // Connect or reconnect to port 80.
-    //
-    g_sEnet.eState = iEthTCPConnectWait;
-
-    //
     // Copy the base forecast request to the buffer.
     //
     i32Idx = MergeRequest(0, g_cWeatherRequestForecast,
@@ -883,11 +828,6 @@ WeatherCurrent(tWeatherSource eWeatherSource, const char *pcQuery,
     // Save the size of this request.
     //
     g_sWeather.ui32RequestSize = i32Idx;
-
-    //
-    // Connect or reconnect to port 80.
-    //
-    g_sEnet.eState = iEthTCPConnectWait;
 
     //
     // Current weather report request.
