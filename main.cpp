@@ -15,11 +15,13 @@
 #include "inputmanager.hpp"
 #include "outputManager.hpp"
 #include "networkManager.hpp"
+#include "weathermanager.hpp"
 #include "projectconfiguration.hpp"
 
 using namespace manager::rtcTask;
 using namespace manager::inboundTask;
 using namespace manager::networkTask;
+using namespace manager::weatherTask;
 using namespace manager::outboundTask;
 
 //! =============================================================================
@@ -46,6 +48,7 @@ int main(void) {
 	if(pdPASS != xTaskCreate(&outputManager::start,		"TaaT_Output",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
 	if(pdPASS != xTaskCreate(&networkManager::start,	"TaaT_THBH_NP",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
 	if(pdPASS != xTaskCreate(&rtcManager::start,		"TaaT_RTC",			configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
+	if(pdPASS != xTaskCreate(&weatherManager::start,	"TaaT_WEATHER",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
 
 	vTaskStartScheduler();
 	while(1);
