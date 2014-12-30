@@ -176,9 +176,7 @@ err_t weatherManager::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, str
 		}
 		else if(i32Items < 0)
 		{
-			//
-			// This was not a valid request.
-			//
+			UARTprintf("Invalid request arrived");
 		}
 	}
 	else if(_request.type == forecastRequest)
@@ -196,9 +194,7 @@ err_t weatherManager::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, str
 		}
 		else if(i32Items < 0)
 		{
-			//
-			// This was not a valid request.
-			//
+			UARTprintf("Invalid request arrived");
 		}
 	}
 
