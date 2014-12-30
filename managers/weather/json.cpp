@@ -29,7 +29,7 @@
 #include "ustdlib.h"
 #include "lwiplib.h"
 #include "json.hpp"
-#include "images.h"
+#include "images.hpp"
 
 using namespace manager::weatherTask;
 

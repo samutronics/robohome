@@ -39,4 +39,4 @@ extern const uint8_t g_pui8RightImage[];
 extern uint8_t g_pui8TIImagePalette[];
 extern uint8_t g_pui8TIImage[];
 
-#endif
+#endif // __IMAGES_H__
