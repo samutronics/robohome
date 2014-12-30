@@ -25,17 +25,20 @@
 #ifndef __JSON_H__
 #define __JSON_H__
 
-#ifndef JSON_H_
-#define JSON_H_
+#include <stdint.h>
+
+#include "weatherreport.hpp"
 
 #define INVALID_INT             ((int32_t)(0x80000000))
 
-extern int32_t JSONParseCurrent(uint32_t ui32Index,
-                                tWeatherReport *psWeatherReport,
-                                struct pbuf *psBuf);
-extern int32_t JSONParseForecast(uint32_t ui32Index,
-                                 tWeatherReport *psWeatherReport,
-                                 struct pbuf *psBuf);
-#endif
+namespace manager {
+namespace weatherTask {
+
+int32_t JSONParseCurrent(uint32_t ui32Index, report& psWeatherReport, struct pbuf *psBuf);
+int32_t JSONParseForecast(uint32_t ui32Index, report& psWeatherReport, struct pbuf *psBuf);
+
+} // weatherTask
+
+} // manager
 
 #endif

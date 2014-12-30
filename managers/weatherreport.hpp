@@ -8,6 +8,8 @@
 #ifndef _WEATHERREPORT_H_
 #define _WEATHERREPORT_H_
 
+#include "../projectconfiguration.hpp"
+
 namespace manager {
 namespace weatherTask {
 

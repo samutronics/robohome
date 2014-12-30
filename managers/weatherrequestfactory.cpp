@@ -17,43 +17,40 @@ const char weatherRequestFactory::g_cAPPIDOpenWeather[] = "&APIID=afc5370fef1dfe
 const char weatherRequestFactory::g_cHTTP11[] = " HTTP/1.0\r\n\r\n";
 const char weatherRequestFactory::pcCount[] = "&cnt=1";
 
-const weatherRequest& weatherRequestFactory::request(const char* location, bool forecast, u32 days) {
-	static weatherRequest rq;
-	memset(rq.request, 0, sizeof(rq.request));
-	rq.len = 0;
+void weatherRequestFactory::request(weatherRequest& request, const char* location, bool forecast, u32 days) {
+	memset(request.request, 0, sizeof(request.request));
+	request.len = 0;
 
-	if(strstr(location, " ")) {
-		return rq;
-	}
+	if(strstr(location, " ")) {return;}
 
 	if(forecast) {
-		strncpy(rq.request + rq.len, g_cWeatherRequestForecast, sizeof(g_cWeatherRequestForecast));
-		rq.len += sizeof(g_cWeatherRequestForecast);
+		strncpy(request.request + request.len, g_cWeatherRequestForecast, sizeof(g_cWeatherRequestForecast));
+		request.len += sizeof(g_cWeatherRequestForecast);
+		request.type = forecastRequest;
 	}
 	else {
-		strncpy(rq.request + rq.len, g_cWeatherRequest, sizeof(g_cWeatherRequest));
-		rq.len += sizeof(g_cWeatherRequest);
+		strncpy(request.request + request.len, g_cWeatherRequest, sizeof(g_cWeatherRequest));
+		request.len += sizeof(g_cWeatherRequest);
+		request.type = currentRequest;
 	}
 
 	u32 lcoationSize = strlen(location);
-	strncpy(rq.request + rq.len, location, lcoationSize);
-	rq.len += lcoationSize;
+	strncpy(request.request + request.len, location, lcoationSize);
+	request.len += lcoationSize;
 
-	strncpy(rq.request + rq.len, g_cMode, sizeof(g_cMode));
-	rq.len += sizeof(g_cMode);
+	strncpy(request.request + request.len, g_cMode, sizeof(g_cMode));
+	request.len += sizeof(g_cMode);
 
 	if(forecast) {
-		strncpy(rq.request + rq.len, pcCount, sizeof(pcCount));
-		rq.len += sizeof(pcCount);
+		strncpy(request.request + request.len, pcCount, sizeof(pcCount));
+		request.len += sizeof(pcCount);
 	}
 
-	strncpy(rq.request + rq.len, g_cAPPIDOpenWeather, sizeof(g_cAPPIDOpenWeather));
-	rq.len += sizeof(g_cAPPIDOpenWeather);
+	strncpy(request.request + request.len, g_cAPPIDOpenWeather, sizeof(g_cAPPIDOpenWeather));
+	request.len += sizeof(g_cAPPIDOpenWeather);
 
-	strncpy(rq.request + rq.len, g_cHTTP11, sizeof(g_cHTTP11));
-	rq.len += sizeof(g_cHTTP11);
-
-	return rq;
+	strncpy(request.request + request.len, g_cHTTP11, sizeof(g_cHTTP11));
+	request.len += sizeof(g_cHTTP11);
 }
 
 // =============================================================================

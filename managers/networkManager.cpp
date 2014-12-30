@@ -13,8 +13,6 @@
 using namespace manager::networkTask;
 using namespace manager::networkTask::configuration;
 
-tWeatherReport networkManager::_weatherReport;
-
 networkManager::networkManager() {
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
 	GPIOPinConfigure(GPIO_PF0_EN0LED0);
@@ -42,19 +40,10 @@ networkManager::networkManager() {
 }
 
 void networkManager::task(void *pvParameters) {
-	WeatherCurrent(iWSrcOpenWeatherMap, "Budapest, HU", &_weatherReport, &networkManager::cbWetherMethod);
-
     while(1) {
 		taskYIELD();
 	}
 }
-
-void networkManager::cbWetherMethod(uint32_t ui32Event, void* pvData, uint32_t ui32Param) {
-	UARTprintf("Temperature: %i\n", _weatherReport.i32Temp);
-	UARTprintf("Humidity: %i\n", _weatherReport.i32Humidity);
-	UARTprintf("Pressure: %i\n", _weatherReport.i32Pressure);
-}
-
 
 // =============================================================================
 //! \file

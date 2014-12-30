@@ -15,14 +15,21 @@
 namespace manager {
 namespace weatherTask {
 
+enum requestType {
+	currentRequest,
+	forecastRequest
+};
+
 class weatherRequest {
 public: s8 request[configuration::requestSize];
-public: u32 len;
+public: u16 len;
+public: requestType type;
 };
 
 
 class weatherRequestFactory {
-public: static const weatherRequest& request(const char* location, bool forecast, u32 days);
+
+public: static void request(weatherRequest& request, const char* location, bool forecast, u32 days);
 
 private: static const char g_cWeatherRequest[];
 private: static const char g_cWeatherRequestForecast[];

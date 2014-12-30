@@ -28,9 +28,10 @@
 
 #include "ustdlib.h"
 #include "lwiplib.h"
-#include "eth_client.h"
-#include "json.h"
+#include "json.hpp"
 #include "images.h"
+
+using namespace manager::weatherTask;
 
 //****************************************************************************
 //
@@ -108,7 +109,7 @@ GetImage(char *pcIcon, const uint8_t **ppui8Image, const char **ppcDescription)
 {
     static const struct
     {
-        char pcId[2];
+        char pcId[3];
         const uint8_t *pui8Image;
         const char *pcDescription;
     }
@@ -443,8 +444,7 @@ GetFieldValueString(tBufPtr *psBufPtr, char *pcDataDest, uint32_t ui32SizeDest)
 //
 //*****************************************************************************
 int32_t
-JSONParseForecast(uint32_t ui32Index, tWeatherReport *psWeatherReport,
-                  struct pbuf *psBuf)
+JSONParseForecast(uint32_t ui32Index, report& psWeatherReport, struct pbuf *psBuf)
 {
     tBufPtr sBufPtr, sBufList, sBufTemp;
     char pcCode[4];
@@ -514,12 +514,12 @@ JSONParseForecast(uint32_t ui32Index, tWeatherReport *psWeatherReport,
         //
         if(GetField("humidity", &sBufPtr) != 0)
         {
-            psWeatherReport->i32Humidity = GetFieldValueInt(&sBufPtr);
+            psWeatherReport.Humidity = GetFieldValueInt(&sBufPtr);
             i32Items++;
         }
         else
         {
-            psWeatherReport->i32Humidity = INVALID_INT;
+            psWeatherReport.Humidity = INVALID_INT;
         }
 
         //
@@ -532,12 +532,12 @@ JSONParseForecast(uint32_t ui32Index, tWeatherReport *psWeatherReport,
         //
         if(GetField("pressure", &sBufPtr) != 0)
         {
-            psWeatherReport->i32Pressure = GetFieldValueInt(&sBufPtr);
+            psWeatherReport.Pressure = GetFieldValueInt(&sBufPtr);
             i32Items++;
         }
         else
         {
-            psWeatherReport->i32Pressure = INVALID_INT;
+            psWeatherReport.Pressure = INVALID_INT;
         }
 
         //
@@ -552,12 +552,12 @@ JSONParseForecast(uint32_t ui32Index, tWeatherReport *psWeatherReport,
         {
             if(GetField("day", &sBufPtr) != 0)
             {
-                psWeatherReport->i32Temp = GetFieldValueInt(&sBufPtr);
+                psWeatherReport.Temp = GetFieldValueInt(&sBufPtr);
                 i32Items++;
             }
             else
             {
-                psWeatherReport->i32Temp = INVALID_INT;
+                psWeatherReport.Temp = INVALID_INT;
             }
         }
 
@@ -573,12 +573,12 @@ JSONParseForecast(uint32_t ui32Index, tWeatherReport *psWeatherReport,
         {
             if(GetField("min", &sBufPtr) != 0)
             {
-                psWeatherReport->i32TempLow = GetFieldValueInt(&sBufPtr);
+                psWeatherReport.TempLow = GetFieldValueInt(&sBufPtr);
                 i32Items++;
             }
             else
             {
-                psWeatherReport->i32TempLow = INVALID_INT;
+                psWeatherReport.TempLow = INVALID_INT;
             }
         }
 
@@ -594,12 +594,12 @@ JSONParseForecast(uint32_t ui32Index, tWeatherReport *psWeatherReport,
         {
             if(GetField("max", &sBufPtr) != 0)
             {
-                psWeatherReport->i32TempHigh = GetFieldValueInt(&sBufPtr);
+                psWeatherReport.TempHigh = GetFieldValueInt(&sBufPtr);
                 i32Items++;
             }
             else
             {
-                psWeatherReport->i32TempHigh = INVALID_INT;
+                psWeatherReport.TempHigh = INVALID_INT;
             }
         }
         //
@@ -609,12 +609,12 @@ JSONParseForecast(uint32_t ui32Index, tWeatherReport *psWeatherReport,
 
         if(GetField("dt", &sBufPtr) != 0)
         {
-            psWeatherReport->ui32Time = GetFieldValueInt(&sBufPtr);
+            psWeatherReport.Time = GetFieldValueInt(&sBufPtr);
             i32Items++;
         }
         else
         {
-            psWeatherReport->ui32Time = 0;
+            psWeatherReport.Time = 0;
         }
     }
 
@@ -628,8 +628,7 @@ JSONParseForecast(uint32_t ui32Index, tWeatherReport *psWeatherReport,
 //
 //*****************************************************************************
 int32_t
-JSONParseCurrent(uint32_t ui32Index, tWeatherReport *psWeatherReport,
-                 struct pbuf *psBuf)
+JSONParseCurrent(uint32_t ui32Index, report& psWeatherReport, struct pbuf *psBuf)
 {
     tBufPtr sBufPtr, sBufMain, sBufTemp;
     char pcIcon[3];
@@ -696,8 +695,7 @@ JSONParseCurrent(uint32_t ui32Index, tWeatherReport *psWeatherReport,
                 //
                 // Save the image pointer.
                 //
-                GetImage(pcIcon, &psWeatherReport->pui8Image,
-                         &psWeatherReport->pcDescription);
+                GetImage(pcIcon, &psWeatherReport.pui8Image, &psWeatherReport.Description);
 
                 i32Items++;
             }
@@ -706,7 +704,7 @@ JSONParseCurrent(uint32_t ui32Index, tWeatherReport *psWeatherReport,
                 //
                 // No image was found.
                 //
-                psWeatherReport->pui8Image = 0;
+                psWeatherReport.pui8Image = 0;
             }
         }
     }
@@ -731,13 +729,13 @@ JSONParseCurrent(uint32_t ui32Index, tWeatherReport *psWeatherReport,
         //
         if(GetField("sunrise", &sBufPtr) != 0)
         {
-            psWeatherReport->ui32SunRise = GetFieldValueInt(&sBufPtr);
+            psWeatherReport.SunRise = GetFieldValueInt(&sBufPtr);
 
             i32Items++;
         }
         else
         {
-            psWeatherReport->ui32SunRise = 0;
+            psWeatherReport.SunRise = 0;
         }
 
         //
@@ -750,13 +748,13 @@ JSONParseCurrent(uint32_t ui32Index, tWeatherReport *psWeatherReport,
         //
         if(GetField("sunset", &sBufPtr) != 0)
         {
-            psWeatherReport->ui32SunSet = GetFieldValueInt(&sBufPtr);
+            psWeatherReport.SunSet = GetFieldValueInt(&sBufPtr);
 
             i32Items++;
         }
         else
         {
-            psWeatherReport->ui32SunSet = 0;
+            psWeatherReport.SunSet = 0;
         }
     }
 
@@ -770,13 +768,13 @@ JSONParseCurrent(uint32_t ui32Index, tWeatherReport *psWeatherReport,
     //
     if(GetField("dt", &sBufPtr) != 0)
     {
-        psWeatherReport->ui32Time = GetFieldValueInt(&sBufPtr);
+        psWeatherReport.Time = GetFieldValueInt(&sBufPtr);
 
         i32Items++;
     }
     else
     {
-        psWeatherReport->ui32Time = 0;
+        psWeatherReport.Time = 0;
     }
 
     //
@@ -796,12 +794,12 @@ JSONParseCurrent(uint32_t ui32Index, tWeatherReport *psWeatherReport,
 
         if(GetField("humidity", &sBufPtr) != 0)
         {
-            psWeatherReport->i32Humidity = GetFieldValueInt(&sBufPtr);
+            psWeatherReport.Humidity = GetFieldValueInt(&sBufPtr);
             i32Items++;
         }
         else
         {
-            psWeatherReport->i32Humidity = INVALID_INT;
+            psWeatherReport.Humidity = INVALID_INT;
         }
 
         //
@@ -814,12 +812,12 @@ JSONParseCurrent(uint32_t ui32Index, tWeatherReport *psWeatherReport,
         //
         if(GetField("temp", &sBufPtr) != 0)
         {
-            psWeatherReport->i32Temp = GetFieldValueInt(&sBufPtr);
+            psWeatherReport.Temp = GetFieldValueInt(&sBufPtr);
             i32Items++;
         }
         else
         {
-            psWeatherReport->i32Temp = INVALID_INT;
+            psWeatherReport.Temp = INVALID_INT;
         }
 
         //
@@ -832,12 +830,12 @@ JSONParseCurrent(uint32_t ui32Index, tWeatherReport *psWeatherReport,
         //
         if(GetField("pressure", &sBufPtr) != 0)
         {
-            psWeatherReport->i32Pressure = GetFieldValueInt(&sBufPtr);
+            psWeatherReport.Pressure = GetFieldValueInt(&sBufPtr);
             i32Items++;
         }
         else
         {
-            psWeatherReport->i32Pressure = INVALID_INT;
+            psWeatherReport.Pressure = INVALID_INT;
         }
     }
     return(i32Items);
