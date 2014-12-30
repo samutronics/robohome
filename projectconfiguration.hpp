@@ -87,7 +87,7 @@ typedef char*			sp8;
 // =============================================================================
 // Configuration options
 // =============================================================================
-namespace system {
+namespace systemGlobal {
 
 const u32 requestedSystemClockFrequency = 120000000;
 static u32 currentSystemClockFrequency = 0;
@@ -134,7 +134,7 @@ const u32 rtcQueueWidth = sizeof(u32);
 namespace weatherTask {
 namespace configuration {
 
-const char* weatherServerURL = "api.openweathermap.org";
+const char weatherServerURL[] = "api.openweathermap.org";
 const u32 weatherServerPort = 80;
 const u32 requestSize = 256;
 

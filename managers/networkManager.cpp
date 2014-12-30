@@ -34,7 +34,7 @@ networkManager::networkManager() {
     mac[4] = ((usr1 >>  8) & 0xff);
     mac[5] = ((usr1 >> 16) & 0xff);
 
-    lwIPInit(system::currentSystemClockFrequency, mac, 0, 0, 0, IPGatheringStrategie);
+    lwIPInit(systemGlobal::currentSystemClockFrequency, mac, 0, 0, 0, IPGatheringStrategie);
 
     httpd_init();
 }
