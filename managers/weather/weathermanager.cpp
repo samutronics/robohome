@@ -24,23 +24,33 @@ weatherManager::weatherManager() {
 }
 
 void weatherManager::task(void *pvParameters) {
+	// check the server IP address at the first start and resolve the URL
     if(0 == _serverIP.addr || 0xFFFFFFFF == _serverIP.addr) {
-        dns_gethostbyname(weatherServerURL, &_serverIP, resolveHostCallback, 0);
+    	// very stupid solution: wait until the LwIP stack is initialized
+    	// it would be better, that the LwIP initialize can send some signal, like events, or semaphore.
+        while(ERR_ARG == dns_gethostbyname(weatherServerURL, &_serverIP, resolveHostCallback, 0)) {taskYIELD();}
     }
 
+    // waiting for the server address
 	while(0 == _serverIP.addr || 0xFFFFFFFF == _serverIP.addr) {taskYIELD();}
 
+	// create the request.
+	// Please note, that whitespaces aren't allowed in the request
+	weatherRequestFactory::request(_request, "Budapest,HU", false, 0);
+
 	while(1) {
+		// send a connection request to the server
 		connectToServer();
 
+		// wait for the proper connection state.
+		// it seems to be a suitable solution
 		while(ESTABLISHED != _pcb->state) {taskYIELD();}
 
-		weatherRequestFactory::request(_request, "Budapest,HU", false, 0);
-
+		// write the request into the TCP socket.
 		sendRequest();
 
-		// The task gives up its remained time-slice
-		taskYIELD();
+		// block the task until the update time elapses.
+		vTaskDelay(weatherReportUpdateTime);
 	}
 }
 
@@ -160,18 +170,16 @@ err_t weatherManager::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, str
 		//
 		if(i32Items > 0)
 		{
-			// this is the place, where the notification can be reaised.
+			UARTprintf("Temperature: %i\n",	_report.Temp);
+			UARTprintf("Humidity: %i\n",	_report.Humidity);
+			UARTprintf("Pressure: %i\n",	_report.Pressure);
 		}
 		else if(i32Items < 0)
 		{
-				//
-				// This was not a valid request.
-				//
-
-				//
-				// Clear the event function and return to the idle state.
-				//
-			}
+			//
+			// This was not a valid request.
+			//
+		}
 	}
 	else if(_request.type == forecastRequest)
 	{
@@ -182,13 +190,15 @@ err_t weatherManager::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, str
 
 		if(i32Items > 0)
 		{
-			// this is the place, where the notification can be reaised.
+			UARTprintf("Temperature: %i\n",	_report.Temp);
+			UARTprintf("Humidity: %i\n",	_report.Humidity);
+			UARTprintf("Pressure: %i\n",	_report.Pressure);
 		}
 		else if(i32Items < 0)
 		{
-				//
-				// This was not a valid request.
-				//
+			//
+			// This was not a valid request.
+			//
 		}
 	}
 
