@@ -30,7 +30,7 @@
 *
 *****************************************************************************/
 
-#include "drivers/exosite_hal_lwip.h"
+#include "exosite_hal_lwip.h"
 #include "exosite_meta.h"
 
 #include <string.h>
