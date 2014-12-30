@@ -42,6 +42,7 @@ int main(void) {
 	GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
 
 	UARTStdioConfig(0, 115200, systemGlobal::currentSystemClockFrequency);
+    UARTprintf("\033[2J\033[H");
 	UARTprintf("application starts\n");
 
 	if(pdPASS != xTaskCreate(&inputManager::start,		"TaaT_TBHB_Input",	configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
