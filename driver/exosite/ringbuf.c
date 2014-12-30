@@ -24,10 +24,11 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "inc/hw_types.h"
-#include "driverlib/debug.h"
-#include "driverlib/interrupt.h"
-#include "utils/ringbuf.h"
+
+#include "hw_types.h"
+#include "debug.h"
+#include "interrupt.h"
+#include "ringbuf.h"
 
 //*****************************************************************************
 //
