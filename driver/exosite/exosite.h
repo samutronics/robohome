@@ -35,6 +35,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // defines
 enum UUIDInterfaceTypes
 {
@@ -78,5 +82,9 @@ void Exosite_SetCIK(char * pCIK);
 int Exosite_GetCIK(char * pCIK);
 int Exosite_StatusCode(void);
 int Exosite_GetResponse(void);
+
+#ifdef __cplusplus
+}
 #endif
 
+#endif // EXOSITE_H
