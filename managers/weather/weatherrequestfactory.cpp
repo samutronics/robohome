@@ -25,12 +25,12 @@ void weatherRequestFactory::request(weatherRequest& request, const char* locatio
 
 	if(forecast) {
 		strncpy(request.request + request.len, g_cWeatherRequestForecast, sizeof(g_cWeatherRequestForecast));
-		request.len += sizeof(g_cWeatherRequestForecast);
+		request.len += sizeof(g_cWeatherRequestForecast) - 1;
 		request.type = forecastRequest;
 	}
 	else {
 		strncpy(request.request + request.len, g_cWeatherRequest, sizeof(g_cWeatherRequest));
-		request.len += sizeof(g_cWeatherRequest);
+		request.len += sizeof(g_cWeatherRequest) - 1;
 		request.type = currentRequest;
 	}
 
@@ -39,18 +39,18 @@ void weatherRequestFactory::request(weatherRequest& request, const char* locatio
 	request.len += lcoationSize;
 
 	strncpy(request.request + request.len, g_cMode, sizeof(g_cMode));
-	request.len += sizeof(g_cMode);
+	request.len += sizeof(g_cMode) - 1;
 
 	if(forecast) {
 		strncpy(request.request + request.len, pcCount, sizeof(pcCount));
-		request.len += sizeof(pcCount);
+		request.len += sizeof(pcCount) - 1;
 	}
 
 	strncpy(request.request + request.len, g_cAPPIDOpenWeather, sizeof(g_cAPPIDOpenWeather));
-	request.len += sizeof(g_cAPPIDOpenWeather);
+	request.len += sizeof(g_cAPPIDOpenWeather) - 1;
 
 	strncpy(request.request + request.len, g_cHTTP11, sizeof(g_cHTTP11));
-	request.len += sizeof(g_cHTTP11);
+	request.len += sizeof(g_cHTTP11) - 1;
 }
 
 // =============================================================================
