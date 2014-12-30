@@ -12,14 +12,12 @@
 #include "../projectconfiguration.hpp"
 
 namespace manager {
-
 namespace networkTask {
 
 class networkManager: public IManager {
 private: networkManager();
 private: virtual void task(void *pvParameters);
 TO_BE_RUNABLE(networkManager)
-DEFINE_TH
 };
 
 } // networkTask

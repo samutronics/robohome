@@ -13,8 +13,6 @@
 using namespace manager::networkTask;
 using namespace manager::networkTask::configuration;
 
-DECLARE_TH(networkManager)
-
 networkManager::networkManager() {
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
 	GPIOPinConfigure(GPIO_PF0_EN0LED0);
@@ -36,19 +34,15 @@ networkManager::networkManager() {
     mac[4] = ((usr1 >>  8) & 0xff);
     mac[5] = ((usr1 >> 16) & 0xff);
 
-    lwIPInit(system::currentSystemClockFrequency, mac, 0, 0, 0, IPGatheringStrategie);
+    lwIPInit(systemGlobal::currentSystemClockFrequency, mac, 0, 0, 0, IPGatheringStrategie);
 
     httpd_init();
 }
 
 void networkManager::task(void *pvParameters) {
-	while(1) {
+    while(1) {
 		taskYIELD();
 	}
-}
-
-void networkManager::handlerTH() {
-
 }
 
 // =============================================================================

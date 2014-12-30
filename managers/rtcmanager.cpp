@@ -16,7 +16,7 @@ using namespace communication::ipc;
 using namespace manager::rtcTask;
 
 rtcManager::rtcManager() {
-	HibernateEnableExpClk(system::currentSystemClockFrequency);
+	HibernateEnableExpClk(systemGlobal::currentSystemClockFrequency);
 	HibernateCounterMode(HIBERNATE_COUNTER_24HR);
 
 	std::tm t;
@@ -68,4 +68,4 @@ void rtcManager::handlerTH() {
 // =============================================================================
 //! \file
 //! \copyright
-// ===================== end of file: rtcmanager.cpp ========================
+// ======================= end of file: rtcmanager.cpp =========================
