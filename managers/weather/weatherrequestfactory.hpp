@@ -5,8 +5,8 @@
 //! \date			29.12.2014.
 //! \note
 // =============================================================================
-#ifndef _WEATHERREQUESTFACTORY_H_
-#define _WEATHERREQUESTFACTORY_H_
+#ifndef _WEATHERREQUESTFACTORY_HPP_
+#define _WEATHERREQUESTFACTORY_HPP_
 
 #include <string.h>
 
@@ -44,7 +44,7 @@ private: static const char pcCount[];
 
 } // manager
 
-#endif // _WEATHERREQUESTFACTORY_H_
+#endif // _WEATHERREQUESTFACTORY_HPP_
 // =============================================================================
 //! \file
 //! \copyright
