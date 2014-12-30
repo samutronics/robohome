@@ -5,12 +5,14 @@
 //! \date			30.12.2014.
 //! \note
 // =============================================================================
+#include "exosite.h"
 #include "exositemanager.hpp"
 #include "../projectconfiguration.hpp"
 
 using namespace manager::exositeTask;
 
 exositeManager::exositeManager() {
+    Exosite_Init("texasinstruments", "ek-tm4c1294xl", IF_ENET, 0);
 }
 
 void exositeManager::task(void *pvParameters) {
