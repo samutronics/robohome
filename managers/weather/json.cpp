@@ -31,8 +31,6 @@
 #include "json.hpp"
 #include "images.hpp"
 
-using namespace manager::weatherTask;
-
 //****************************************************************************
 //
 // The locally defined lwIP buffer parsing pointer.
@@ -444,7 +442,7 @@ GetFieldValueString(tBufPtr *psBufPtr, char *pcDataDest, uint32_t ui32SizeDest)
 //
 //*****************************************************************************
 int32_t
-JSONParseForecast(uint32_t ui32Index, report& psWeatherReport, struct pbuf *psBuf)
+manager::weatherTask::JSONParseForecast(uint32_t ui32Index, report& psWeatherReport, struct pbuf *psBuf)
 {
     tBufPtr sBufPtr, sBufList, sBufTemp;
     char pcCode[4];
@@ -628,7 +626,7 @@ JSONParseForecast(uint32_t ui32Index, report& psWeatherReport, struct pbuf *psBu
 //
 //*****************************************************************************
 int32_t
-JSONParseCurrent(uint32_t ui32Index, report& psWeatherReport, struct pbuf *psBuf)
+manager::weatherTask::JSONParseCurrent(uint32_t ui32Index, report& psWeatherReport, struct pbuf *psBuf)
 {
     tBufPtr sBufPtr, sBufMain, sBufTemp;
     char pcIcon[3];
