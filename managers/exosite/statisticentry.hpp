@@ -1,14 +1,14 @@
-/*
- * devicestatistic.hpp
- *
- *  Created on: 2014.12.31.
- *      Author: moravas
- */
+// =============================================================================
+//! \file
+//! \brief
+//! \author         Norbert Toth
+//! \date			31.12.2014.
+//! \note
+// =============================================================================
+#ifndef _STATISTICENTRY_HPP_
+#define _STATISTICENTRY_HPP_
 
 #include "../../projectconfiguration.hpp"
-
-#ifndef _DEVICESTATISTIC_HPP_
-#define _DEVICESTATISTIC_HPP_
 
 namespace manager {
 namespace exositeTask {
@@ -42,15 +42,11 @@ public: valueType type;
 public: accessMode access;
 };
 
-class deviceStatistic {
-public: static inline statisticEntry const* current() {return _entries[_index];}
-public: static inline bool next() {return _entries[++_index] != 0? true : false;}
-public: static inline void reset() {_index = -1;}
-private: static s32				_index;
-private: static statisticEntry*	_entries[];
-};
-
 } // exositeTask
 } // namespace manager
 
-#endif // _DEVICESTATISTIC_HPP_
+#endif // _STATISTICENTRY_HPP_
+// =============================================================================
+//! \file
+//! \copyright
+// ==================== end of file: statisticentry.hpp ========================

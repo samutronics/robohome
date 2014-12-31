@@ -1,11 +1,11 @@
-/*
- * devicestatistic.cpp
- *
- *  Created on: 2014.12.31.
- *      Author: moravas
- */
-
-#include <devicestatistic.hpp>
+// =============================================================================
+//! \file
+//! \brief
+//! \author         Norbert Toth
+//! \date			31.12.2014.
+//! \note
+// =============================================================================
+#include "devicestatistic.hpp"
 
 using namespace manager::exositeTask;
 
@@ -18,3 +18,8 @@ statisticEntry*	deviceStatistic::_entries[] = {
 		&led1,
 		0
 };
+
+// =============================================================================
+//! \file
+//! \copyright
+// ==================== end of file: devicestatistic.cpp =======================
