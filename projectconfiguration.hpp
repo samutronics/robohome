@@ -142,6 +142,15 @@ const u32 weatherReportUpdateTime = 1800000; //0.5 h with the current scheduler 
 }  // configuration
 }  // weatherTask
 
+namespace exositeTask {
+namespace configuration {
+
+const char serverURL[] = "m2.exosite.com";
+const u32 serverPort = 80;
+
+}  // configuration
+}  // exositeTask
+
 }  // manager
 
 #endif // _PROJECTCONFIGURATION_HPP_
