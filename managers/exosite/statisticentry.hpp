@@ -88,17 +88,17 @@ inline void statisticEntry::requestFormat(char* requestBuffer) const {
 	switch (type) {
 	case STRING: {
 #pragma warning "synchronization may require";
-		usprintf(requestBuffer, "%s=%s", entryAliasInCloud, value);
+		sprintf(requestBuffer, "%s=%s", entryAliasInCloud, value);
 		break;
 	}
 	case INT: {
 #pragma warning "check the correct alignement in the value string"
-		usprintf(requestBuffer, "%s=%d", entryAliasInCloud, strtol(value, 0, 10));
+		sprintf(requestBuffer, "%s=%d", entryAliasInCloud, strtol(value, 0, 10));
 		break;
 	}
 	case HEX: {
 #pragma warning "check the correct alignement in the value string"
-		usprintf(requestBuffer, "%s=0x%x", entryAliasInCloud, strtol(value, 0, 16));
+		sprintf(requestBuffer, "%s=0x%x", entryAliasInCloud, strtol(value, 0, 16));
 		break;
 	}
 	default: {
