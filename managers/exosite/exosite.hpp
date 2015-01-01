@@ -72,8 +72,7 @@ public: static int init(const char* vendor, const char* model, const unsigned ch
 public: static int activate();
 public: static void setCIK(char* pCIK);
 public: static int getCIK(char* pCIK);
-public: static int statusCode();
-public: static int getResponse();
+public: static inline ExositeStatusCodes statusCode() {return _statusCode;}
 
 private: static int info_assemble(const char* vendor, const char* model, const char* sn);
 private: static inline void update_m2ip() {return;}
@@ -81,7 +80,7 @@ private: static int getHTTPStatus(long socket);
 private: static long connectToExosite();
 private: static void sendLine(long socket, unsigned char LINE, const char* payload);
 
-private: static int status_code;
+private: static ExositeStatusCodes _statusCode;
 private: static int exosite_initialized;
 
 private: static const u8	_vendorNameSize = 20;
