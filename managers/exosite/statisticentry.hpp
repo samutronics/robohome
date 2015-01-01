@@ -31,7 +31,9 @@ class statisticEntry {
 public: static const u32 dataStringLength = 32;
 
 public: inline statisticEntry(const char* name, const char* alias, valueType t, accessMode a):
-		entryName(name), entryAliasInCloud(alias), type(t), access(a) {}
+				entryName(name), entryAliasInCloud(alias), type(t), access(a) {
+	memset(value, 0, dataStringLength);
+}
 
 public: inline void requestFormat(char* requestBuffer) const;
 
@@ -39,11 +41,12 @@ public: inline void setValue(char* requestBuffer);
 public: inline bool getValue(char* requestBuffer) const;
 public: inline bool getValue(s32& requestBuffer) const;
 
-private: const char* entryName;
+public: const char* entryName;
+public: const char* entryAliasInCloud;
+public: accessMode access;
+
 private: s8 value[dataStringLength];
-private: const char* entryAliasInCloud;
 private: valueType type;
-private: accessMode access;
 };
 
 // =============================================================================

@@ -12,6 +12,8 @@ using namespace manager::exositeTask;
 statisticEntry led0("LED D1", "ledd1", INT, READ_WRITE);
 statisticEntry led1("LED D2", "ledd2", INT, READ_WRITE);
 
+const u32		deviceStatistic::deviceStatisticEntryCount = 2;
+
 s32				deviceStatistic::_index = -1;
 statisticEntry*	deviceStatistic::_entries[] = {
 		&led0,
