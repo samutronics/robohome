@@ -217,7 +217,7 @@ int exosite::init(const char* vendor, const char* model, const unsigned char if_
 	char struuid[_serialNumberSize];
 	unsigned char uuid_len = 0;
 
-	exosite_meta_init(reset);          //always initialize Exosite meta structure
+	metaData::init(reset);          //always initialize Exosite meta structure
 	uuid_len = exoHAL_ReadUUID(if_nbr, (unsigned char *)struuid);
 
 	if (0 == uuid_len) {
@@ -233,7 +233,7 @@ int exosite::init(const char* vendor, const char* model, const unsigned char if_
 		return 0;
 	}
 
-	exosite_meta_write((unsigned char *)struuid, uuid_len, META_UUID);
+	metaData::write((unsigned char *)struuid, uuid_len, META_UUID);
 
 	// read UUID into 'sn'
 	info_assemble(vendor, model, struuid);
@@ -365,7 +365,7 @@ void exosite::setCIK(char* pCIK) {
 		_statusCode = EXO_STATUS_INIT;
 		return;
 	}
-	exosite_meta_write((unsigned char *)pCIK, _CIKSize, META_CIK);
+	metaData::write((unsigned char *)pCIK, _CIKSize, META_CIK);
 	_statusCode = EXO_STATUS_OK;
 	return;
 }
@@ -374,7 +374,7 @@ int exosite::getCIK(char* pCIK) {
 	unsigned char i;
 	char tempCIK[_CIKSize + 1];
 
-	exosite_meta_read((unsigned char *)tempCIK, _CIKSize, META_CIK);
+	metaData::read((unsigned char *)tempCIK, _CIKSize, META_CIK);
 	tempCIK[_CIKSize] = 0;
 
 	for (i = 0; i < _CIKSize; i++)
@@ -461,10 +461,10 @@ int exosite::getHTTPStatus(long socket) {
 
 long exosite::connectToExosite() {
 	unsigned char connectRetries = 0;
-	unsigned char server[META_SERVER_SIZE];
+	unsigned char server[serverIPSize];
 	long sock = -1;
 
-	exosite_meta_read(server, META_SERVER_SIZE, META_SERVER);
+	metaData::read(server, serverIPSize, META_SERVER);
 
 	while (connectRetries++ <= _maxConnectRetryCount) {
 
