@@ -5,7 +5,6 @@
 //! \date			30.12.2014.
 //! \note
 // =============================================================================
-#include "exosite.h"
 #include "exositemanager.hpp"
 #include "../projectconfiguration.hpp"
 

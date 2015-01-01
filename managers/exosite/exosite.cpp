@@ -6,9 +6,10 @@
 //! \note
 // =============================================================================
 #include "exosite_hal_lwip.h"
-#include "exosite_meta.h"
 
 #include "exosite.hpp"
+#include "metadata.hpp"
+#include "metadataentry.hpp"
 
 using namespace manager::exositeTask;
 

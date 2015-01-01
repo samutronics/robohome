@@ -5,11 +5,8 @@
 //! \date			01.01.2015.
 //! \note
 // =============================================================================
-#include <stdint.h>
-#include <stdbool.h>
-
-#include "exosite.h"
 #include "request.hpp"
+#include "exosite.hpp"
 #include "devicestatistic.hpp"
 
 using namespace manager::exositeTask;
@@ -52,7 +49,7 @@ bool requestHandler::syncWithExosite() {
     // doesn't respond, return "false", and assume that no data got through.
     //
     if(ustrlen(_writeRequestOutbound)) {
-        if(!Exosite_Write(_writeRequestOutbound, ustrlen(_writeRequestOutbound))) {
+        if(!exosite::write(_writeRequestOutbound, ustrlen(_writeRequestOutbound))) {
             return false;
         }
     }
@@ -62,7 +59,7 @@ bool requestHandler::syncWithExosite() {
     // doesn't respond, return "false", and assume that no data got through.
     //
     if(ustrlen(_readRequestOutbound)) {
-        if(!Exosite_Read(_readRequestOutbound, _response, requestBufferSize)) {
+        if(!exosite::read(_readRequestOutbound, _response, requestBufferSize)) {
             return false;
         }
     }
