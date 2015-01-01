@@ -58,6 +58,7 @@
 #include "flash.h"
 #include "timer.h"
 #include "sysctl.h"
+#include "eeprom.h"
 #include "pin_map.h"
 #include "interrupt.h"
 #include "hibernate.h"
