@@ -113,10 +113,6 @@ typedef void (* tExositeEventHandler)(uint32_t ui32Event, void* pvData1,
                                       uint16_t ui16Size2);
 
 int exoHAL_ReadUUID(unsigned char ucIfNbr, unsigned char * pucUUIDBuf);
-void exoHAL_EnableMeta(void);
-void exoHAL_EraseMeta(void);
-void exoHAL_WriteMetaItem(unsigned char * pucBuffer, int iLength, int iOffset);
-void exoHAL_ReadMetaItem(unsigned char * pucBuffer, int iLength, int iOffset);
 void exoHAL_SocketClose(long ulSocket);
 long exoHAL_SocketOpenTCP(unsigned char *pucServer);
 long exoHAL_ServerConnect(long ulSocket);
