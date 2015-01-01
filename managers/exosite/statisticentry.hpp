@@ -38,6 +38,7 @@ public: inline void requestFormat(char* requestBuffer) const;
 public: inline void setValue(char* requestBuffer);
 public: inline bool getValue(char* requestBuffer) const;
 public: inline bool getValue(s32& requestBuffer) const;
+
 private: const char* entryName;
 private: s8 value[dataStringLength];
 private: const char* entryAliasInCloud;
@@ -100,6 +101,7 @@ inline void statisticEntry::requestFormat(char* requestBuffer) const {
 	default: {
 		while(true);
 	}
+}
 }
 
 } // exositeTask

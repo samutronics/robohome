@@ -18,6 +18,7 @@ class deviceStatistic {
 public: static inline statisticEntry const* current() {return _entries[_index];}
 public: static inline bool next() {return _entries[++_index] != 0? true : false;}
 public: static inline void reset() {_index = -1;}
+
 private: static s32				_index;
 private: static statisticEntry*	_entries[];
 };
