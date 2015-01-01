@@ -94,19 +94,19 @@ private: static const u8	_length = _serialNumberSize + _modelNameSize + _vendorN
 private: static const u8	_receiveSize = 50;
 private: static const u8	_MACLength = 6;
 
-private: static u8			_exositeProvisionInfo[_length];
+private: static s8			_exositeProvisionInfo[_length];
 
-private: static const s8*	_requestPartCIKHeader;
-private: static const s8*	_requestPartContentLength;
-private: static const s8*	_requestPartGetURL;
-private: static const s8*	_requestPartHTTP;
-private: static const s8*	_requestPartHost;
-private: static const s8*	_requestPartAccept;
-private: static const s8*	_requestPartContent;
-private: static const s8*	_requestPartVendor;
-private: static const s8*	_requestPartModel;
-private: static const s8*	_requestPartSerialNumber;
-private: static const s8*	_requestPartCRLF;
+private: static const s8	_requestPartCIKHeader[];
+private: static const s8	_requestPartContentLength[];
+private: static const s8	_requestPartGetURL[];
+private: static const s8	_requestPartHTTP[];
+private: static const s8	_requestPartHost[];
+private: static const s8	_requestPartAccept[];
+private: static const s8	_requestPartContent[];
+private: static const s8	_requestPartVendor[];
+private: static const s8	_requestPartModel[];
+private: static const s8	_requestPartSerialNumber[];
+private: static const s8	_requestPartCRLF[];
 
 private: enum lineTypes {
   CIK_LINE,

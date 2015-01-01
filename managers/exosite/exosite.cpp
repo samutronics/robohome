@@ -33,34 +33,24 @@
 #include "exosite_hal_lwip.h"
 #include "exosite_meta.h"
 
-#include <string.h>
-//#include <apps/apps.h>
-//#include "exosite.h"
-//#include <inc/common.h>
 
-#include "utils/ustdlib.h"
+//#include "utils/ustdlib.h"
 
 #include "exosite.hpp"
 
 using namespace manager::exositeTask;
 
-const char* exosite::_requestPartCIKHeader		= "X-Exosite-CIK: ";
-const char* exosite::_requestPartContentLength	= "Content-Length: ";
-const char* exosite::_requestPartGetURL			= "GET /onep:v1/stack/alias?";
-const char* exosite::_requestPartHTTP			= "  HTTP/1.1\r\n";
-const char* exosite::_requestPartHost			= "Host: m2.exosite.com\r\n";
-const char* exosite::_requestPartAccept			= "Accept: application/x-www-form-urlencoded; charset=utf-8\r\n";
-const char* exosite::_requestPartContent		= "Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n";
-const char* exosite::_requestPartVendor			= "vendor=";
-const char* exosite::_requestPartModel			= "model=";
-const char* exosite::_requestPartSerialNumber	= "sn=";
-const char* exosite::_requestPartCRLF			= "\r\n";
-
-
-
-
-
-
+const s8 exosite::_requestPartCIKHeader[]		= "X-Exosite-CIK: ";
+const s8 exosite::_requestPartContentLength[]	= "Content-Length: ";
+const s8 exosite::_requestPartGetURL[]			= "GET /onep:v1/stack/alias?";
+const s8 exosite::_requestPartHTTP[]			= "  HTTP/1.1\r\n";
+const s8 exosite::_requestPartHost[]			= "Host: m2.exosite.com\r\n";
+const s8 exosite::_requestPartAccept[]			= "Accept: application/x-www-form-urlencoded; charset=utf-8\r\n";
+const s8 exosite::_requestPartContent[]			= "Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n";
+const s8 exosite::_requestPartVendor[]			= "vendor=";
+const s8 exosite::_requestPartModel[]			= "model=";
+const s8 exosite::_requestPartSerialNumber[]	= "sn=";
+const s8 exosite::_requestPartCRLF[]			= "\r\n";
 
 int exosite::write(char* pbuf, unsigned int bufsize) {
 	  int success = 0;
@@ -69,19 +59,18 @@ int exosite::write(char* pbuf, unsigned int bufsize) {
 	  char strBuf[10];
 
 	  if (!exosite_initialized) {
-	    status_code = EXO_STATUS_INIT;
+	    _statusCode = EXO_STATUS_INIT;
 	    return success;
 	  }
 
-	  if (!Exosite_GetCIK(bufCIK))
-	  {
+	  if (!getCIK(bufCIK)) {
 	    return success;
 	  }
 
 
-	  long sock = connect_to_exosite();
+	  long sock = connectToExosite();
 	  if (sock < 0) {
-	    status_code = EXO_STATUS_BAD_TCP;
+	    _statusCode = EXO_STATUS_BAD_TCP;
 	    return 0;
 	  }
 
@@ -94,8 +83,7 @@ int exosite::write(char* pbuf, unsigned int bufsize) {
 	//  s.send('Content-Length: 6\r\n\r\n')
 	//  s.send('temp=2')
 
-	  usprintf((int)bufsize, strBuf, 10); //make a string for length
-	  sprintf(strBuf, "%d", 10);
+	  sprintf(strBuf, "%d", bufsize);
 
 	  sendLine(sock, POSTDATA_LINE, "/onep:v1/stack/alias");
 	  sendLine(sock, HOST_LINE, NULL);
@@ -104,18 +92,16 @@ int exosite::write(char* pbuf, unsigned int bufsize) {
 	  sendLine(sock, LENGTH_LINE, strBuf);
 	  exoHAL_SocketSend(sock, pbuf, bufsize);
 
-	  http_status = get_http_status(sock);
+	  http_status = getHTTPStatus(sock);
 
 	  exoHAL_SocketClose(sock);
 
-	  if (401 == http_status)
-	  {
-	    status_code = EXO_STATUS_NOAUTH;
+	  if (401 == http_status) {
+	    _statusCode = EXO_STATUS_NOAUTH;
 	  }
-	  if (204 == http_status)
-	  {
+	  if (204 == http_status) {
 	    success = 1;
-	    status_code = EXO_STATUS_OK;
+	    _statusCode = EXO_STATUS_OK;
 	  }
 
 	  return success;
@@ -135,19 +121,19 @@ int exosite::read(char* palias, char* pbuf, unsigned int buflen) {
   //char *pcheck;
 
   if (!exosite_initialized) {
-    status_code = EXO_STATUS_INIT;
+    _statusCode = EXO_STATUS_INIT;
     return success;
   }
 
-  if (!Exosite_GetCIK(bufCIK))
+  if (!getCIK(bufCIK))
   {
     return success;
   }
 
 
-  long sock = connect_to_exosite();
+  long sock = connectToExosite();
   if (sock < 0) {
-    status_code = EXO_STATUS_BAD_TCP;
+    _statusCode = EXO_STATUS_BAD_TCP;
     return 0;
   }
 
@@ -169,15 +155,15 @@ int exosite::read(char* palias, char* pbuf, unsigned int buflen) {
   //pcheck = palias;
   vlen = 0;
 
-  http_status = get_http_status(sock);
+  http_status = getHTTPStatus(sock);
   if (200 == http_status)
   {
-    char strBuf[RX_SIZE];
+    char strBuf[_receiveSize];
     unsigned char crlf = 0;
 
     do
     {
-      strLen = exoHAL_SocketRecv(sock, strBuf, RX_SIZE);
+      strLen = exoHAL_SocketRecv(sock, strBuf, _receiveSize);
       len = strLen;
       p = strBuf;
 
@@ -236,47 +222,41 @@ int exosite::read(char* palias, char* pbuf, unsigned int buflen) {
           --len;
         }
       }
-    } while (RX_SIZE == strLen);
+    } while (_receiveSize == strLen);
   }
 
   exoHAL_SocketClose(sock);
 
-  if (200 == http_status)
-  {
-    status_code = EXO_STATUS_OK;
+  if (200 == http_status) {
+    _statusCode = EXO_STATUS_OK;
   }
-  if (204 == http_status)
-  {
-    status_code = EXO_STATUS_OK;
+  if (204 == http_status) {
+    _statusCode = EXO_STATUS_OK;
   }
-  if (401 == http_status)
-  {
-    status_code = EXO_STATUS_NOAUTH;
+  if (401 == http_status) {
+    _statusCode = EXO_STATUS_NOAUTH;
   }
 
   return vlen;
 }
 
 int exosite::init(const char* vendor, const char* model, const unsigned char if_nbr, int reset) {
-	  char struuid[EXOSITE_SN_MAXLENGTH];
+	  char struuid[_serialNumberSize];
 	  unsigned char uuid_len = 0;
 
 	  exosite_meta_init(reset);          //always initialize Exosite meta structure
 	  uuid_len = exoHAL_ReadUUID(if_nbr, (unsigned char *)struuid);
 
-	  if (0 == uuid_len)
-	  {
-	    status_code = EXO_STATUS_BAD_UUID;
+	  if (0 == uuid_len) {
+	    _statusCode = EXO_STATUS_BAD_UUID;
 	    return 0;
 	  }
-	  if (strlen(vendor) > EXOSITE_VENDOR_MAXLENGTH)
-	  {
-	    status_code = EXO_STATUS_BAD_VENDOR;
+	  if (strlen(vendor) > _vendorNameSize) {
+	    _statusCode = EXO_STATUS_BAD_VENDOR;
 	    return 0;
 	  }
-	  if (strlen(model) > EXOSITE_MODEL_MAXLENGTH)
-	  {
-	    status_code = EXO_STATUS_BAD_MODEL;
+	  if (strlen(model) > _modelNameSize) {
+	    _statusCode = EXO_STATUS_BAD_MODEL;
 	    return 0;
 	  }
 
@@ -287,7 +267,7 @@ int exosite::init(const char* vendor, const char* model, const unsigned char if_
 
 	  exosite_initialized = 1;
 
-	  status_code = EXO_STATUS_OK;
+	  _statusCode = EXO_STATUS_OK;
 
 	  return 1;
 }
@@ -302,43 +282,43 @@ int exosite::activate() {
 	  int http_status = 0;
 
 	  if (!exosite_initialized) {
-	    status_code = EXO_STATUS_INIT;
+	    _statusCode = EXO_STATUS_INIT;
 	    return newcik;
 	  }
 	  update_m2ip();        //check our IP api to see if the old IP is advertising a new one
 
-	  long sock = connect_to_exosite();
+	  long sock = connectToExosite();
 	  if (sock < 0) {
-	    status_code = EXO_STATUS_BAD_TCP;
+	    _statusCode = EXO_STATUS_BAD_TCP;
 	    return 0;
 	  }
 
 	  // Get activation Serial Number
-	  length = strlen(exosite_provision_info);
-	  itoa(length, strLen, 10); //make a string for length
+	  length = strlen(_exositeProvisionInfo);
+	  sprintf(strLen, "%d", length);
 
 	  sendLine(sock, POSTDATA_LINE, "/provision/activate");
 	  sendLine(sock, HOST_LINE, NULL);
 	  sendLine(sock, CONTENT_LINE, NULL);
 	  sendLine(sock, LENGTH_LINE, strLen);
 
-	  exoHAL_SocketSend(sock, exosite_provision_info, length);
+	  exoHAL_SocketSend(sock, _exositeProvisionInfo, length);
 
-	  http_status = get_http_status(sock);
+	  http_status = getHTTPStatus(sock);
 
 	  if (200 == http_status)
 	  {
-	    char strBuf[RX_SIZE];
+	    char strBuf[_receiveSize];
 	    unsigned char strLen, len;
 	    unsigned char cik_len_valid = 0;
 	    char *p;
 	    unsigned char crlf = 0;
 	    unsigned char ciklen = 0;
-	    char NCIK[CIK_LENGTH + 1];
+	    char NCIK[_CIKSize + 1];
 
 	    do
 	    {
-	      strLen = exoHAL_SocketRecv(sock, strBuf, RX_SIZE);
+	      strLen = exoHAL_SocketRecv(sock, strBuf, _receiveSize);
 	      len = strLen;
 	      p = strBuf;
 
@@ -367,40 +347,41 @@ int exosite::activate() {
 	      }
 
 	      // The body is the cik
-	      if (0 < len && 4 == crlf && CIK_LENGTH > ciklen)
+	      if (0 < len && 4 == crlf && _CIKSize > ciklen)
 	      {
 	        // TODO, be more robust - match Content-Length header value to CIK_LENGTH
-	        unsigned char need, part;
-	        if (!(cik_len_valid == 1)) // cik length != 40
-	        {
-	          status_code = EXO_STATUS_CONFLICT;
-	          exoHAL_SocketClose(sock);
-	          return newcik;
-	        }
-	        need = CIK_LENGTH - ciklen;
+	    	  unsigned char need, part;
+	    	  if (!(cik_len_valid == 1)) // cik length != 40
+	    	  {
+	    		  _statusCode = EXO_STATUS_CONFLICT;
+	    		  exoHAL_SocketClose(sock);
+	    		  return newcik;
+	    	  }
+	    	  need = _CIKSize - ciklen;
 	        part = need < len ? need : len;
 	        strncpy(NCIK + ciklen, p, part);
 	        ciklen += part;
 	      }
-	    } while (RX_SIZE == strLen);
+	    } while (_receiveSize == strLen);
 
-	    if (CIK_LENGTH == ciklen)
+	    if (_CIKSize == ciklen)
 	    {
 	      NCIK[40] = 0;
-	      Exosite_SetCIK(NCIK);
+	      setCIK(NCIK);
 	      newcik = 1;
 	    }
 	  }
 
 	  exoHAL_SocketClose(sock);
 
-	  if (200 == http_status)
-	    status_code = EXO_STATUS_OK;
-	  if (404 == http_status)
-	    status_code = EXO_STATUS_BAD_SN;
-	  if (409 == http_status || 408 == http_status)
-	  {
-	    status_code = EXO_STATUS_CONFLICT;
+	  if (200 == http_status) {
+		  _statusCode = EXO_STATUS_OK;
+	  }
+	  else if (404 == http_status) {
+		  _statusCode = EXO_STATUS_BAD_SN;
+	  }
+	  else if (409 == http_status || 408 == http_status) {
+		  _statusCode = EXO_STATUS_CONFLICT;
 	  }
 
 	  return newcik;
@@ -408,32 +389,32 @@ int exosite::activate() {
 
 void exosite::setCIK(char* pCIK) {
 	if (!exosite_initialized) {
-		status_code = EXO_STATUS_INIT;
+		_statusCode = EXO_STATUS_INIT;
 		return;
 	}
-	exosite_meta_write((unsigned char *)pCIK, CIK_LENGTH, META_CIK);
-	status_code = EXO_STATUS_OK;
+	exosite_meta_write((unsigned char *)pCIK, _CIKSize, META_CIK);
+	_statusCode = EXO_STATUS_OK;
 	return;
 }
 
 int exosite::getCIK(char* pCIK) {
 	  unsigned char i;
-	  char tempCIK[CIK_LENGTH + 1];
+	  char tempCIK[_CIKSize + 1];
 
-	  exosite_meta_read((unsigned char *)tempCIK, CIK_LENGTH, META_CIK);
-	  tempCIK[CIK_LENGTH] = 0;
+	  exosite_meta_read((unsigned char *)tempCIK, _CIKSize, META_CIK);
+	  tempCIK[_CIKSize] = 0;
 
-	  for (i = 0; i < CIK_LENGTH; i++)
+	  for (i = 0; i < _CIKSize; i++)
 	  {
 	    if (!(tempCIK[i] >= 'a' && tempCIK[i] <= 'f' || tempCIK[i] >= '0' && tempCIK[i] <= '9'))
 	    {
-	      status_code = EXO_STATUS_BAD_CIK;
+	      _statusCode = EXO_STATUS_BAD_CIK;
 	      return 0;
 	    }
 	  }
 
 	  if (NULL != pCIK)
-	    memcpy(pCIK ,tempCIK ,CIK_LENGTH + 1);
+	    memcpy(pCIK, tempCIK, _CIKSize + 1);
 
 	  return 1;
 }
@@ -441,18 +422,18 @@ int exosite::getCIK(char* pCIK) {
 int exosite::info_assemble(const char* vendor, const char* model, const char* sn) {
 	  int info_len = 0;
 	  int assemble_len = 0;
-	  char * vendor_info = exosite_provision_info;
+	  char * vendor_info = _exositeProvisionInfo;
 
 	  // verify the assembly length
-	  assemble_len = strlen(STR_VENDOR) + strlen(vendor)
-	                 + strlen(STR_MODEL) + strlen(model)
-	                 + strlen(STR_SN) + 3;
+	  assemble_len = strlen(_requestPartVendor) + strlen(vendor)
+	                 + strlen(_requestPartModel) + strlen(model)
+	                 + strlen(_requestPartSerialNumber) + 3;
 	  if (assemble_len > 95)
 	    return info_len;
 
 	  // vendor=
-	  memcpy(vendor_info, STR_VENDOR, strlen(STR_VENDOR));
-	  info_len = strlen(STR_VENDOR);
+	  memcpy(vendor_info, _requestPartVendor, strlen(_requestPartVendor));
+	  info_len = strlen(_requestPartVendor);
 
 	  // vendor="custom's vendor"
 	  memcpy(&vendor_info[info_len], vendor, strlen(vendor));
@@ -463,8 +444,8 @@ int exosite::info_assemble(const char* vendor, const char* model, const char* sn
 	  info_len += 1;
 
 	  // vendor="custom's vendor"&model=
-	  memcpy(&vendor_info[info_len], STR_MODEL, strlen(STR_MODEL));
-	  info_len += strlen(STR_MODEL);
+	  memcpy(&vendor_info[info_len], _requestPartModel, strlen(_requestPartModel));
+	  info_len += strlen(_requestPartModel);
 
 	  // vendor="custom's vendor"&model="custom's model"
 	  memcpy(&vendor_info[info_len], model, strlen(model));
@@ -475,8 +456,8 @@ int exosite::info_assemble(const char* vendor, const char* model, const char* sn
 	  info_len += 1;
 
 	  // vendor="custom's vendor"&model="custom's model"&sn=
-	  memcpy(&vendor_info[info_len], STR_SN, strlen(STR_SN));
-	  info_len += strlen(STR_SN);
+	  memcpy(&vendor_info[info_len], _requestPartSerialNumber, strlen(_requestPartSerialNumber));
+	  info_len += strlen(_requestPartSerialNumber);
 
 	  // vendor="custom's vendor"&model="custom's model"&sn="device's sn"
 	  memcpy(&vendor_info[info_len], sn, strlen(sn));
@@ -512,7 +493,7 @@ long exosite::connectToExosite() {
 
 	  exosite_meta_read(server, META_SERVER_SIZE, META_SERVER);
 
-	  while (connectRetries++ <= EXOSITE_MAX_CONNECT_RETRY_COUNT) {
+	  while (connectRetries++ <= _maxConnectRetryCount) {
 
 	    sock = exoHAL_SocketOpenTCP(server);
 
@@ -545,56 +526,56 @@ void exosite::sendLine(long socket, unsigned char LINE, const char* payload) {
 
 	  switch(LINE) {
 	    case CIK_LINE:
-	      strLen = strlen(STR_CIK_HEADER);
-	      memcpy(strBuf,STR_CIK_HEADER,strLen);
+	      strLen = sizeof(_requestPartCIKHeader) - 1;
+	      memcpy(strBuf,_requestPartCIKHeader,strLen);
 	      memcpy(&strBuf[strLen],payload, strlen(payload));
 	      strLen += strlen(payload);
-	      memcpy(&strBuf[strLen],STR_CRLF, 2);
-	      strLen += strlen(STR_CRLF);
+	      memcpy(&strBuf[strLen],_requestPartCRLF, 2);
+	      strLen += sizeof(_requestPartCRLF) - 1;
 	      break;
 	    case HOST_LINE:
-	      strLen = strlen(STR_HOST);
-	      memcpy(strBuf,STR_HOST,strLen);
+	      strLen = sizeof(_requestPartHost) - 1;
+	      memcpy(strBuf,_requestPartHost,strLen);
 	      break;
 	    case CONTENT_LINE:
-	      strLen = strlen(STR_CONTENT);
-	      memcpy(strBuf,STR_CONTENT,strLen);
+	      strLen = sizeof(_requestPartContent) - 1;
+	      memcpy(strBuf,_requestPartContent,strLen);
 	      break;
 	    case ACCEPT_LINE:
-	      strLen = strlen(STR_ACCEPT);
-	      memcpy(strBuf,STR_ACCEPT,strLen);
+	      strLen = sizeof(_requestPartAccept) - 1;
+	      memcpy(strBuf,_requestPartAccept,strLen);
 	      memcpy(&strBuf[strLen],payload, strlen(payload));
 	      strLen += strlen(payload);
 	      break;
 	    case LENGTH_LINE: // Content-Length: NN
-	      strLen = strlen(STR_CONTENT_LENGTH);
-	      memcpy(strBuf,STR_CONTENT_LENGTH,strLen);
+	      strLen = sizeof(_requestPartContentLength) - 1;
+	      memcpy(strBuf,_requestPartContentLength,strLen);
 	      memcpy(&strBuf[strLen],payload, strlen(payload));
 	      strLen += strlen(payload);
-	      memcpy(&strBuf[strLen],STR_CRLF, 2);
+	      memcpy(&strBuf[strLen],_requestPartCRLF, 2);
 	      strLen += 2;
-	      memcpy(&strBuf[strLen],STR_CRLF, 2);
+	      memcpy(&strBuf[strLen],_requestPartCRLF, 2);
 	      strLen += 2;
 	      break;
 	    case GETDATA_LINE:
-	      strLen = strlen(STR_GET_URL);
-	      memcpy(strBuf,STR_GET_URL,strLen);
+	      strLen = sizeof(_requestPartGetURL) - 1;
+	      memcpy(strBuf,_requestPartGetURL,strLen);
 	      memcpy(&strBuf[strLen],payload, strlen(payload));
 	      strLen += strlen(payload);
-	      memcpy(&strBuf[strLen],STR_HTTP, strlen(STR_HTTP));
-	      strLen += strlen(STR_HTTP);
+	      memcpy(&strBuf[strLen], _requestPartHTTP, sizeof(_requestPartHTTP) - 1);
+	      strLen += sizeof(_requestPartHTTP) - 1;
 	      break;
 	    case POSTDATA_LINE:
-	      strLen = strlen("POST ");
+	      strLen = sizeof("POST ") - 1;
 	      memcpy(strBuf,"POST ", strLen);
 	      memcpy(&strBuf[strLen],payload, strlen(payload));
 	      strLen += strlen(payload);
-	      memcpy(&strBuf[strLen],STR_HTTP, strlen(STR_HTTP));
-	      strLen += strlen(STR_HTTP);
+	      memcpy(&strBuf[strLen],_requestPartHTTP, sizeof(_requestPartHTTP) - 1);
+	      strLen += sizeof(_requestPartHTTP) - 1;
 	      break;
 	    case EMPTY_LINE:
-	      strLen = strlen(STR_CRLF);
-	      memcpy(strBuf,STR_CRLF,strLen);
+	      strLen = sizeof(_requestPartCRLF) - 1;
+	      memcpy(strBuf,_requestPartCRLF,strLen);
 	      break;
 	    default:
 	      break;
