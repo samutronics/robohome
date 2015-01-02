@@ -8,7 +8,6 @@
 #ifndef _STATISTICENTRY_HPP_
 #define _STATISTICENTRY_HPP_
 
-#include "ustdlib.h"
 #include "../../projectconfiguration.hpp"
 
 namespace manager {
