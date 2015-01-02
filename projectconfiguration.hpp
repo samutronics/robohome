@@ -55,6 +55,7 @@
 // Drived librarie includes
 // =============================================================================
 #include "gpio.h"
+#include "emac.h"
 #include "flash.h"
 #include "timer.h"
 #include "sysctl.h"
