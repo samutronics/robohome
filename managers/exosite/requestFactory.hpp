@@ -8,24 +8,25 @@
 #ifndef __REQUESTS_HPP__
 #define __REQUESTS_HPP__
 
+#include "basicvector.hpp"
 #include "statisticentry.hpp"
 #include "../../projectconfiguration.hpp"
 
 namespace manager {
 namespace exositeTask {
 
-class requestHandler {
+class requestFactory {
 public: static const u32 requestBufferSize = 255;
 
-public: static bool syncWithExosite();
-public: static bool addSyncRequest(const statisticEntry& entry);
+public: static bool makeDeviceSyncRequest();
+public: static bool makeSyncRequest(const statisticEntry& entry);
 
-private: static bool addRequest(const char* pcNewRequest, char* pcRequestBuffer, uint32_t ui32Size);
+private: static bool addRequest(const char* pcNewRequest, basicVector<u8, requestBufferSize>& buf, uint32_t ui32Size);
 private: static bool extractValueByAlias(const char* pcAlias, char* pcBuffer, char* pcDestString, uint32_t ui32MaxSize);
 
-private: static s8 _writeRequestOutbound[requestBufferSize];
-private: static s8 _readRequestOutbound[requestBufferSize];
-private: static s8 _response[requestBufferSize];
+public: static basicVector<u8, requestBufferSize> writeRequestOutbound;
+public: static basicVector<u8, requestBufferSize> readRequestOutbound;
+public: static basicVector<u8, requestBufferSize> _response;
 };
 
 } // exositeTask
@@ -35,4 +36,4 @@ private: static s8 _response[requestBufferSize];
 // =============================================================================
 //! \file
 //! \copyright
-// ========================= end of file: request.hpp ==========================
+// ===================== end of file: requestfactory.hpp =======================

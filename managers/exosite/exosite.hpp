@@ -10,6 +10,7 @@
 
 #include "lwip/tcp.h"
 #include "basicvector.hpp"
+#include "requestFactory.hpp"
 #include "../../projectconfiguration.hpp"
 
 namespace manager {
@@ -41,9 +42,9 @@ enum ExositeStatusCodes {
 };
 
 class exosite {
-public: static bool write(basicVector<u8, configuration::requestBufferSize>& buf, char* pbuf, unsigned int bufsize);
+public: static bool write(const basicVector<u8, requestFactory::requestBufferSize>& request, basicVector<u8, configuration::requestBufferSize>& buf);
 public: static int parseWriteResult(pbuf* buf);
-public: static int read(basicVector<u8, configuration::requestBufferSize>& buf, char* palias, char* pbuf, unsigned int buflen);
+public: static int read(const basicVector<u8, requestFactory::requestBufferSize>& request, basicVector<u8, configuration::requestBufferSize>& buf);
 public: static int parseReadResult(pbuf* buf, char* pbuf, unsigned int buflen);
 
 public: static int init(const s8* vendor, const s8* model, const u8 if_nbr, u8* pui8MACAddr, s32 reset);

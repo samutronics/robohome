@@ -29,8 +29,7 @@ s8 exosite::_exositeProvisionInfo[_length];
 ExositeStatusCodes exosite::_statusCode;
 int exosite::exosite_initialized;
 
-bool exosite::write(basicVector<u8, configuration::requestBufferSize>& buf, char* pbuf, unsigned int bufsize) {
-	int success = 0;
+bool exosite::write(const basicVector<u8, requestFactory::requestBufferSize>& request, basicVector<u8, configuration::requestBufferSize>& buf) {
 	char bufCIK[41];
 	char strBuf[10];
 
@@ -51,7 +50,7 @@ bool exosite::write(basicVector<u8, configuration::requestBufferSize>& buf, char
 	//  s.send('Content-Length: 6\r\n\r\n')
 	//  s.send('temp=2')
 
-	sprintf(strBuf, "%d", bufsize);
+	sprintf(strBuf, "%d", request.len);
 
 	sendLine(buf, POSTDATA_LINE, "/onep:v1/stack/alias");
 	sendLine(buf, HOST_LINE, 0);
@@ -59,8 +58,8 @@ bool exosite::write(basicVector<u8, configuration::requestBufferSize>& buf, char
 	sendLine(buf, CONTENT_LINE, 0);
 	sendLine(buf, LENGTH_LINE, strBuf);
 
-	strncpy((s8*)(buf.container + buf.len), pbuf, bufsize);
-	buf.len += bufsize;
+	strncpy((s8*)(buf.container + buf.len), (s8*)request.container, request.len);
+	buf.len += request.len;
 
 	return true;
 }
@@ -81,17 +80,17 @@ int exosite::parseWriteResult(pbuf* buf) {
 	return success;
 }
 
-int exosite::read(basicVector<u8, configuration::requestBufferSize>& buf, char* palias, char* pbuf, unsigned int buflen) {
+int exosite::read(const basicVector<u8, requestFactory::requestBufferSize>& request, basicVector<u8, configuration::requestBufferSize>& buf) {
 	//
 	// Modified by Texas Instruments, DGT, changed buflen from unsigned char to
 	// unsigned int. comment out declaration of *pcheck to prevent warnings
 	// created by CAJ changes below.
 	//
 	int success = 0;
-	int http_status = 0;
+//	int http_status = 0;
 	char bufCIK[41];
-	unsigned char strLen, len, vlen;
-	char *p;
+//	unsigned char strLen, len, vlen;
+//	char *p;
 	//char *pcheck;
 
 	if (!exosite_initialized) {
@@ -109,7 +108,7 @@ int exosite::read(basicVector<u8, configuration::requestBufferSize>& buf, char* 
 	//  s.send('X-Exosite-CIK: 5046454a9a1666c3acfae63bc854ec1367167815\r\n')
 	//  s.send('Accept: application/x-www-form-urlencoded; charset=utf-8\r\n\r\n')
 
-	sendLine(buf, GETDATA_LINE, palias);
+	sendLine(buf, GETDATA_LINE, (s8*)request.container);
 	sendLine(buf, HOST_LINE, 0);
 	sendLine(buf, CIK_LINE, bufCIK);
 	sendLine(buf, ACCEPT_LINE, "\r\n");

@@ -9,6 +9,7 @@
 #define _EXOSITEMANAGER_H_
 
 #include "imanager.hpp"
+#include "basicvector.hpp"
 
 namespace manager {
 namespace exositeTask {
@@ -20,6 +21,7 @@ TO_BE_RUNABLE(exositeManager)
 
 private: static err_t connectToServer();
 private: static err_t sendRequest();
+private: static void closeConnection();
 
 // =============================================================================
 // Callback methods
@@ -46,10 +48,20 @@ private: static u8 socketRecv(long lSocket, s8* buffer, s32 length);
 // Member declarations
 // =============================================================================
 
-private: static const u16	_rxTxBufSize = 4096;
-private: static u8			_rxTxBuf[_rxTxBufSize];
-private: static ip_addr		_serverIP;
-private: static tcp_pcb*	_pcb;
+private: static const u16						_rxTxBufSize = 4096;
+private: static basicVector<u8, _rxTxBufSize>	_rxTxBuf;
+private: static ip_addr							_serverIP;
+private: static tcp_pcb*						_pcb;
+
+private: enum state {
+	readRequestSent,
+	readRequestProcessed,
+	writeRequestSent,
+	writeRequestProcessed,
+	idle
+};
+
+private: static state		_state;
 };
 
 } // exositeTask

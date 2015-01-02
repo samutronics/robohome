@@ -9,7 +9,7 @@
 #include "lwIP/ip_addr.h"
 #include "lwIP/dns.h"
 #include "exosite.hpp"
-#include "request.hpp"
+#include "requestFactory.hpp"
 #include "exositemanager.hpp"
 #include "devicestatistic.hpp"
 #include "../projectconfiguration.hpp"
@@ -17,8 +17,10 @@
 using namespace manager::exositeTask;
 using namespace manager::exositeTask::configuration;
 
-ip_addr			exositeManager::_serverIP;
-tcp_pcb*		exositeManager::_pcb;
+ip_addr											exositeManager::_serverIP;
+tcp_pcb*										exositeManager::_pcb;
+exositeManager::state							exositeManager::_state = idle;
+basicVector<u8, exositeManager::_rxTxBufSize>	exositeManager::_rxTxBuf;
 
 exositeManager::exositeManager() {
 }
@@ -39,28 +41,79 @@ void exositeManager::task(void *pvParameters) {
 	exosite::init("texasinstruments", "ek-tm4c1294xl", IF_ENET, pucMACAddr, 0);
 
 	while(1) {
-		// send a connection request to the server
-		connectToServer();
+		requestFactory::makeDeviceSyncRequest();
 
-		// wait for the proper connection state.
-		// it seems to be a suitable solution
-		while(ESTABLISHED != _pcb->state) {taskYIELD();}
+		if(0 != requestFactory::writeRequestOutbound.len) {
+			_state = writeRequestSent;
+			exosite::write(requestFactory::writeRequestOutbound, _rxTxBuf);
 
-		deviceStatistic::reset();
-		deviceStatistic::next();
-		requestHandler::addSyncRequest(*deviceStatistic::current());
+	    	UARTprintf("\n================================Sent: =====================================\n");
+			UARTwrite((s8*)_rxTxBuf.container, _rxTxBuf.len);
+	    	UARTprintf("\n=====================================================================\n");
 
-		// write the request into the TCP socket.
-		sendRequest();
+	    	// send a connection request to the server
+	    	connectToServer();
 
-		taskYIELD();
+	    	// wait for the proper connection state.
+	    	// it seems to be a suitable solution
+	    	while(ESTABLISHED != _pcb->state) {taskYIELD();}
+
+			sendRequest();
+			_rxTxBuf.len = 0;
+			while(writeRequestProcessed != _state) {taskYIELD();}
+
+			closeConnection();
+		}
+
+		if(0 != requestFactory::readRequestOutbound.len) {
+			_state = readRequestSent;
+			exosite::read(requestFactory::readRequestOutbound, _rxTxBuf);
+
+	    	UARTprintf("\n================================Sent: =====================================\n");
+			UARTwrite((s8*)_rxTxBuf.container, _rxTxBuf.len);
+	    	UARTprintf("\n=====================================================================\n");
+
+	    	// send a connection request to the server
+	    	connectToServer();
+
+	    	// wait for the proper connection state.
+	    	// it seems to be a suitable solution
+	    	while(ESTABLISHED != _pcb->state) {taskYIELD();}
+
+			sendRequest();
+			_rxTxBuf.len = 0;
+			while(readRequestProcessed != _state) {taskYIELD();}
+
+			closeConnection();
+		}
+
+		vTaskDelay(4000);
+		//		taskYIELD();
+	}
+}
+
+void exositeManager::closeConnection() {
+	if(_pcb)
+	{
+		//
+		// Clear out all of the TCP callbacks.
+		//
+		tcp_sent(_pcb, 0);
+		tcp_recv(_pcb, 0);
+		tcp_err(_pcb, 0);
+
+		//
+		// Close the TCP connection.
+		//
+		tcp_close(_pcb);
+		_pcb = 0;
 	}
 }
 
 err_t exositeManager::connectToServer() {
-    if(_pcb)
-    {
-        //
+	if(_pcb)
+	{
+		//
         // Initially clear out all of the TCP callbacks.
         //
         tcp_sent(_pcb, 0);
@@ -85,9 +138,7 @@ err_t exositeManager::connectToServer() {
 }
 
 err_t exositeManager::sendRequest() {
-//    err_t retVal = tcp_write(_pcb, _request.request, _request.len, TCP_WRITE_FLAG_COPY);
-
-	err_t retVal = ERR_OK;
+    err_t retVal = tcp_write(_pcb, _rxTxBuf.container, _rxTxBuf.len, TCP_WRITE_FLAG_COPY);
 
 	//
     //  Write data for sending (but does not send it immediately).
@@ -162,6 +213,19 @@ err_t exositeManager::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, str
 
 		return(ERR_OK);
 	}
+
+
+	UARTprintf("\n================================Received: =====================================\n");
+	UARTwrite((s8*)psBuf->payload, psBuf->tot_len);
+	UARTprintf("\n=====================================================================\n");
+
+	if(writeRequestSent == _state) {
+		_state = writeRequestProcessed;
+	}
+	else if(readRequestSent == _state) {
+		_state = readRequestProcessed;
+	}
+
 /*
 	if(_request.type == currentRequest)
 	{
