@@ -270,7 +270,7 @@ bool requestHandler::addRequest(const char* pcNewRequest, char* pcRequestBuffer,
         // Append the data from the new request to the request buffer, and make
         // sure to put a terminator after it.
         //
-        ustrncpy(&pcRequestBuffer[ui32BufferOffset], pcNewRequest, ui32Size);
+        strncpy(&pcRequestBuffer[ui32BufferOffset], pcNewRequest, ui32Size);
         pcRequestBuffer[ui32BufferOffset + ui32Size] = 0;
         return true;
     }
