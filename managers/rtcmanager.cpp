@@ -9,8 +9,6 @@
 #include "rtcmanager.hpp"
 #include "sntp.h"
 #include "time.h"
-#include "ustdlib.h"
-
 
 using namespace communication::ipc;
 using namespace manager::rtcTask;
@@ -42,12 +40,11 @@ void rtcManager::task(void *pvParameters) {
 		u32 time;
 		xQueueReceive(queueHandle, &time, 0);
 
-		std::tm t;
-		ulocaltime(time, reinterpret_cast<tm*>(&t));
+		std::tm* t = std::localtime(&time);
 
 		// The hour has to be incremented, because the Budapest
 		//	time zone is shifted by one related to the GMT.
-		t.tm_hour++;
+		t->tm_hour++;
 		HibernateRTCDisable();
 		HibernateCalendarSet(reinterpret_cast<tm*>(&t));
 		HibernateRTCEnable();

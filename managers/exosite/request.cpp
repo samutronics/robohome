@@ -48,20 +48,20 @@ bool requestHandler::syncWithExosite() {
     // Perform the write, and wait for a response from the server. If exosite
     // doesn't respond, return "false", and assume that no data got through.
     //
-    if(ustrlen(_writeRequestOutbound)) {
-        if(!exosite::write(_writeRequestOutbound, ustrlen(_writeRequestOutbound))) {
-            return false;
-        }
+    if(strlen(_writeRequestOutbound)) {
+//        if(!exosite::write(_writeRequestOutbound, ustrlen(_writeRequestOutbound))) {
+//            return false;
+//        }
     }
 
     //
     // Perform the read, and wait for a response from the server. If exosite
     // doesn't respond, return "false", and assume that no data got through.
     //
-    if(ustrlen(_readRequestOutbound)) {
-        if(!exosite::read(_readRequestOutbound, _response, requestBufferSize)) {
-            return false;
-        }
+    if(strlen(_readRequestOutbound)) {
+//        if(!exosite::read(_readRequestOutbound, _response, requestBufferSize)) {
+//            return false;
+//        }
     }
 
     //
@@ -124,12 +124,12 @@ bool requestHandler::extractValueByAlias(const char* pcAlias, char* pcBuffer, ch
     // appended. This should help us distinguish between a real alias and a
     // string value made up of the same letters.
     //
-    usprintf(pcSearchString, "%s=", pcAlias);
+    sprintf(pcSearchString, "%s=", pcAlias);
 
     //
     // Find the desired alias in the buffer.
     //
-    pcValueStart = ustrstr(pcBuffer, pcAlias);
+    pcValueStart = strstr(pcBuffer, pcAlias);
 
     //
     // If we couldn't find it, return a zero. Otherwise, continue extracting
@@ -144,7 +144,7 @@ bool requestHandler::extractValueByAlias(const char* pcAlias, char* pcBuffer, ch
     // Find the equals-sign, which should be just before the start of the
     // value.
     //
-    pcValueStart = ustrstr(pcValueStart, "=");
+    pcValueStart = strstr(pcValueStart, "=");
 
     if(!pcValueStart)
     {
@@ -211,7 +211,7 @@ bool requestHandler::addSyncRequest(const statisticEntry& entry) {
         //
         // If the request didn't fit, report failure.
         //
-        if(!addRequest(pcFormattedRequest, _writeRequestOutbound, ustrlen(pcFormattedRequest)))
+        if(!addRequest(pcFormattedRequest, _writeRequestOutbound, strlen(pcFormattedRequest)))
         {
             return false;
         }
@@ -221,10 +221,13 @@ bool requestHandler::addSyncRequest(const statisticEntry& entry) {
         //
         // If the request didn't fit, report failure.
         //
-        if(!addRequest(entry.entryAliasInCloud, _readRequestOutbound, ustrlen(entry.entryAliasInCloud))) {
+        if(!addRequest(entry.entryAliasInCloud, _readRequestOutbound, strlen(entry.entryAliasInCloud))) {
             return false;
         }
     }
+
+    UARTprintf("The write request: %s\n", _writeRequestOutbound);
+    UARTprintf("The reaad request: %s\n", _readRequestOutbound);
 
     //
     // Shouldn't get here...
@@ -239,7 +242,7 @@ bool requestHandler::addRequest(const char* pcNewRequest, char* pcRequestBuffer,
     // Set the buffer offset to the location of the first null character in the
     // string.
     //
-    ui32BufferOffset = ustrlen(pcRequestBuffer);
+    ui32BufferOffset = strlen(pcRequestBuffer);
 
 
     //

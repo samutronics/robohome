@@ -18,8 +18,8 @@ class requestHandler {
 public: static const u32 requestBufferSize = 255;
 
 public: static bool syncWithExosite();
+public: static bool addSyncRequest(const statisticEntry& entry);
 
-private: static bool addSyncRequest(const statisticEntry& entry);
 private: static bool addRequest(const char* pcNewRequest, char* pcRequestBuffer, uint32_t ui32Size);
 private: static bool extractValueByAlias(const char* pcAlias, char* pcBuffer, char* pcDestString, uint32_t ui32MaxSize);
 

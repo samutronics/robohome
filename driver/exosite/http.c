@@ -21,11 +21,12 @@
 // This is part of revision 2.1.0.12573 of the EK-TM4C1294XL Firmware Package.
 //
 //*****************************************************************************
+#include <stdio.h>
 #include <stdint.h>
-#include <stdbool.h>
 #include <string.h>
+#include <stdlib.h>
+#include <stdbool.h>
 #include "inc/hw_types.h"
-#include "utils/ustdlib.h"
 #include "http.h"
 
 //*****************************************************************************
@@ -248,47 +249,47 @@ HTTPMessageTypeSet(char *pcDest, uint8_t ui8Type, char *pcResource)
         {
             case HTTP_MESSAGE_CONNECT:
             {
-                usprintf(pcDest, g_pcHttpConnect);
+                sprintf(pcDest, g_pcHttpConnect);
                 break;
             }
             case HTTP_MESSAGE_GET:
             {
-                usprintf(pcDest, g_pcHttpGet);
+                sprintf(pcDest, g_pcHttpGet);
                 break;
             }
             case HTTP_MESSAGE_POST:
             {
-                usprintf(pcDest, g_pcHttpPost);
+                sprintf(pcDest, g_pcHttpPost);
                 break;
             }
             case HTTP_MESSAGE_PUT:
             {
-                usprintf(pcDest, g_pcHttpPut);
+                sprintf(pcDest, g_pcHttpPut);
                 break;
             }
             case HTTP_MESSAGE_DELETE:
             {
-                usprintf(pcDest, g_pcHttpDelete);
+                sprintf(pcDest, g_pcHttpDelete);
                 break;
             }
             case HTTP_MESSAGE_HEAD:
             {
-                usprintf(pcDest, g_pcHttpHead);
+                sprintf(pcDest, g_pcHttpHead);
                 break;
             }
             case HTTP_MESSAGE_TRACE:
             {
-                usprintf(pcDest, g_pcHttpTrace);
+                sprintf(pcDest, g_pcHttpTrace);
                 break;
             }
             case HTTP_MESSAGE_OPTIONS:
             {
-                usprintf(pcDest, g_pcHttpOptions);
+                sprintf(pcDest, g_pcHttpOptions);
                 break;
             }
             case HTTP_MESSAGE_PATCH:
             {
-                usprintf(pcDest, g_pcHttpPatch);
+                sprintf(pcDest, g_pcHttpPatch);
                 break;
             }
         }
@@ -412,7 +413,7 @@ HTTPResponseParse(char *pcData, char *pcResponseText, uint32_t *pui32NumHeaders)
     //
     // Fail if not a HTTP response.
     //
-    if(ustrncmp(g_pcTempData, "HTTP/", 5))
+    if(strncmp(g_pcTempData, "HTTP/", 5))
     {
         *pcResponseText = 0;
         *pui32NumHeaders = 0;
@@ -428,7 +429,7 @@ HTTPResponseParse(char *pcData, char *pcResponseText, uint32_t *pui32NumHeaders)
     //
     // Convert return code to unsigned long.
     //
-    ui32Response = ustrtoul(g_pcTempData, 0, 10);
+    ui32Response = strtoul(g_pcTempData, 0, 10);
 
     //
     // Get the response text.

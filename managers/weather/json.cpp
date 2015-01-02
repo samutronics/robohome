@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "ustdlib.h"
+//#include "ustdlib.h"
 #include "lwiplib.h"
 #include "json.hpp"
 #include "images.hpp"
@@ -262,7 +262,7 @@ GetField(char *pcField, tBufPtr *psBufPtr)
         if(i32NewItem)
         {
             i32NewItem = 0;
-            if(CompareString(psBufPtr, pcField, ustrlen(pcField)) == 0)
+            if(CompareString(psBufPtr, pcField, strlen(pcField)) == 0)
             {
                 while(1)
                 {
@@ -299,7 +299,7 @@ GetFieldValueInt(tBufPtr *psBufPtr)
 {
     int32_t i32Idx;
     char pcTemp[20];
-    const char *pEnd;
+    char* pEnd;
 
     i32Idx = 0;
 
@@ -315,7 +315,7 @@ GetFieldValueInt(tBufPtr *psBufPtr)
             // decimal.
             //
             pcTemp[i32Idx] = 0;
-            return(ustrtoul(pcTemp, &pEnd, 10));
+            return(strtoul(pcTemp, &pEnd, 10));
         }
 
         //
@@ -483,7 +483,7 @@ manager::weatherTask::JSONParseForecast(uint32_t ui32Index, report& psWeatherRep
             //
             // Check for a 404 not found error.
             //
-            if(ustrncmp(pcCode, "404", 3) == 0)
+            if(strncmp(pcCode, "404", 3) == 0)
             {
                 return(-1);
             }
@@ -664,7 +664,7 @@ manager::weatherTask::JSONParseCurrent(uint32_t ui32Index, report& psWeatherRepo
             //
             // Check for a 404 not found error.
             //
-            if(ustrncmp(pcCode, "404", 3) == 0)
+            if(strncmp(pcCode, "404", 3) == 0)
             {
                 return(-1);
             }

@@ -24,6 +24,7 @@
 // =============================================================================
 // standard includes
 // =============================================================================
+#include <time.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -152,6 +153,7 @@ namespace configuration {
 
 const char serverURL[] = "m2.exosite.com";
 const u32 serverPort = 80;
+const u32 requestBufferSize = 4096;
 
 }  // configuration
 }  // exositeTask

@@ -8,6 +8,8 @@
 #ifndef _EXOSITE_H_
 #define _EXOSITE_H_
 
+#include "lwip/tcp.h"
+#include "basicvector.hpp"
 #include "../../projectconfiguration.hpp"
 
 namespace manager {
@@ -39,19 +41,20 @@ enum ExositeStatusCodes {
 };
 
 class exosite {
-public: static int write(char* pbuf, unsigned int bufsize);
-public: static int read(char* palias, char* pbuf, unsigned int buflen);
-public: static int init(const char* vendor, const char* model, const unsigned char if_nbr, int reset);
-public: static int activate();
+public: static bool write(basicVector<u8, configuration::requestBufferSize>& buf, char* pbuf, unsigned int bufsize);
+public: static int parseWriteResult(pbuf* buf);
+public: static int read(basicVector<u8, configuration::requestBufferSize>& buf, char* palias, char* pbuf, unsigned int buflen);
+public: static int parseReadResult(pbuf* buf, char* pbuf, unsigned int buflen);
+
+public: static int init(const s8* vendor, const s8* model, const u8 if_nbr, u8* pui8MACAddr, s32 reset);
 public: static void setCIK(char* pCIK);
 public: static int getCIK(char* pCIK);
 public: static inline ExositeStatusCodes statusCode() {return _statusCode;}
 
 private: static int info_assemble(const char* vendor, const char* model, const char* sn);
 private: static inline void update_m2ip() {return;}
-private: static int getHTTPStatus(long socket);
-private: static long connectToExosite();
-private: static void sendLine(long socket, unsigned char LINE, const char* payload);
+private: static int getHTTPStatus(pbuf* buf);
+private: static void sendLine(basicVector<u8, configuration::requestBufferSize>& buf, unsigned char LINE, const char* payload);
 
 private: static ExositeStatusCodes _statusCode;
 private: static int exosite_initialized;
