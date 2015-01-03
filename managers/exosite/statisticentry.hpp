@@ -36,7 +36,7 @@ public: inline statisticEntry(const char* name, const char* alias, valueType t, 
 
 public: inline void requestFormat(char* requestBuffer) const;
 
-public: inline void setValue(char* requestBuffer);
+public: inline void setValue(const char* requestBuffer);
 public: inline bool getValue(char* requestBuffer) const;
 public: inline bool getValue(s32& requestBuffer) const;
 
@@ -52,8 +52,8 @@ private: valueType type;
 // section for impelentation of inpline methods
 // =============================================================================
 
-inline void statisticEntry::setValue(char* requestBuffer) {
-	strncpy(value, requestBuffer, dataStringLength);
+inline void statisticEntry::setValue(const char* requestBuffer) {
+	strcpy(value, requestBuffer);
 }
 
 inline bool statisticEntry::getValue(char* requestBuffer) const {
