@@ -6,8 +6,8 @@
 //! \note
 // =============================================================================
 #include "exosite.hpp"
-#include "requestFactory.hpp"
 #include "devicestatistic.hpp"
+#include "devicerequestFactory.hpp"
 
 using namespace manager::exositeTask;
 

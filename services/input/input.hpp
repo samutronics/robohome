@@ -8,11 +8,10 @@
 #ifndef _LED_MANAGER_H_
 #define _LED_MANAGER_H_
 
-#include "imanager.hpp"
+#include "iservice.hpp"
 #include "../projectconfiguration.hpp"
 
 namespace manager {
-
 namespace inboundTask {
 
 class inputManager: public IManager {

@@ -38,7 +38,7 @@
 
 #include "lwip/opt.h"
 
-#include "sntp.h"
+#include "sntpd.h"
 
 #include "lwip/timers.h"
 #include "lwip/udp.h"

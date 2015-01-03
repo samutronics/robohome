@@ -8,6 +8,7 @@
 #include "exosite.hpp"
 #include "metadata.hpp"
 #include "metadataentry.hpp"
+#include "exositerequestfactory.hpp"
 
 using namespace manager::exositeTask;
 

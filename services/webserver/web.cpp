@@ -5,10 +5,9 @@
 //! \date			03.12.2014.
 //! \note
 // =============================================================================
-
-#include "sntp.h"
+#include "web.hpp"
 #include "httpd.h"
-#include "networkManager.hpp"
+#include "sntp.hpp"
 
 using namespace manager::networkTask;
 using namespace manager::networkTask::configuration;

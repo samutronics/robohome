@@ -9,8 +9,8 @@
 #include "lwIP/dns.h"
 #include "lwIP/tcp.h"
 #include "lwIP/pbuf.h"
-#include "weathermanager.hpp"
-#include "weatherrequestfactory.hpp"
+#include "weather.hpp"
+#include "requestfactory.hpp"
 
 using namespace manager::weatherTask;
 using namespace manager::weatherTask::configuration;

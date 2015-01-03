@@ -5,9 +5,8 @@
 //! \date			04.12.2014.
 //! \note
 // =============================================================================
-
+#include "input.hpp"
 #include "ipcQueue.hpp"
-#include "inputmanager.hpp"
 #include "../projectconfiguration.hpp"
 
 using namespace communication::ipc;

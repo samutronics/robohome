@@ -5,8 +5,7 @@
 //! \date			29.12.2014.
 //! \note
 // =============================================================================
-
-#include "weatherrequestfactory.hpp"
+#include "requestfactory.hpp"
 
 using namespace manager::weatherTask;
 

@@ -11,12 +11,12 @@
 // =============================================================================
 // Custom include files
 // =============================================================================
-#include "rtcmanager.hpp"
-#include "inputmanager.hpp"
-#include "outputManager.hpp"
-#include "networkManager.hpp"
-#include "weathermanager.hpp"
-#include "exositemanager.hpp"
+#include "web.hpp"
+#include "sntp.hpp"
+#include "input.hpp"
+#include "output.hpp"
+#include "weather.hpp"
+#include "exosite.hpp"
 #include "projectconfiguration.hpp"
 
 using namespace manager::rtcTask;

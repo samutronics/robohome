@@ -8,9 +8,9 @@
 #ifndef _WEATHERMANAGER_H_
 #define _WEATHERMANAGER_H_
 
-#include "imanager.hpp"
-#include "weatherreport.hpp"
-#include "weatherrequestfactory.hpp"
+#include "report.hpp"
+#include "iservice.hpp"
+#include "requestfactory.hpp"
 #include "../projectconfiguration.hpp"
 
 namespace manager {

@@ -8,7 +8,7 @@
 #ifndef _RTCMANAGER_H_
 #define _RTCMANAGER_H_
 
-#include "imanager.hpp"
+#include "iservice.hpp"
 #include "../projectconfiguration.hpp"
 
 namespace manager {

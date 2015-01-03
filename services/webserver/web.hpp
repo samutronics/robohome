@@ -8,7 +8,7 @@
 #ifndef _NETWORKMANAGER_HPP_
 #define _NETWORKMANAGER_HPP_
 
-#include "imanager.hpp"
+#include "iservice.hpp"
 #include "../projectconfiguration.hpp"
 
 namespace manager {

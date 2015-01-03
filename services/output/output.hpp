@@ -8,7 +8,7 @@
 #ifndef _OUTPUTMANAGER_H_
 #define _OUTPUTMANAGER_H_
 
-#include "imanager.hpp"
+#include "iservice.hpp"
 #include "../projectconfiguration.hpp"
 
 namespace manager {

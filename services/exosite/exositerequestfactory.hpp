@@ -10,7 +10,7 @@
 
 #include "lwip/tcp.h"
 #include "basicvector.hpp"
-#include "requestFactory.hpp"
+#include "devicerequestFactory.hpp"
 #include "../../projectconfiguration.hpp"
 
 namespace manager {

@@ -8,8 +8,9 @@
 #ifndef _EXOSITEMANAGER_H_
 #define _EXOSITEMANAGER_H_
 
-#include "imanager.hpp"
+#include "iservice.hpp"
 #include "basicvector.hpp"
+#include "../../projectconfiguration.hpp"
 
 namespace manager {
 namespace exositeTask {

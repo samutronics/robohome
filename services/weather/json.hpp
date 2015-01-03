@@ -27,7 +27,7 @@
 
 #include <stdint.h>
 
-#include "weatherreport.hpp"
+#include "report.hpp"
 
 #define INVALID_INT             ((int32_t)(0x80000000))
 

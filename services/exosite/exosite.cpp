@@ -10,8 +10,8 @@
 #include "lwIP/dns.h"
 #include "exosite.hpp"
 #include "requestFactory.hpp"
-#include "exositemanager.hpp"
 #include "devicestatistic.hpp"
+#include "exositerequestfactory.hpp"
 #include "../projectconfiguration.hpp"
 
 using namespace manager::exositeTask;

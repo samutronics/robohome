@@ -5,10 +5,10 @@
 //! \date			15.12.2014.
 //! \note
 // =============================================================================
-#include "ipcQueue.hpp"
-#include "rtcmanager.hpp"
-#include "sntp.h"
 #include "time.h"
+#include "sntpd.h"
+#include "sntp.hpp"
+#include "ipcQueue.hpp"
 
 using namespace communication::ipc;
 using namespace manager::rtcTask;
