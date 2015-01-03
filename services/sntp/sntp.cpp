@@ -17,9 +17,10 @@ sntp::sntp() {
 	HibernateEnableExpClk(systemGlobal::currentSystemClockFrequency);
 	HibernateCounterMode(HIBERNATE_COUNTER_24HR);
 
-	std::tm t;
-	HibernateCalendarSet((tm*)&t);
-	HibernateCalendarMatchSet(0, reinterpret_cast<tm*>(&t));
+	tm t;
+	memset(&t, 0, sizeof(tm));
+	HibernateCalendarSet(&t);
+	HibernateCalendarMatchSet(0, &t);
 	HibernateIntClear(HIBERNATE_INT_PIN_WAKE | HIBERNATE_INT_LOW_BAT | HIBERNATE_INT_RTC_MATCH_0);
 	HibernateIntEnable(HIBERNATE_INT_RTC_MATCH_0);
 	HibernateIntRegister(&sntp::handlerTH);
@@ -40,14 +41,25 @@ void sntp::task(void *pvParameters) {
 		u32 time;
 		xQueueReceive(queueHandle, &time, 0);
 
-		std::tm* t = std::localtime(&time);
+		tm* t = std::localtime(&time);
 
 		// The hour has to be incremented, because the Budapest
 		//	time zone is shifted by one related to the GMT.
 		t->tm_hour++;
-		HibernateRTCDisable();
-		HibernateCalendarSet(reinterpret_cast<tm*>(&t));
-		HibernateRTCEnable();
+
+		// The TivaC library add 100 to the year.
+		// It's incomprehensible, why...
+		t->tm_year += 100;
+		HibernateCalendarSet(t);
+
+		HibernateCalendarGet(t);
+		UARTprintf("Date and time is set to: %d.%d.%d %d:%d:%d\n",
+				t->tm_mday,
+				t->tm_mon + 1, // increment the month due to human readable format
+				t->tm_year + 1970 - 100, // add the date offset: 1970, and subtract the library "compensation"
+				t->tm_hour,
+				t->tm_min,
+				t->tm_sec);
 
 		// The task gives up its remained time-slice
 		taskYIELD();
