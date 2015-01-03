@@ -10,25 +10,25 @@
 #include "metadataentry.hpp"
 #include "exositerequestfactory.hpp"
 
-using namespace manager::exositeTask;
+using namespace service::exositeTask;
 
-const s8 exosite::_requestPartCIKHeader[]		= "X-Exosite-CIK: ";
-const s8 exosite::_requestPartContentLength[]	= "Content-Length: ";
-const s8 exosite::_requestPartGetURL[]			= "GET /onep:v1/stack/alias?";
-const s8 exosite::_requestPartHTTP[]			= "  HTTP/1.1\r\n";
-const s8 exosite::_requestPartHost[]			= "Host: m2.exosite.com\r\n";
-const s8 exosite::_requestPartAccept[]			= "Accept: application/x-www-form-urlencoded; charset=utf-8\r\n";
-const s8 exosite::_requestPartContent[]			= "Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n";
-const s8 exosite::_requestPartVendor[]			= "vendor=";
-const s8 exosite::_requestPartModel[]			= "model=";
-const s8 exosite::_requestPartSerialNumber[]	= "sn=";
-const s8 exosite::_requestPartCRLF[]			= "\r\n";
+const s8 exositeRequestFactory::_requestPartCIKHeader[]		= "X-Exosite-CIK: ";
+const s8 exositeRequestFactory::_requestPartContentLength[]	= "Content-Length: ";
+const s8 exositeRequestFactory::_requestPartGetURL[]			= "GET /onep:v1/stack/alias?";
+const s8 exositeRequestFactory::_requestPartHTTP[]			= "  HTTP/1.1\r\n";
+const s8 exositeRequestFactory::_requestPartHost[]			= "Host: m2.exosite.com\r\n";
+const s8 exositeRequestFactory::_requestPartAccept[]			= "Accept: application/x-www-form-urlencoded; charset=utf-8\r\n";
+const s8 exositeRequestFactory::_requestPartContent[]			= "Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n";
+const s8 exositeRequestFactory::_requestPartVendor[]			= "vendor=";
+const s8 exositeRequestFactory::_requestPartModel[]			= "model=";
+const s8 exositeRequestFactory::_requestPartSerialNumber[]	= "sn=";
+const s8 exositeRequestFactory::_requestPartCRLF[]			= "\r\n";
 
-s8 exosite::_exositeProvisionInfo[_length];
-ExositeStatusCodes exosite::_statusCode;
-int exosite::exosite_initialized;
+s8 exositeRequestFactory::_exositeProvisionInfo[_length];
+ExositeStatusCodes exositeRequestFactory::_statusCode;
+int exositeRequestFactory::exosite_initialized;
 
-bool exosite::write(const basicVector<u8, requestFactory::requestBufferSize>& request, basicVector<u8, configuration::requestBufferSize>& buf) {
+bool exositeRequestFactory::write(const basicVector<u8, deviceRequestFactory::requestBufferSize>& request, basicVector<u8, configuration::requestBufferSize>& buf) {
 	char bufCIK[41];
 	char strBuf[10];
 
@@ -63,7 +63,7 @@ bool exosite::write(const basicVector<u8, requestFactory::requestBufferSize>& re
 	return true;
 }
 
-void exosite::parseWriteResult(pbuf* buf) {
+void exositeRequestFactory::parseWriteResult(pbuf* buf) {
 	int http_status = getHTTPStatus(buf);
 	if (401 == http_status) {
 		_statusCode = EXO_STATUS_NOAUTH;
@@ -73,7 +73,7 @@ void exosite::parseWriteResult(pbuf* buf) {
 	}
 }
 
-int exosite::read(const basicVector<u8, requestFactory::requestBufferSize>& request, basicVector<u8, configuration::requestBufferSize>& buf) {
+int exositeRequestFactory::read(const basicVector<u8, deviceRequestFactory::requestBufferSize>& request, basicVector<u8, configuration::requestBufferSize>& buf) {
 	//
 	// Modified by Texas Instruments, DGT, changed buflen from unsigned char to
 	// unsigned int. comment out declaration of *pcheck to prevent warnings
@@ -105,7 +105,7 @@ int exosite::read(const basicVector<u8, requestFactory::requestBufferSize>& requ
 	return 1;
 }
 
-void exosite::parseReadResult(pbuf* buf, basicVector<u8, requestFactory::requestBufferSize>& result) {
+void exositeRequestFactory::parseReadResult(pbuf* buf, basicVector<u8, deviceRequestFactory::requestBufferSize>& result) {
 	int http_status = getHTTPStatus(buf);
 	if (200 == http_status) {
 		u8 crlf = 0;
@@ -140,7 +140,7 @@ void exosite::parseReadResult(pbuf* buf, basicVector<u8, requestFactory::request
 	}
 }
 
-int exosite::init(const s8* vendor, const s8* model, const u8 if_nbr, u8* pui8MACAddr, s32 reset) {
+int exositeRequestFactory::init(const s8* vendor, const s8* model, const u8 if_nbr, u8* pui8MACAddr, s32 reset) {
 	char struuid[_serialNumberSize];
 
 	metaData::init(reset);          //always initialize Exosite meta structure
@@ -180,7 +180,7 @@ int exosite::init(const s8* vendor, const s8* model, const u8 if_nbr, u8* pui8MA
 	return 1;
 }
 
-void exosite::setCIK(char* pCIK) {
+void exositeRequestFactory::setCIK(char* pCIK) {
 	if (!exosite_initialized) {
 		_statusCode = EXO_STATUS_INIT;
 		return;
@@ -190,7 +190,7 @@ void exosite::setCIK(char* pCIK) {
 	return;
 }
 
-int exosite::getCIK(char* pCIK) {
+int exositeRequestFactory::getCIK(char* pCIK) {
 	unsigned char i;
 	char tempCIK[_CIKSize + 1];
 
@@ -212,7 +212,7 @@ int exosite::getCIK(char* pCIK) {
 	return 1;
 }
 
-int exosite::info_assemble(const char* vendor, const char* model, const char* sn) {
+int exositeRequestFactory::info_assemble(const char* vendor, const char* model, const char* sn) {
 	int info_len = 0;
 	int assemble_len = 0;
 	char * vendor_info = _exositeProvisionInfo;
@@ -261,7 +261,7 @@ int exosite::info_assemble(const char* vendor, const char* model, const char* sn
 	return info_len;
 }
 
-int exosite::getHTTPStatus(pbuf* buf) {
+int exositeRequestFactory::getHTTPStatus(pbuf* buf) {
 	char rxBuf[12];
 
 	memcpy(rxBuf, buf->payload, 12);
@@ -273,7 +273,7 @@ int exosite::getHTTPStatus(pbuf* buf) {
 	return code;
 }
 
-void exosite::sendLine(basicVector<u8, configuration::requestBufferSize>& buf, unsigned char LINE, const char* payload) {
+void exositeRequestFactory::sendLine(basicVector<u8, configuration::requestBufferSize>& buf, unsigned char LINE, const char* payload) {
 	char strBuf[70];
 	unsigned char strLen;
 

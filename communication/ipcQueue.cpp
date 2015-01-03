@@ -8,8 +8,8 @@
 #include "ipcQueue.hpp"
 
 using namespace communication::ipc;
-using namespace manager::rtcTask::configuration;
-using namespace manager::outboundTask::configuration;
+using namespace service::rtcTask::configuration;
+using namespace service::outboundTask::configuration;
 
 ipcQueue ipcQueue::_singleton;
 

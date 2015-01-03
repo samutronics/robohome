@@ -10,7 +10,7 @@
 
 #include "../../projectconfiguration.hpp"
 
-namespace manager {
+namespace service {
 namespace exositeTask {
 
 static const u16 metaDataSize	= 256;

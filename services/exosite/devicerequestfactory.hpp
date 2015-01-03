@@ -12,10 +12,10 @@
 #include "statisticentry.hpp"
 #include "../../projectconfiguration.hpp"
 
-namespace manager {
+namespace service {
 namespace exositeTask {
 
-class requestFactory {
+class deviceRequestFactory {
 public: static const u32 requestBufferSize = 255;
 
 public: static bool makeDeviceSyncRequest();

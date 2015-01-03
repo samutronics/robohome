@@ -12,18 +12,18 @@
 #include "weather.hpp"
 #include "requestfactory.hpp"
 
-using namespace manager::weatherTask;
-using namespace manager::weatherTask::configuration;
+using namespace service::weatherTask;
+using namespace service::weatherTask::configuration;
 
-report			weatherManager::_report;
-ip_addr			weatherManager::_serverIP;
-tcp_pcb*		weatherManager::_pcb;
-weatherRequest	weatherManager::_request;
+report			weather::_report;
+ip_addr			weather::_serverIP;
+tcp_pcb*		weather::_pcb;
+weatherRequest	weather::_request;
 
-weatherManager::weatherManager() {
+weather::weather() {
 }
 
-void weatherManager::task(void *pvParameters) {
+void weather::task(void *pvParameters) {
 	// check the server IP address at the first start and resolve the URL
     if(0 == _serverIP.addr || 0xFFFFFFFF == _serverIP.addr) {
     	// very stupid solution: wait until the LwIP stack is initialized
@@ -54,7 +54,7 @@ void weatherManager::task(void *pvParameters) {
 	}
 }
 
-err_t weatherManager::connectToServer() {
+err_t weather::connectToServer() {
     if(_pcb)
     {
         //
@@ -81,7 +81,7 @@ err_t weatherManager::connectToServer() {
     return tcp_connect(_pcb, &_serverIP, weatherServerPort, connectToServerCallback);
 }
 
-err_t weatherManager::sendRequest() {
+err_t weather::sendRequest() {
     err_t retVal = tcp_write(_pcb, _request.request, _request.len, TCP_WRITE_FLAG_COPY);
 
     //
@@ -98,13 +98,13 @@ err_t weatherManager::sendRequest() {
     return retVal;
 }
 
-void weatherManager::resolveHostCallback(const char* pcName, struct ip_addr* psIPAddr, void* vpArg) {
+void weather::resolveHostCallback(const char* pcName, struct ip_addr* psIPAddr, void* vpArg) {
 	if(psIPAddr) {
 		_serverIP = *psIPAddr;
 	}
 }
 
-err_t weatherManager::connectToServerCallback(void *pvArg, struct tcp_pcb *psPcb, err_t iErr) {
+err_t weather::connectToServerCallback(void *pvArg, struct tcp_pcb *psPcb, err_t iErr) {
     //
     // Check if there was a TCP error.
     //
@@ -139,7 +139,7 @@ err_t weatherManager::connectToServerCallback(void *pvArg, struct tcp_pcb *psPcb
     return(ERR_OK);
 }
 
-err_t weatherManager::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, struct pbuf* psBuf, err_t iErr) {
+err_t weather::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, struct pbuf* psBuf, err_t iErr) {
 	struct pbuf *psBufCur;
 	int32_t i32Items;
 
@@ -238,8 +238,8 @@ err_t weatherManager::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, str
 	return(ERR_OK);
 }
 
-err_t weatherManager::TCPSentCallback(void* pvArg, struct tcp_pcb* psPcb, u16_t ui16Len) {return (ERR_OK);}
-void weatherManager::TCPErrorCallback(void*, err_t) {}
+err_t weather::TCPSentCallback(void* pvArg, struct tcp_pcb* psPcb, u16_t ui16Len) {return (ERR_OK);}
+void weather::TCPErrorCallback(void*, err_t) {}
 
 // =============================================================================
 //! \file

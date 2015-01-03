@@ -442,7 +442,7 @@ GetFieldValueString(tBufPtr *psBufPtr, char *pcDataDest, uint32_t ui32SizeDest)
 //
 //*****************************************************************************
 int32_t
-manager::weatherTask::JSONParseForecast(uint32_t ui32Index, report& psWeatherReport, struct pbuf *psBuf)
+service::weatherTask::JSONParseForecast(uint32_t ui32Index, report& psWeatherReport, struct pbuf *psBuf)
 {
     tBufPtr sBufPtr, sBufList, sBufTemp;
     char pcCode[4];
@@ -626,7 +626,7 @@ manager::weatherTask::JSONParseForecast(uint32_t ui32Index, report& psWeatherRep
 //
 //*****************************************************************************
 int32_t
-manager::weatherTask::JSONParseCurrent(uint32_t ui32Index, report& psWeatherReport, struct pbuf *psBuf)
+service::weatherTask::JSONParseCurrent(uint32_t ui32Index, report& psWeatherReport, struct pbuf *psBuf)
 {
     tBufPtr sBufPtr, sBufMain, sBufTemp;
     char pcIcon[3];

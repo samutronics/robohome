@@ -12,13 +12,13 @@
 #include "basicvector.hpp"
 #include "../../projectconfiguration.hpp"
 
-namespace manager {
+namespace service {
 namespace exositeTask {
 
-class exositeManager: public IManager {
-private: exositeManager();
+class exosite: public IService {
+private: exosite();
 private: virtual void task(void *pvParameters);
-TO_BE_RUNABLE(exositeManager)
+TO_BE_RUNABLE(exosite)
 
 private: static err_t connectToServer();
 private: static err_t sendRequest();

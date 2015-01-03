@@ -11,13 +11,13 @@
 #include "iservice.hpp"
 #include "../projectconfiguration.hpp"
 
-namespace manager {
-namespace networkTask {
+namespace service {
+namespace webTask {
 
-class networkManager: public IManager {
-private: networkManager();
+class web: public IService {
+private: web();
 private: virtual void task(void *pvParameters);
-TO_BE_RUNABLE(networkManager)
+TO_BE_RUNABLE(web)
 };
 
 } // networkTask

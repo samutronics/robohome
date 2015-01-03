@@ -9,13 +9,13 @@
 #include "devicestatistic.hpp"
 #include "devicerequestFactory.hpp"
 
-using namespace manager::exositeTask;
+using namespace service::exositeTask;
 
-basicVector<u8, requestFactory::requestBufferSize> requestFactory::writeRequestOutbound;
-basicVector<u8, requestFactory::requestBufferSize> requestFactory::readRequestOutbound;
-basicVector<u8, requestFactory::requestBufferSize> requestFactory::response;
+basicVector<u8, deviceRequestFactory::requestBufferSize> deviceRequestFactory::writeRequestOutbound;
+basicVector<u8, deviceRequestFactory::requestBufferSize> deviceRequestFactory::readRequestOutbound;
+basicVector<u8, deviceRequestFactory::requestBufferSize> deviceRequestFactory::response;
 
-bool requestFactory::makeDeviceSyncRequest() {
+bool deviceRequestFactory::makeDeviceSyncRequest() {
     //
     // Clear the request buffers
     //
@@ -42,7 +42,7 @@ bool requestFactory::makeDeviceSyncRequest() {
     return true;
 }
 
-bool requestFactory::updateEntryByResponse(statisticEntry& entry) {
+bool deviceRequestFactory::updateEntryByResponse(statisticEntry& entry) {
     char *pcValueStart;
 
     //
@@ -95,7 +95,7 @@ bool requestFactory::updateEntryByResponse(statisticEntry& entry) {
     return true;
 }
 
-bool requestFactory::makeSyncRequest(const statisticEntry& entry) {
+bool deviceRequestFactory::makeSyncRequest(const statisticEntry& entry) {
 	char pcFormattedRequest[100];
 
 	//
@@ -136,7 +136,7 @@ bool requestFactory::makeSyncRequest(const statisticEntry& entry) {
 	return true;
 }
 
-bool requestFactory::addRequest(const char* pcNewRequest, basicVector<u8, requestBufferSize>& buf, uint32_t ui32Size) {
+bool deviceRequestFactory::addRequest(const char* pcNewRequest, basicVector<u8, requestBufferSize>& buf, uint32_t ui32Size) {
     //
     // Check to make sure that the buffer is not full.
     //

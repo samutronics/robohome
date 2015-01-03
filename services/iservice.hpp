@@ -10,9 +10,9 @@
 #ifndef _IMANAGER_H_
 #define _IMANAGER_H_
 
-namespace manager {
+namespace service {
 
-class IManager {
+class IService {
 	protected: virtual void task(void *pvParameters) = 0;
 };
 

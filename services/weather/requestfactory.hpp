@@ -12,7 +12,7 @@
 
 #include "../projectconfiguration.hpp"
 
-namespace manager {
+namespace service {
 namespace weatherTask {
 
 enum requestType {

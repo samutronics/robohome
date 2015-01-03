@@ -10,10 +10,10 @@
 #include "../projectconfiguration.hpp"
 
 using namespace communication::ipc;
-using namespace manager::outboundTask;
-using namespace manager::outboundTask::configuration;
+using namespace service::outboundTask;
+using namespace service::outboundTask::configuration;
 
-outputManager::outputManager() {
+output::output() {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPION);
     GPIOPinTypeGPIOOutput(GPIO_PORTN_BASE, GPIO_PIN_1);
     GPIODirModeSet(GPIO_PORTN_BASE, GPIO_PIN_1, GPIO_DIR_MODE_OUT);
@@ -21,7 +21,7 @@ outputManager::outputManager() {
     _queueOutbound = xQueueCreate(outboundQueueLength, outboundQueueWidth);
 }
 
-void outputManager::task(void *pvParameters) {
+void output::task(void *pvParameters) {
 	while(1) {
 		// Query the queue handler due to performance reason.
 		xQueueHandle queueHandle = ipcQueue::singleton().queue(outboundQueue);

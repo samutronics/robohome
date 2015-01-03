@@ -10,12 +10,12 @@
 #include "../projectconfiguration.hpp"
 
 using namespace communication::ipc;
-using namespace manager::inboundTask;
-using namespace manager::inboundTask::configuration;
+using namespace service::inboundTask;
+using namespace service::inboundTask::configuration;
 
-DECLARE_TH(inputManager)
+DECLARE_TH(input)
 
-inputManager::inputManager() {
+input::input() {
 	_THQueue = xQueueCreate(THQueueLength, THQueueWidth);
 
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOJ);
@@ -23,11 +23,11 @@ inputManager::inputManager() {
     GPIOPadConfigSet(GPIO_PORTJ_BASE, GPIO_PIN_0, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
 
     GPIOIntTypeSet(GPIO_PORTJ_BASE, GPIO_PIN_0, GPIO_RISING_EDGE);
-    GPIOIntRegister(GPIO_PORTJ_BASE, &inputManager::handlerTH);
+    GPIOIntRegister(GPIO_PORTJ_BASE, &input::handlerTH);
     GPIOIntEnable(GPIO_PORTJ_BASE, GPIO_INT_PIN_0);
 }
 
-void inputManager::task(void *pvParameters) {
+void input::task(void *pvParameters) {
 	while(1) {
 		// The thread gives up its time-slice, if the TH queue is empty: there was no interrupt
 		while(0 == uxQueueMessagesWaiting(_THQueue)) {taskYIELD();}
@@ -46,7 +46,7 @@ void inputManager::task(void *pvParameters) {
 	}
 }
 
-void inputManager::handlerTH() {
+void input::handlerTH() {
 	static bool loggedState = false;
 	loggedState = !loggedState;
 	xQueueSendToBackFromISR(_THQueue, &loggedState, NULL);

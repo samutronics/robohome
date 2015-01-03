@@ -11,9 +11,9 @@
 #include "ipcQueue.hpp"
 
 using namespace communication::ipc;
-using namespace manager::rtcTask;
+using namespace service::rtcTask;
 
-rtcManager::rtcManager() {
+sntp::sntp() {
 	HibernateEnableExpClk(systemGlobal::currentSystemClockFrequency);
 	HibernateCounterMode(HIBERNATE_COUNTER_24HR);
 
@@ -22,13 +22,13 @@ rtcManager::rtcManager() {
 	HibernateCalendarMatchSet(0, reinterpret_cast<tm*>(&t));
 	HibernateIntClear(HIBERNATE_INT_PIN_WAKE | HIBERNATE_INT_LOW_BAT | HIBERNATE_INT_RTC_MATCH_0);
 	HibernateIntEnable(HIBERNATE_INT_RTC_MATCH_0);
-	HibernateIntRegister(&rtcManager::handlerTH);
+	HibernateIntRegister(&sntp::handlerTH);
 	HibernateRTCEnable();
 
 	sntp_init(&delegateProcessSNTPTime);
 }
 
-void rtcManager::task(void *pvParameters) {
+void sntp::task(void *pvParameters) {
 	while(1) {
 		// Query the queue handler due to performance reason.
 		xQueueHandle queueHandle = ipcQueue::singleton().queue(rtcQueue);
@@ -54,11 +54,11 @@ void rtcManager::task(void *pvParameters) {
 	}
 }
 
-void rtcManager::delegateProcessSNTPTime(u32 time) {
+void sntp::delegateProcessSNTPTime(u32 time) {
 	xQueueSendToBack(ipcQueue::singleton().queue(rtcQueue), &time, NULL);
 }
 
-void rtcManager::handlerTH() {
+void sntp::handlerTH() {
 	HibernateIntClear(HIBERNATE_INT_RTC_MATCH_0);
 }
 

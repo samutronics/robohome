@@ -11,14 +11,14 @@
 #include "iservice.hpp"
 #include "../projectconfiguration.hpp"
 
-namespace manager {
+namespace service {
 namespace rtcTask {
 
-class rtcManager: public IManager {
-private: rtcManager();
+class sntp: public IService {
+private: sntp();
 private: virtual void task(void *pvParameters);
 private: static void delegateProcessSNTPTime(u32 time);
-TO_BE_RUNABLE(rtcManager)
+TO_BE_RUNABLE(sntp)
 DEFINE_TH
 };
 

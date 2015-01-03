@@ -7,7 +7,7 @@
 // =============================================================================
 #include "requestfactory.hpp"
 
-using namespace manager::weatherTask;
+using namespace service::weatherTask;
 
 const char weatherRequestFactory::g_cWeatherRequest[] = "GET http://api.openweathermap.org/data/2.5/weather?q=";
 const char weatherRequestFactory::g_cWeatherRequestForecast[] = "GET http://api.openweathermap.org/data/2.5/forecast/daily?q=";

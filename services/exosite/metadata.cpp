@@ -8,7 +8,7 @@
 #include "metadata.hpp"
 #include "metadataentry.hpp"
 
-using namespace manager::exositeTask;
+using namespace service::exositeTask;
 
 const char metaData::_exomark[] = "exosite!";
 

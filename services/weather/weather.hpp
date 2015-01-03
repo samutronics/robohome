@@ -13,13 +13,13 @@
 #include "requestfactory.hpp"
 #include "../projectconfiguration.hpp"
 
-namespace manager {
+namespace service {
 namespace weatherTask {
 
-class weatherManager: public IManager {
-private: weatherManager();
+class weather: public IService {
+private: weather();
 private: virtual void task(void *pvParameters);
-TO_BE_RUNABLE(weatherManager)
+TO_BE_RUNABLE(weather)
 
 private: static err_t connectToServer();
 private: static err_t sendRequest();

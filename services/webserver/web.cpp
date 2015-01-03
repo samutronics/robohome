@@ -9,10 +9,10 @@
 #include "httpd.h"
 #include "sntp.hpp"
 
-using namespace manager::networkTask;
-using namespace manager::networkTask::configuration;
+using namespace service::webTask;
+using namespace service::webTask::configuration;
 
-networkManager::networkManager() {
+web::web() {
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
 	GPIOPinConfigure(GPIO_PF0_EN0LED0);
 	GPIOPinConfigure(GPIO_PF4_EN0LED1);
@@ -38,7 +38,7 @@ networkManager::networkManager() {
     httpd_init();
 }
 
-void networkManager::task(void *pvParameters) {
+void web::task(void *pvParameters) {
     while(1) {
 		taskYIELD();
 	}

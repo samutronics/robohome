@@ -11,13 +11,13 @@
 #include "iservice.hpp"
 #include "../projectconfiguration.hpp"
 
-namespace manager {
+namespace service {
 namespace outboundTask {
 
-class outputManager: public IManager{
-private: outputManager();
+class output: public IService{
+private: output();
 private: virtual void task(void *pvParameters);
-TO_BE_RUNABLE(outputManager)
+TO_BE_RUNABLE(output)
 
 private: xQueueHandle _queueOutbound;
 };

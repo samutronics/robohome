@@ -100,7 +100,7 @@ static u32 currentSystemClockFrequency = 0;
 
 }  // system
 
-namespace manager {
+namespace service {
 
 namespace outboundTask {
 namespace configuration {
@@ -120,7 +120,7 @@ const u32 THQueueWidth = 1;
 }  // configuration
 }  // inboundTask
 
-namespace networkTask {
+namespace webTask {
 namespace configuration {
 
 const u32 IPGatheringStrategie = IPADDR_USE_DHCP;

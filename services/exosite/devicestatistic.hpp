@@ -11,7 +11,7 @@
 #include "statisticentry.hpp"
 #include "../../projectconfiguration.hpp"
 
-namespace manager {
+namespace service {
 namespace exositeTask {
 
 class deviceStatistic {

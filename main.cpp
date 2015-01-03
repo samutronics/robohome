@@ -19,12 +19,12 @@
 #include "exosite.hpp"
 #include "projectconfiguration.hpp"
 
-using namespace manager::rtcTask;
-using namespace manager::inboundTask;
-using namespace manager::networkTask;
-using namespace manager::weatherTask;
-using namespace manager::exositeTask;
-using namespace manager::outboundTask;
+using namespace service::rtcTask;
+using namespace service::inboundTask;
+using namespace service::webTask;
+using namespace service::weatherTask;
+using namespace service::exositeTask;
+using namespace service::outboundTask;
 
 //! =============================================================================
 //! The main method is responsible for:
@@ -46,12 +46,12 @@ int main(void) {
     UARTprintf("\033[2J\033[H");
 	UARTprintf("application starts\n");
 
-	if(pdPASS != xTaskCreate(&inputManager::start,		"TaaT_TBHB_Input",	configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
-	if(pdPASS != xTaskCreate(&outputManager::start,		"TaaT_Output",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
-	if(pdPASS != xTaskCreate(&networkManager::start,	"TaaT_THBH_NP",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
-	if(pdPASS != xTaskCreate(&rtcManager::start,		"TaaT_RTC",			configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
-	if(pdPASS != xTaskCreate(&weatherManager::start,	"TaaT_WEATHER",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
-	if(pdPASS != xTaskCreate(&exositeManager::start,	"TaaT_Exosite",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
+	if(pdPASS != xTaskCreate(&input::start,		"TaaT_TBHB_Input",	configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
+	if(pdPASS != xTaskCreate(&output::start,		"TaaT_Output",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
+	if(pdPASS != xTaskCreate(&web::start,	"TaaT_THBH_NP",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
+	if(pdPASS != xTaskCreate(&sntp::start,		"TaaT_RTC",			configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
+	if(pdPASS != xTaskCreate(&weather::start,	"TaaT_WEATHER",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
+	if(pdPASS != xTaskCreate(&exosite::start,	"TaaT_Exosite",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
 
 	vTaskStartScheduler();
 	while(1);

@@ -14,18 +14,18 @@
 #include "exositerequestfactory.hpp"
 #include "../projectconfiguration.hpp"
 
-using namespace manager::exositeTask;
-using namespace manager::exositeTask::configuration;
+using namespace service::exositeTask;
+using namespace service::exositeTask::configuration;
 
-ip_addr											exositeManager::_serverIP;
-tcp_pcb*										exositeManager::_pcb;
-exositeManager::state							exositeManager::_state = idle;
-basicVector<u8, exositeManager::_rxTxBufSize>	exositeManager::_rxTxBuf;
+ip_addr											exosite::_serverIP;
+tcp_pcb*										exosite::_pcb;
+exosite::state							exosite::_state = idle;
+basicVector<u8, exosite::_rxTxBufSize>	exosite::_rxTxBuf;
 
-exositeManager::exositeManager() {
+exosite::exosite() {
 }
 
-void exositeManager::task(void *pvParameters) {
+void exosite::task(void *pvParameters) {
 	// check the server IP address at the first start and resolve the URL
     if(0 == _serverIP.addr || 0xFFFFFFFF == _serverIP.addr) {
     	// very stupid solution: wait until the LwIP stack is initialized
@@ -38,7 +38,7 @@ void exositeManager::task(void *pvParameters) {
 
 	u8 pucMACAddr[6];
 	EMACAddrGet(EMAC0_BASE, 0, pucMACAddr);
-	exosite::init("texasinstruments", "ek-tm4c1294xl", IF_ENET, pucMACAddr, 0);
+	exositeRequestFactory::init("texasinstruments", "ek-tm4c1294xl", IF_ENET, pucMACAddr, 0);
 
 	connectToServer();
 
@@ -47,10 +47,10 @@ void exositeManager::task(void *pvParameters) {
 	while(ESTABLISHED != _pcb->state) {taskYIELD();}
 
 	while(1) {
-		requestFactory::makeDeviceSyncRequest();
+		deviceRequestFactory::makeDeviceSyncRequest();
 
-		if((0 != requestFactory::writeRequestOutbound.len) && (_state == idle)) {
-			exosite::write(requestFactory::writeRequestOutbound, _rxTxBuf);
+		if((0 != deviceRequestFactory::writeRequestOutbound.len) && (_state == idle)) {
+			exositeRequestFactory::write(deviceRequestFactory::writeRequestOutbound, _rxTxBuf);
 			sendRequest();
 			_state = writeRequestSent;
 			_rxTxBuf.len = 0;
@@ -60,8 +60,8 @@ void exositeManager::task(void *pvParameters) {
 
 		vTaskDelay(updatePeriode / 2);
 
-		if((0 != requestFactory::readRequestOutbound.len) && (_state == idle)) {
-			exosite::read(requestFactory::readRequestOutbound, _rxTxBuf);
+		if((0 != deviceRequestFactory::readRequestOutbound.len) && (_state == idle)) {
+			exositeRequestFactory::read(deviceRequestFactory::readRequestOutbound, _rxTxBuf);
 			sendRequest();
 			_state = readRequestSent;
 			_rxTxBuf.len = 0;
@@ -70,7 +70,7 @@ void exositeManager::task(void *pvParameters) {
 		    deviceStatistic::reset();
 		    while(deviceStatistic::next()) {
 		    	vPortEnterCritical();
-		    	requestFactory::updateEntryByResponse(*deviceStatistic::current());
+		    	deviceRequestFactory::updateEntryByResponse(*deviceStatistic::current());
 
 		    	if(deviceStatistic::current()->entryName) {
 		    		static s8 value[statisticEntry::dataStringLength];
@@ -88,7 +88,7 @@ void exositeManager::task(void *pvParameters) {
 	}
 }
 
-void exositeManager::closeConnection(tcp_pcb* psPcb) {
+void exosite::closeConnection(tcp_pcb* psPcb) {
 	if(psPcb) {
 		//
 		// Clear out all of the TCP callbacks.
@@ -107,7 +107,7 @@ void exositeManager::closeConnection(tcp_pcb* psPcb) {
 	}
 }
 
-err_t exositeManager::connectToServer() {
+err_t exosite::connectToServer() {
 	closeConnection(_pcb);
 
 	//
@@ -121,7 +121,7 @@ err_t exositeManager::connectToServer() {
     return tcp_connect(_pcb, &_serverIP, serverPort, connectToServerCallback);
 }
 
-err_t exositeManager::sendRequest() {
+err_t exosite::sendRequest() {
     err_t retVal = tcp_write(_pcb, _rxTxBuf.container, _rxTxBuf.len, TCP_WRITE_FLAG_COPY);
 
 	//
@@ -137,13 +137,13 @@ err_t exositeManager::sendRequest() {
     return retVal;
 }
 
-void exositeManager::resolveHostCallback(const char* pcName, struct ip_addr* psIPAddr, void* vpArg) {
+void exosite::resolveHostCallback(const char* pcName, struct ip_addr* psIPAddr, void* vpArg) {
 	if(psIPAddr) {
 		_serverIP = *psIPAddr;
 	}
 }
 
-err_t exositeManager::connectToServerCallback(void *pvArg, struct tcp_pcb *psPcb, err_t iErr) {
+err_t exosite::connectToServerCallback(void *pvArg, struct tcp_pcb *psPcb, err_t iErr) {
     //
     // Check if there was a TCP error.
     //
@@ -162,7 +162,7 @@ err_t exositeManager::connectToServerCallback(void *pvArg, struct tcp_pcb *psPcb
     return(ERR_OK);
 }
 
-err_t exositeManager::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, struct pbuf* psBuf, err_t iErr) {
+err_t exosite::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, struct pbuf* psBuf, err_t iErr) {
 	struct pbuf *psBufCur;
 
 	if(!psBuf) {
@@ -172,11 +172,11 @@ err_t exositeManager::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, str
 
 	if(writeRequestSent == _state) {
 		_state = writeRequestProcessed;
-		exosite::parseWriteResult(psBuf);
+		exositeRequestFactory::parseWriteResult(psBuf);
 	}
 	else if(readRequestSent == _state) {
 		_state = readRequestProcessed;
-		exosite::parseReadResult(psBuf, requestFactory::response);
+		exositeRequestFactory::parseReadResult(psBuf, deviceRequestFactory::response);
 	}
 
 	//
@@ -218,8 +218,8 @@ err_t exositeManager::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, str
 	return(ERR_OK);
 }
 
-err_t exositeManager::TCPSentCallback(void* pvArg, struct tcp_pcb* psPcb, u16_t ui16Len) {return (ERR_OK);}
-void exositeManager::TCPErrorCallback(void*, err_t) {
+err_t exosite::TCPSentCallback(void* pvArg, struct tcp_pcb* psPcb, u16_t ui16Len) {return (ERR_OK);}
+void exosite::TCPErrorCallback(void*, err_t) {
 }
 
 // =============================================================================

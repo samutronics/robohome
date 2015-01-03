@@ -11,13 +11,13 @@
 #include "iservice.hpp"
 #include "../projectconfiguration.hpp"
 
-namespace manager {
+namespace service {
 namespace inboundTask {
 
-class inputManager: public IManager {
-private: inputManager();
+class input: public IService {
+private: input();
 private: virtual void task(void *pvParameters);
-TO_BE_RUNABLE(inputManager)
+TO_BE_RUNABLE(input)
 DEFINE_TH
 };
 
