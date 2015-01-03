@@ -13,7 +13,7 @@ using namespace manager::exositeTask;
 
 basicVector<u8, requestFactory::requestBufferSize> requestFactory::writeRequestOutbound;
 basicVector<u8, requestFactory::requestBufferSize> requestFactory::readRequestOutbound;
-basicVector<u8, requestFactory::requestBufferSize> requestFactory::_response;
+basicVector<u8, requestFactory::requestBufferSize> requestFactory::response;
 
 bool requestFactory::makeDeviceSyncRequest() {
     //
@@ -42,31 +42,19 @@ bool requestFactory::makeDeviceSyncRequest() {
     return true;
 }
 
-bool requestFactory::extractValueByAlias(const char* pcAlias, char* pcBuffer, char* pcDestString, uint32_t ui32MaxSize) {
-    char pcSearchString[100];
+bool requestFactory::updateEntryByResponse(statisticEntry& entry) {
     char *pcValueStart;
-    uint32_t ui32Idx;
-
-    //
-    // Set the search string to be the desired alias with an equals-sign
-    // appended. This should help us distinguish between a real alias and a
-    // string value made up of the same letters.
-    //
-    sprintf(pcSearchString, "%s=", pcAlias);
 
     //
     // Find the desired alias in the buffer.
     //
-    pcValueStart = strstr(pcBuffer, pcAlias);
+    pcValueStart = strstr((s8*)response.container, entry.entryAliasInCloud);
 
     //
     // If we couldn't find it, return a zero. Otherwise, continue extracting
     // the value.
     //
-    if(!pcValueStart)
-    {
-        return false;
-    }
+    if(!pcValueStart) {return false;}
 
     //
     // Find the equals-sign, which should be just before the start of the
@@ -74,10 +62,7 @@ bool requestFactory::extractValueByAlias(const char* pcAlias, char* pcBuffer, ch
     //
     pcValueStart = strstr(pcValueStart, "=");
 
-    if(!pcValueStart)
-    {
-        return false;
-    }
+    if(!pcValueStart) {return false;}
 
     //
     // Advance to the first character of the value.
@@ -88,76 +73,67 @@ bool requestFactory::extractValueByAlias(const char* pcAlias, char* pcBuffer, ch
     // Loop through the input value from the buffer, and copy characters to the
     // destination string.
     //
-    ui32Idx = 0;
-    while(ui32Idx < ui32MaxSize)
-    {
+    s8 pcDestString[statisticEntry::dataStringLength];
+    for(u32 index = 0; index < response.len; index++) {
         //
         // Check for the end of the value string.
         //
-        if((pcValueStart[ui32Idx] == '&') ||
-           (pcValueStart[ui32Idx] == 0))
-        {
+        if((pcValueStart[index] == '&') || (pcValueStart[index] == 0)) {
             //
             // If we have reached the end of the value, null-terminate the
             // destination string, and return.
             //
-            pcDestString[ui32Idx] = 0;
+            pcDestString[index] = 0;
+            entry.setValue(pcDestString);
             return true;
         }
-        else
-        {
-            pcDestString[ui32Idx] = pcValueStart[ui32Idx];
+        else {
+            pcDestString[index] = pcValueStart[index];
         }
-
-        ui32Idx++;
     }
 
-    pcDestString[ui32MaxSize - 1] = 0;
     return true;
 }
 
 bool requestFactory::makeSyncRequest(const statisticEntry& entry) {
-    char pcFormattedRequest[100];
+	char pcFormattedRequest[100];
 
-    //
-    // Only interact with the server if the stat has an alias
-    //
-    if(entry.entryAliasInCloud == 0) {
-        return true;
-    }
+	//
+	// Only interact with the server if the stat has an alias
+	//
+	if(entry.entryAliasInCloud == 0) {return true;}
 
-    //
-    // Check to see if we write this stat to the server.
-    //
-    if((entry.access == WRITE_ONLY) || (entry.access == READ_WRITE))
-    {
-        //
-        // Format a request to write the current value of this stat.
-        //
-    	entry.requestFormat(pcFormattedRequest);
+	//
+	// Check to see if we write this stat to the server.
+	//
+	if((entry.access == WRITE_ONLY) || (entry.access == READ_WRITE)) {
+		//
+		// Format a request to write the current value of this stat.
+		//
+		entry.requestFormat(pcFormattedRequest);
 
-        //
-        // If the request didn't fit, report failure.
-        //
-        if(!addRequest(pcFormattedRequest, writeRequestOutbound, strlen(pcFormattedRequest)))
-        {
-            return false;
-        }
+		//
+		// If the request didn't fit, report failure.
+		//
+		if(!addRequest(pcFormattedRequest, writeRequestOutbound, strlen(pcFormattedRequest))) {
+			return false;
+		}
 
-    }
-    else if(entry.access == READ_ONLY) {
-        //
-        // If the request didn't fit, report failure.
-        //
-        if(!addRequest(entry.entryAliasInCloud, readRequestOutbound, strlen(entry.entryAliasInCloud))) {
-            return false;
-        }
-    }
+	}
 
-    //
-    // Shouldn't get here...
-    //
-    return true;
+	if((entry.access == READ_ONLY) || (entry.access == READ_WRITE)) {
+		//
+		// If the request didn't fit, report failure.
+		//
+		if(!addRequest(entry.entryAliasInCloud, readRequestOutbound, strlen(entry.entryAliasInCloud))) {
+			return false;
+		}
+	}
+
+	//
+	// Shouldn't get here...
+	//
+	return true;
 }
 
 bool requestFactory::addRequest(const char* pcNewRequest, basicVector<u8, requestBufferSize>& buf, uint32_t ui32Size) {

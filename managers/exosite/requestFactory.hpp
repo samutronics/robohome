@@ -20,9 +20,9 @@ public: static const u32 requestBufferSize = 255;
 
 public: static bool makeDeviceSyncRequest();
 public: static bool makeSyncRequest(const statisticEntry& entry);
+public: static bool updateEntryByResponse(statisticEntry& entry);
 
 private: static bool addRequest(const char* pcNewRequest, basicVector<u8, requestBufferSize>& buf, uint32_t ui32Size);
-private: static bool extractValueByAlias(const char* pcAlias, char* pcBuffer, char* pcDestString, uint32_t ui32MaxSize);
 
 public: static basicVector<u8, requestBufferSize> writeRequestOutbound;
 public: static basicVector<u8, requestBufferSize> readRequestOutbound;
