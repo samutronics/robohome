@@ -17,8 +17,8 @@
 using namespace service::exositeTask;
 using namespace service::exositeTask::configuration;
 
-ip_addr											exosite::_serverIP;
-tcp_pcb*										exosite::_pcb;
+ip_addr									exosite::_serverIP;
+tcp_pcb*								exosite::_pcb;
 exosite::state							exosite::_state = idle;
 basicVector<u8, exosite::_rxTxBufSize>	exosite::_rxTxBuf;
 

@@ -23,6 +23,7 @@ TO_BE_RUNABLE(weather)
 
 private: static err_t connectToServer();
 private: static err_t sendRequest();
+private: static void closeConnection(tcp_pcb* psPcb);
 
 // =============================================================================
 // Callback methods
