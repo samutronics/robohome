@@ -10,7 +10,7 @@
 using namespace manager::exositeTask;
 
 statisticEntry sw0		("Button1", "usrsw1", INT, WRITE_ONLY);
-statisticEntry sw1		("Button1", "usrsw2", INT, WRITE_ONLY);
+statisticEntry sw1		("Button2", "usrsw2", INT, WRITE_ONLY);
 statisticEntry tempF	("Temp(F)", "", INT, WRITE_ONLY);
 statisticEntry tempC	("Temp(C)", "jtemp", INT, WRITE_ONLY);
 statisticEntry ontime	("Time since reset", "ontime", INT, WRITE_ONLY);
