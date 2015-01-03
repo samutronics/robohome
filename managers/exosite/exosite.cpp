@@ -79,11 +79,7 @@ int exosite::read(const basicVector<u8, requestFactory::requestBufferSize>& requ
 	// created by CAJ changes below.
 	//
 	int success = 0;
-//	int http_status = 0;
 	char bufCIK[41];
-//	unsigned char strLen, len, vlen;
-//	char *p;
-	//char *pcheck;
 
 	if (!exosite_initialized) {
 		_statusCode = EXO_STATUS_INIT;
