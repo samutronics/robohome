@@ -127,7 +127,6 @@ void exosite::parseReadResult(pbuf* buf, basicVector<u8, requestFactory::request
 			// read in the rest of the body as the value
 			result.len = buf->len - index;
 			strncpy((s8*)result.container, static_cast<s8*>(buf->payload) + index, result.len);
-			UARTprintf("Parse result is:\n%s\n", result.container);
 		}
 
 		_statusCode = EXO_STATUS_OK;
