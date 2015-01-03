@@ -69,16 +69,19 @@ void exosite::task(void *pvParameters) {
 
 		    deviceStatistic::reset();
 		    while(deviceStatistic::next()) {
-		    	vPortEnterCritical();
+		    	taskEXIT_CRITICAL();
 		    	deviceRequestFactory::updateEntryByResponse(*deviceStatistic::current());
 
+				//Guard the message printing.
+				taskENTER_CRITICAL();
 		    	if(deviceStatistic::current()->entryName) {
 		    		static s8 value[statisticEntry::dataStringLength];
 		    		deviceStatistic::current()->getValue(value);
 		    		UARTprintf("%s=%s\n", deviceStatistic::current()->entryName, value);
 		    	}
+		    	taskEXIT_CRITICAL(); //this is only for the systematic usage of print guarding
 
-		    	vPortExitCritical();
+		    	taskEXIT_CRITICAL();
 		    }
 
 		    _state = idle;

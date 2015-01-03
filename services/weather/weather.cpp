@@ -144,9 +144,12 @@ err_t weather::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, struct pbu
 		// Make sure some items were found.
 		//
 		if(i32Items > 0) {
+			//Guard the message printing.
+			taskENTER_CRITICAL();
 			UARTprintf("Temperature: %d C\n",	_report.Temp);
 			UARTprintf("Humidity: %d %%\n",		_report.Humidity);
 			UARTprintf("Pressure: %d hpa\n",	_report.Pressure);
+			taskEXIT_CRITICAL();
 		}
 		else if(i32Items < 0) {
 			UARTprintf("Invalid request arrived");
@@ -159,9 +162,12 @@ err_t weather::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, struct pbu
 		i32Items = JSONParseForecast(0, _report, psBuf);
 
 		if(i32Items > 0) {
+			//Guard the message printing.
+			taskENTER_CRITICAL();
 			UARTprintf("Temperature: %d C\n",	_report.Temp);
 			UARTprintf("Humidity: %d %%\n",		_report.Humidity);
 			UARTprintf("Pressure: %d hpa\n",	_report.Pressure);
+			taskEXIT_CRITICAL();
 		}
 		else if(i32Items < 0) {
 			UARTprintf("Invalid request arrived");

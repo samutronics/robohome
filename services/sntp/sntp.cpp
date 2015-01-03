@@ -52,6 +52,8 @@ void sntp::task(void *pvParameters) {
 		t->tm_year += 100;
 		HibernateCalendarSet(t);
 
+		//Guard the message printing.
+		taskENTER_CRITICAL();
 		HibernateCalendarGet(t);
 		UARTprintf("Date and time is set to: %d.%d.%d %d:%d:%d\n",
 				t->tm_mday,
@@ -60,6 +62,7 @@ void sntp::task(void *pvParameters) {
 				t->tm_hour,
 				t->tm_min,
 				t->tm_sec);
+		taskEXIT_CRITICAL();
 
 		// The task gives up its remained time-slice
 		taskYIELD();
