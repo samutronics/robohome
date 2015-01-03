@@ -35,16 +35,6 @@ private: static err_t TCPSentCallback(void *pvArg, struct tcp_pcb *psPcb, u16_t 
 private: static void TCPErrorCallback(void *vPArg, err_t iErr);
 
 // =============================================================================
-// HAL methods
-// =============================================================================
-
-public: static int exositeReadCallback(char* palias, char* pbuf, unsigned int buflen);
-
-private: static void socketClose(long lSocket);
-private: static u8 socketSend(long lSocket, s8* buffer, s32 length);
-private: static u8 socketRecv(long lSocket, s8* buffer, s32 length);
-
-// =============================================================================
 // Member declarations
 // =============================================================================
 

@@ -40,61 +40,44 @@ void exositeManager::task(void *pvParameters) {
 	EMACAddrGet(EMAC0_BASE, 0, pucMACAddr);
 	exosite::init("texasinstruments", "ek-tm4c1294xl", IF_ENET, pucMACAddr, 0);
 
-	while(1) {
-		requestFactory::makeDeviceSyncRequest();
+	requestFactory::makeDeviceSyncRequest();
 
+	connectToServer();
+
+	// wait for the proper connection state.
+	// it seems to be a suitable solution
+	while(ESTABLISHED != _pcb->state) {taskYIELD();}
+
+	while(1) {
 		if(0 != requestFactory::writeRequestOutbound.len) {
 			_state = writeRequestSent;
 			exosite::write(requestFactory::writeRequestOutbound, _rxTxBuf);
 
-	    	UARTprintf("\n================================Sent: =====================================\n");
-			UARTwrite((s8*)_rxTxBuf.container, _rxTxBuf.len);
-	    	UARTprintf("\n=====================================================================\n");
-
-	    	// send a connection request to the server
-	    	connectToServer();
-
-	    	// wait for the proper connection state.
-	    	// it seems to be a suitable solution
-	    	while(ESTABLISHED != _pcb->state) {taskYIELD();}
-
 			sendRequest();
 			_rxTxBuf.len = 0;
 			while(writeRequestProcessed != _state) {taskYIELD();}
-
-			closeConnection();
 		}
 
 		if(0 != requestFactory::readRequestOutbound.len) {
 			_state = readRequestSent;
 			exosite::read(requestFactory::readRequestOutbound, _rxTxBuf);
 
-	    	UARTprintf("\n================================Sent: =====================================\n");
-			UARTwrite((s8*)_rxTxBuf.container, _rxTxBuf.len);
-	    	UARTprintf("\n=====================================================================\n");
-
-	    	// send a connection request to the server
-	    	connectToServer();
-
-	    	// wait for the proper connection state.
-	    	// it seems to be a suitable solution
-	    	while(ESTABLISHED != _pcb->state) {taskYIELD();}
-
 			sendRequest();
 			_rxTxBuf.len = 0;
 			while(readRequestProcessed != _state) {taskYIELD();}
 
-			closeConnection();
+		    deviceStatistic::reset();
+		    while(deviceStatistic::next()) {
+		    	requestFactory::updateEntryByResponse(*deviceStatistic::current());
+		    }
 		}
 
-		vTaskDelay(4000);
-		//		taskYIELD();
+		vTaskDelay(updatePeriode);
 	}
 }
 
 void exositeManager::closeConnection() {
-	if(_pcb)
-	{
+	if(_pcb) {
 		//
 		// Clear out all of the TCP callbacks.
 		//
@@ -111,25 +94,12 @@ void exositeManager::closeConnection() {
 }
 
 err_t exositeManager::connectToServer() {
-	if(_pcb)
-	{
-		//
-        // Initially clear out all of the TCP callbacks.
-        //
-        tcp_sent(_pcb, 0);
-        tcp_recv(_pcb, 0);
-        tcp_err(_pcb, 0);
+	closeConnection();
 
-        //
-        // Make sure there is no lingering TCP connection.
-        //
-        tcp_close(_pcb);
-    }
-
-    //
-    // Create a new TCP socket.
-    //
-    _pcb = tcp_new();
+	//
+	// Create a new TCP socket.
+	//
+	_pcb = tcp_new();
 
     //
     // Attempt to connect to the server directly.
@@ -143,8 +113,7 @@ err_t exositeManager::sendRequest() {
 	//
     //  Write data for sending (but does not send it immediately).
     //
-    if(retVal == ERR_OK)
-    {
+    if(retVal == ERR_OK) {
         //
         // Find out what we can send and send it
         //
@@ -164,8 +133,7 @@ err_t exositeManager::connectToServerCallback(void *pvArg, struct tcp_pcb *psPcb
     //
     // Check if there was a TCP error.
     //
-    if(iErr != ERR_OK)
-    {
+    if(iErr != ERR_OK) {
         //
         // Clear out all of the TCP callbacks.
         //
@@ -177,8 +145,7 @@ err_t exositeManager::connectToServerCallback(void *pvArg, struct tcp_pcb *psPcb
         // Close the TCP connection.
         //
         tcp_close(psPcb);
-        if(psPcb == _pcb)
-        {
+        if(psPcb == _pcb) {
             _pcb = 0;
         }
 
@@ -197,76 +164,28 @@ err_t exositeManager::connectToServerCallback(void *pvArg, struct tcp_pcb *psPcb
 
 err_t exositeManager::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, struct pbuf* psBuf, err_t iErr) {
 	struct pbuf *psBufCur;
-	int32_t i32Items;
 
-	if(!psBuf)
-	{
+	if(!psBuf) {
 		//
 		// Close out the port.
 		//
 		tcp_close(psPcb);
-
-		if(psPcb == _pcb)
-		{
+		if(psPcb == _pcb) {
 			_pcb = 0;
 		}
 
 		return(ERR_OK);
 	}
 
-
-	UARTprintf("\n================================Received: =====================================\n");
-	UARTwrite((s8*)psBuf->payload, psBuf->tot_len);
-	UARTprintf("\n=====================================================================\n");
-
 	if(writeRequestSent == _state) {
 		_state = writeRequestProcessed;
+		exosite::parseWriteResult(psBuf);
 	}
 	else if(readRequestSent == _state) {
 		_state = readRequestProcessed;
+		exosite::parseReadResult(psBuf, requestFactory::response);
 	}
 
-/*
-	if(_request.type == currentRequest)
-	{
-		//
-		// Read items from the buffer.
-		//
-		i32Items = JSONParseCurrent(0, _report, psBuf);
-
-		//
-		// Make sure some items were found.
-		//
-		if(i32Items > 0)
-		{
-			UARTprintf("Temperature: %i\n",	_report.Temp);
-			UARTprintf("Humidity: %i\n",	_report.Humidity);
-			UARTprintf("Pressure: %i\n",	_report.Pressure);
-		}
-		else if(i32Items < 0)
-		{
-			UARTprintf("Invalid request arrived");
-		}
-	}
-	else if(_request.type == forecastRequest)
-	{
-		//
-		// Read items from the buffer.
-		//
-		i32Items = JSONParseForecast(0, _report, psBuf);
-
-		if(i32Items > 0)
-		{
-			UARTprintf("Temperature: %i\n",	_report.Temp);
-			UARTprintf("Humidity: %i\n",	_report.Humidity);
-			UARTprintf("Pressure: %i\n",	_report.Pressure);
-		}
-		else if(i32Items < 0)
-		{
-			UARTprintf("Invalid request arrived");
-		}
-	}
-*/
 	//
 	// Initialize the linked list pointer to parse.
 	//
@@ -311,14 +230,6 @@ err_t exositeManager::TCPSentCallback(void* pvArg, struct tcp_pcb* psPcb, u16_t 
 void exositeManager::TCPErrorCallback(void*, err_t) {
 }
 
-void exositeManager::socketClose(long lSocket) {
-}
-
-u8 exositeManager::socketSend(long lSocket, s8* buffer, s32 length) {
-}
-
-u8 exositeManager::socketRecv(long lSocket, s8* buffer, s32 length) {
-}
 // =============================================================================
 //! \file
 //! \copyright
