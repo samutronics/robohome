@@ -154,6 +154,7 @@ namespace configuration {
 const char serverURL[] = "m2.exosite.com";
 const u32 serverPort = 80;
 const u32 requestBufferSize = 4096;
+const u32 updatePeriode = 4000;
 
 }  // configuration
 }  // exositeTask
