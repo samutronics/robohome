@@ -57,8 +57,7 @@ inline void statisticEntry::setValue(const char* requestBuffer) {
 }
 
 inline bool statisticEntry::getValue(char* requestBuffer) const {
-	if(STRING != type) {return false;}
-	strncpy(requestBuffer, value, dataStringLength);
+	strcpy(requestBuffer, value);
 	return true;
 }
 
