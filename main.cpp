@@ -27,7 +27,6 @@ using namespace manager::exositeTask;
 using namespace manager::outboundTask;
 
 //! =============================================================================
-//! \fn
 //! The main method is responsible for:
 //!		* Setup system wide availeble stuffs, that are not relating to another
 //!			modules, like system clock
