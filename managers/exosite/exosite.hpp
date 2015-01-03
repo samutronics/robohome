@@ -43,9 +43,9 @@ enum ExositeStatusCodes {
 
 class exosite {
 public: static bool write(const basicVector<u8, requestFactory::requestBufferSize>& request, basicVector<u8, configuration::requestBufferSize>& buf);
-public: static int parseWriteResult(pbuf* buf);
+public: static void parseWriteResult(pbuf* buf);
 public: static int read(const basicVector<u8, requestFactory::requestBufferSize>& request, basicVector<u8, configuration::requestBufferSize>& buf);
-public: static int parseReadResult(pbuf* buf, char* pbuf, unsigned int buflen);
+public: static void parseReadResult(pbuf* buf, basicVector<u8, requestFactory::requestBufferSize>& result);
 
 public: static int init(const s8* vendor, const s8* model, const u8 if_nbr, u8* pui8MACAddr, s32 reset);
 public: static void setCIK(char* pCIK);

@@ -5,8 +5,6 @@
 //! \date			01.01.2015.
 //! \note
 // =============================================================================
-//#include "exosite_hal_lwip.h"
-
 #include "exosite.hpp"
 #include "metadata.hpp"
 #include "metadataentry.hpp"
@@ -64,20 +62,14 @@ bool exosite::write(const basicVector<u8, requestFactory::requestBufferSize>& re
 	return true;
 }
 
-int exosite::parseWriteResult(pbuf* buf) {
-	int success = 0;
-
+void exosite::parseWriteResult(pbuf* buf) {
 	int http_status = getHTTPStatus(buf);
-
 	if (401 == http_status) {
 		_statusCode = EXO_STATUS_NOAUTH;
 	}
-	if (204 == http_status) {
-		success = 1;
+	else if (204 == http_status) {
 		_statusCode = EXO_STATUS_OK;
 	}
-
-	return success;
 }
 
 int exosite::read(const basicVector<u8, requestFactory::requestBufferSize>& request, basicVector<u8, configuration::requestBufferSize>& buf) {
@@ -112,201 +104,44 @@ int exosite::read(const basicVector<u8, requestFactory::requestBufferSize>& requ
 	sendLine(buf, HOST_LINE, 0);
 	sendLine(buf, CIK_LINE, bufCIK);
 	sendLine(buf, ACCEPT_LINE, "\r\n");
-/*
-	//
-	// Modified by Texas Instruments DGT comment reference to pcheck no longer
-	// used. See TI CAJ modification below.
-	//
-	//pcheck = palias;
-	vlen = 0;
 
-	http_status = getHTTPStatus(sock);
-	if (200 == http_status)
-	{
-		char strBuf[_receiveSize];
-		unsigned char crlf = 0;
-
-		do
-		{
-			strLen = sendHandler(sock, strBuf, _receiveSize);
-			len = strLen;
-			p = strBuf;
-
-			// Find 4 consecutive \r or \n - should be: \r\n\r\n
-			while (0 < len && 4 > crlf)
-			{
-				if ('\r' == *p || '\n' == *p)
-				{
-					++crlf;
-				}
-				else
-				{
-					crlf = 0;
-				}
-				++p;
-				--len;
-			}
-
-			// The body is "<key>=<value>"
-			if (0 < len && 4 == crlf && buflen > vlen)
-			{
-
-				// Code below removed by CAJ. Removing the key works for a single
-				// READ request, but doesn't work if multiple values were requested.
-				// For multiple values, the server is not guaranteed to return every
-				// value in the same order that they were sent. This means that the
-				// caller will need the "key" to be able to determine which value
-				// belongs with which alias.
-
-				// Move past "<key>"
-				//        while (0 < len && 0 != *pcheck)
-				//        {
-				//          if (*pcheck == *p)
-				//          {
-				//            ++pcheck;
-				//          }
-				//          else
-				//          {
-				//            pcheck = palias;
-				//          }
-				//          ++p;
-				//          --len;
-				//        }
-				//
-				//        // Match '=',  we should now have '<key>='
-				//        if (0 < len && 0 == *pcheck && '=' == *p)
-				//        {
-				//          ++p;
-				//          --len;
-				//        }
-				//
-				// read in the rest of the body as the value
-				while (0 < len && buflen > vlen)
-				{
-					pbuf[vlen++] = *p++;
-					--len;
-				}
-			}
-		} while (_receiveSize == strLen);
-	}
-
-	closeHandler(sock);
-
-	if (200 == http_status) {
-		_statusCode = EXO_STATUS_OK;
-	}
-	if (204 == http_status) {
-		_statusCode = EXO_STATUS_OK;
-	}
-	if (401 == http_status) {
-		_statusCode = EXO_STATUS_NOAUTH;
-	}
-
-	return vlen;
-*/
 	return 1;
 }
 
-int exosite::parseReadResult(pbuf* buf, char* pbuf, unsigned int buflen) {
-/*
-	//
-	// Modified by Texas Instruments, DGT, changed buflen from unsigned char to
-	// unsigned int. comment out declaration of *pcheck to prevent warnings
-	// created by CAJ changes below.
-	//
-	unsigned char strLen, len, vlen;
-	char *p;
-	//char *pcheck;
-
-	//
-	// Modified by Texas Instruments DGT comment reference to pcheck no longer
-	// used. See TI CAJ modification below.
-	//
-	//pcheck = palias;
-	vlen = 0;
-
+void exosite::parseReadResult(pbuf* buf, basicVector<u8, requestFactory::requestBufferSize>& result) {
 	int http_status = getHTTPStatus(buf);
-	if (200 == http_status)
-	{
-		char strBuf[_receiveSize];
-		unsigned char crlf = 0;
-
-		do
-		{
-			strLen = receiveHandler(sock, strBuf, _receiveSize);
-			len = strLen;
-			p = strBuf;
-
-			// Find 4 consecutive \r or \n - should be: \r\n\r\n
-			while (0 < len && 4 > crlf)
-			{
-				if ('\r' == *p || '\n' == *p)
-				{
-					++crlf;
-				}
-				else
-				{
-					crlf = 0;
-				}
-				++p;
-				--len;
-			}
-
-			// The body is "<key>=<value>"
-			if (0 < len && 4 == crlf && buflen > vlen)
-			{
-
-				// Code below removed by CAJ. Removing the key works for a single
-				// READ request, but doesn't work if multiple values were requested.
-				// For multiple values, the server is not guaranteed to return every
-				// value in the same order that they were sent. This means that the
-				// caller will need the "key" to be able to determine which value
-				// belongs with which alias.
-
-				// Move past "<key>"
-				//        while (0 < len && 0 != *pcheck)
-				//        {
-				//          if (*pcheck == *p)
-				//          {
-				//            ++pcheck;
-				//          }
-				//          else
-				//          {
-				//            pcheck = palias;
-				//          }
-				//          ++p;
-				//          --len;
-				//        }
-				//
-				//        // Match '=',  we should now have '<key>='
-				//        if (0 < len && 0 == *pcheck && '=' == *p)
-				//        {
-				//          ++p;
-				//          --len;
-				//        }
-				//
-				// read in the rest of the body as the value
-				while (0 < len && buflen > vlen)
-				{
-					pbuf[vlen++] = *p++;
-					--len;
-				}
-			}
-		} while (_receiveSize == strLen);
-	}
-
 	if (200 == http_status) {
+		u8 crlf = 0;
+		u32 index = 0;
+
+		// Find 4 consecutive \r or \n - should be: \r\n\r\n
+		while (index < buf->len && 4 > crlf) {
+			if ('\r' == static_cast<s8*>(buf->payload)[index] || '\n' == static_cast<s8*>(buf->payload)[index]) {
+				++crlf;
+			}
+			else {
+				crlf = 0;
+			}
+
+			index++;
+		}
+
+		// The body is "<key>=<value>"
+		if (4 == crlf) {
+			// read in the rest of the body as the value
+			result.len = buf->len - index;
+			strncpy((s8*)result.container, static_cast<s8*>(buf->payload) + index, result.len);
+			UARTprintf("Parse result is:\n%s\n", result.container);
+		}
+
 		_statusCode = EXO_STATUS_OK;
 	}
-	if (204 == http_status) {
+	else if (204 == http_status) {
 		_statusCode = EXO_STATUS_OK;
 	}
-	if (401 == http_status) {
+	else if (401 == http_status) {
 		_statusCode = EXO_STATUS_NOAUTH;
 	}
-
-	return vlen;
-*/
 }
 
 int exosite::init(const s8* vendor, const s8* model, const u8 if_nbr, u8* pui8MACAddr, s32 reset) {
