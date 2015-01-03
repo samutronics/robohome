@@ -2,109 +2,64 @@
 //! \file
 //! \brief
 //! \author         Norbert Toth
-//! \date			01.01.2015.
+//! \date			30.12.2014.
 //! \note
 // =============================================================================
-#ifndef _EXOSITE_H_
-#define _EXOSITE_H_
+#ifndef _EXOSITEMANAGER_H_
+#define _EXOSITEMANAGER_H_
 
-#include "lwip/tcp.h"
+#include "imanager.hpp"
 #include "basicvector.hpp"
-#include "requestFactory.hpp"
-#include "../../projectconfiguration.hpp"
 
 namespace manager {
 namespace exositeTask {
 
-enum UUIDInterfaceTypes {
-    IF_WIFI,
-    IF_ENET,
-    IF_FILE,
-    IF_HDD,
-    IF_I2C,
-    IF_GPRS,
-    IF_NONE
+class exositeManager: public IManager {
+private: exositeManager();
+private: virtual void task(void *pvParameters);
+TO_BE_RUNABLE(exositeManager)
+
+private: static err_t connectToServer();
+private: static err_t sendRequest();
+private: static void closeConnection(tcp_pcb* psPcb);
+
+// =============================================================================
+// Callback methods
+// =============================================================================
+
+private: static void resolveHostCallback(const char *pcName, struct ip_addr *psIPAddr, void *vpArg);
+private: static err_t connectToServerCallback(void *pvArg, struct tcp_pcb *psPcb, err_t iErr);
+
+private: static err_t TCPReceiveCallback(void *pvArg, struct tcp_pcb *psPcb, struct pbuf *psBuf, err_t iErr);
+private: static err_t TCPSentCallback(void *pvArg, struct tcp_pcb *psPcb, u16_t ui16Len);
+private: static void TCPErrorCallback(void *vPArg, err_t iErr);
+
+// =============================================================================
+// Member declarations
+// =============================================================================
+
+private: static const u16						_rxTxBufSize = 4096;
+private: static basicVector<u8, _rxTxBufSize>	_rxTxBuf;
+private: static ip_addr							_serverIP;
+private: static tcp_pcb*						_pcb;
+
+private: enum state {
+	readRequestSent,
+	readRequestProcessed,
+	writeRequestSent,
+	writeRequestProcessed,
+	idle
 };
 
-enum ExositeStatusCodes {
-    EXO_STATUS_OK,
-    EXO_STATUS_INIT,
-    EXO_STATUS_BAD_UUID,
-    EXO_STATUS_BAD_VENDOR,
-    EXO_STATUS_BAD_MODEL,
-    EXO_STATUS_BAD_INIT,
-    EXO_STATUS_BAD_TCP,
-    EXO_STATUS_BAD_SN,
-    EXO_STATUS_CONFLICT,
-    EXO_STATUS_BAD_CIK,
-    EXO_STATUS_NOAUTH,
-    EXO_STATUS_END
-};
-
-class exosite {
-public: static bool write(const basicVector<u8, requestFactory::requestBufferSize>& request, basicVector<u8, configuration::requestBufferSize>& buf);
-public: static void parseWriteResult(pbuf* buf);
-public: static int read(const basicVector<u8, requestFactory::requestBufferSize>& request, basicVector<u8, configuration::requestBufferSize>& buf);
-public: static void parseReadResult(pbuf* buf, basicVector<u8, requestFactory::requestBufferSize>& result);
-
-public: static int init(const s8* vendor, const s8* model, const u8 if_nbr, u8* pui8MACAddr, s32 reset);
-public: static void setCIK(char* pCIK);
-public: static int getCIK(char* pCIK);
-public: static inline ExositeStatusCodes statusCode() {return _statusCode;}
-
-private: static int info_assemble(const char* vendor, const char* model, const char* sn);
-private: static inline void update_m2ip() {return;}
-private: static int getHTTPStatus(pbuf* buf);
-private: static void sendLine(basicVector<u8, configuration::requestBufferSize>& buf, unsigned char LINE, const char* payload);
-
-private: static ExositeStatusCodes _statusCode;
-private: static int exosite_initialized;
-
-private: static const u8	_vendorNameSize = 20;
-private: static const u8	_modelNameSize = 20;
-private: static const u8	_serialNumberSize = 25;
-private: static const u16	_updateInterval = 4000;
-private: static const u8	_CIKSize = 40;
-
-private: static const u8	_maxConnectRetryCount = 5;
-private: static const u8	_length = _serialNumberSize + _modelNameSize + _vendorNameSize;
-private: static const u8	_receiveSize = 50;
-private: static const u8	_MACLength = 6;
-
-private: static s8			_exositeProvisionInfo[_length];
-
-private: static const s8	_requestPartCIKHeader[];
-private: static const s8	_requestPartContentLength[];
-private: static const s8	_requestPartGetURL[];
-private: static const s8	_requestPartHTTP[];
-private: static const s8	_requestPartHost[];
-private: static const s8	_requestPartAccept[];
-private: static const s8	_requestPartContent[];
-private: static const s8	_requestPartVendor[];
-private: static const s8	_requestPartModel[];
-private: static const s8	_requestPartSerialNumber[];
-private: static const s8	_requestPartCRLF[];
-
-private: enum lineTypes {
-  CIK_LINE,
-  HOST_LINE,
-  CONTENT_LINE,
-  ACCEPT_LINE,
-  LENGTH_LINE,
-  GETDATA_LINE,
-  POSTDATA_LINE,
-  EMPTY_LINE
-};
-
+private: static state		_state;
 };
 
 } // exositeTask
 
 } // manager
 
-#endif // _EXOSITE_H_
-
+#endif // _EXOSITEMANAGER_H_
 // =============================================================================
 //! \file
 //! \copyright
-// ========================= end of file: exosite.hpp ==========================
+// ==================== end of file: exositemanager.hpp ========================

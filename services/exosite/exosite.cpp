@@ -2,345 +2,227 @@
 //! \file
 //! \brief
 //! \author         Norbert Toth
-//! \date			01.01.2015.
+//! \date			30.12.2014.
 //! \note
 // =============================================================================
+#include "lwIP/err.h"
+#include "lwIP/ip_addr.h"
+#include "lwIP/dns.h"
 #include "exosite.hpp"
-#include "metadata.hpp"
-#include "metadataentry.hpp"
+#include "requestFactory.hpp"
+#include "exositemanager.hpp"
+#include "devicestatistic.hpp"
+#include "../projectconfiguration.hpp"
 
 using namespace manager::exositeTask;
+using namespace manager::exositeTask::configuration;
 
-const s8 exosite::_requestPartCIKHeader[]		= "X-Exosite-CIK: ";
-const s8 exosite::_requestPartContentLength[]	= "Content-Length: ";
-const s8 exosite::_requestPartGetURL[]			= "GET /onep:v1/stack/alias?";
-const s8 exosite::_requestPartHTTP[]			= "  HTTP/1.1\r\n";
-const s8 exosite::_requestPartHost[]			= "Host: m2.exosite.com\r\n";
-const s8 exosite::_requestPartAccept[]			= "Accept: application/x-www-form-urlencoded; charset=utf-8\r\n";
-const s8 exosite::_requestPartContent[]			= "Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n";
-const s8 exosite::_requestPartVendor[]			= "vendor=";
-const s8 exosite::_requestPartModel[]			= "model=";
-const s8 exosite::_requestPartSerialNumber[]	= "sn=";
-const s8 exosite::_requestPartCRLF[]			= "\r\n";
+ip_addr											exositeManager::_serverIP;
+tcp_pcb*										exositeManager::_pcb;
+exositeManager::state							exositeManager::_state = idle;
+basicVector<u8, exositeManager::_rxTxBufSize>	exositeManager::_rxTxBuf;
 
-s8 exosite::_exositeProvisionInfo[_length];
-ExositeStatusCodes exosite::_statusCode;
-int exosite::exosite_initialized;
-
-bool exosite::write(const basicVector<u8, requestFactory::requestBufferSize>& request, basicVector<u8, configuration::requestBufferSize>& buf) {
-	char bufCIK[41];
-	char strBuf[10];
-
-	if (!exosite_initialized) {
-		_statusCode = EXO_STATUS_INIT;
-		return false;
-	}
-
-	if (!getCIK(bufCIK)) {
-		return false;
-	}
-
-	// This is an example write POST...
-	//  s.send('POST /onep:v1/stack/alias HTTP/1.1\r\n')
-	//  s.send('Host: m2.exosite.com\r\n')
-	//  s.send('X-Exosite-CIK: 5046454a9a1666c3acfae63bc854ec1367167815\r\n')
-	//  s.send('Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n')
-	//  s.send('Content-Length: 6\r\n\r\n')
-	//  s.send('temp=2')
-
-	sprintf(strBuf, "%d", request.len);
-
-	sendLine(buf, POSTDATA_LINE, "/onep:v1/stack/alias");
-	sendLine(buf, HOST_LINE, 0);
-	sendLine(buf, CIK_LINE, bufCIK);
-	sendLine(buf, CONTENT_LINE, 0);
-	sendLine(buf, LENGTH_LINE, strBuf);
-
-	strncpy((s8*)(buf.container + buf.len), (s8*)request.container, request.len);
-	buf.len += request.len;
-
-	return true;
+exositeManager::exositeManager() {
 }
 
-void exosite::parseWriteResult(pbuf* buf) {
-	int http_status = getHTTPStatus(buf);
-	if (401 == http_status) {
-		_statusCode = EXO_STATUS_NOAUTH;
-	}
-	else if (204 == http_status) {
-		_statusCode = EXO_STATUS_OK;
-	}
-}
+void exositeManager::task(void *pvParameters) {
+	// check the server IP address at the first start and resolve the URL
+    if(0 == _serverIP.addr || 0xFFFFFFFF == _serverIP.addr) {
+    	// very stupid solution: wait until the LwIP stack is initialized
+    	// it would be better, that the LwIP initialize can send some signal, like events, or semaphore.
+        while(ERR_ARG == dns_gethostbyname(serverURL, &_serverIP, resolveHostCallback, 0)) {taskYIELD();}
+    }
 
-int exosite::read(const basicVector<u8, requestFactory::requestBufferSize>& request, basicVector<u8, configuration::requestBufferSize>& buf) {
-	//
-	// Modified by Texas Instruments, DGT, changed buflen from unsigned char to
-	// unsigned int. comment out declaration of *pcheck to prevent warnings
-	// created by CAJ changes below.
-	//
-	int success = 0;
-	char bufCIK[41];
+    // waiting for the server address
+	while(0 == _serverIP.addr || 0xFFFFFFFF == _serverIP.addr) {taskYIELD();}
 
-	if (!exosite_initialized) {
-		_statusCode = EXO_STATUS_INIT;
-		return success;
-	}
+	u8 pucMACAddr[6];
+	EMACAddrGet(EMAC0_BASE, 0, pucMACAddr);
+	exosite::init("texasinstruments", "ek-tm4c1294xl", IF_ENET, pucMACAddr, 0);
 
-	if (!getCIK(bufCIK)) {
-		return success;
-	}
+	connectToServer();
 
-	// This is an example read GET
-	//  s.send('GET /onep:v1/stack/alias?temp HTTP/1.1\r\n')
-	//  s.send('Host: m2.exosite.com\r\n')
-	//  s.send('X-Exosite-CIK: 5046454a9a1666c3acfae63bc854ec1367167815\r\n')
-	//  s.send('Accept: application/x-www-form-urlencoded; charset=utf-8\r\n\r\n')
+	// wait for the proper connection state.
+	// it seems to be a suitable solution
+	while(ESTABLISHED != _pcb->state) {taskYIELD();}
 
-	sendLine(buf, GETDATA_LINE, (s8*)request.container);
-	sendLine(buf, HOST_LINE, 0);
-	sendLine(buf, CIK_LINE, bufCIK);
-	sendLine(buf, ACCEPT_LINE, "\r\n");
+	while(1) {
+		requestFactory::makeDeviceSyncRequest();
 
-	return 1;
-}
-
-void exosite::parseReadResult(pbuf* buf, basicVector<u8, requestFactory::requestBufferSize>& result) {
-	int http_status = getHTTPStatus(buf);
-	if (200 == http_status) {
-		u8 crlf = 0;
-		u32 index = 0;
-
-		// Find 4 consecutive \r or \n - should be: \r\n\r\n
-		while (index < buf->len && 4 > crlf) {
-			if ('\r' == static_cast<s8*>(buf->payload)[index] || '\n' == static_cast<s8*>(buf->payload)[index]) {
-				++crlf;
-			}
-			else {
-				crlf = 0;
-			}
-
-			index++;
+		if((0 != requestFactory::writeRequestOutbound.len) && (_state == idle)) {
+			exosite::write(requestFactory::writeRequestOutbound, _rxTxBuf);
+			sendRequest();
+			_state = writeRequestSent;
+			_rxTxBuf.len = 0;
+			while(writeRequestProcessed != _state) {taskYIELD();}
+			_state = idle;
 		}
 
-		// The body is "<key>=<value>"
-		if (4 == crlf) {
-			// read in the rest of the body as the value
-			result.len = buf->len - index;
-			strncpy((s8*)result.container, static_cast<s8*>(buf->payload) + index, result.len);
+		vTaskDelay(updatePeriode / 2);
+
+		if((0 != requestFactory::readRequestOutbound.len) && (_state == idle)) {
+			exosite::read(requestFactory::readRequestOutbound, _rxTxBuf);
+			sendRequest();
+			_state = readRequestSent;
+			_rxTxBuf.len = 0;
+			while(readRequestProcessed != _state) {taskYIELD();}
+
+		    deviceStatistic::reset();
+		    while(deviceStatistic::next()) {
+		    	vPortEnterCritical();
+		    	requestFactory::updateEntryByResponse(*deviceStatistic::current());
+
+		    	if(deviceStatistic::current()->entryName) {
+		    		static s8 value[statisticEntry::dataStringLength];
+		    		deviceStatistic::current()->getValue(value);
+		    		UARTprintf("%s=%s\n", deviceStatistic::current()->entryName, value);
+		    	}
+
+		    	vPortExitCritical();
+		    }
+
+		    _state = idle;
 		}
 
-		_statusCode = EXO_STATUS_OK;
-	}
-	else if (204 == http_status) {
-		_statusCode = EXO_STATUS_OK;
-	}
-	else if (401 == http_status) {
-		_statusCode = EXO_STATUS_NOAUTH;
+		vTaskDelay(updatePeriode / 2);
 	}
 }
 
-int exosite::init(const s8* vendor, const s8* model, const u8 if_nbr, u8* pui8MACAddr, s32 reset) {
-	char struuid[_serialNumberSize];
+void exositeManager::closeConnection(tcp_pcb* psPcb) {
+	if(psPcb) {
+		//
+		// Clear out all of the TCP callbacks.
+		//
+		tcp_sent(psPcb, 0);
+		tcp_recv(psPcb, 0);
+		tcp_err(psPcb, 0);
 
-	metaData::init(reset);          //always initialize Exosite meta structure
-
-	sprintf((char *)struuid,"%02x%02x%02x%02x%02x%02x",
-			(char)pui8MACAddr[0],
-			(char)pui8MACAddr[1],
-			(char)pui8MACAddr[2],
-			(char)pui8MACAddr[3],
-			(char)pui8MACAddr[4],
-			(char)pui8MACAddr[5]);
-
-	unsigned char uuid_len =  strlen(struuid);
-
-	if (0 == uuid_len) {
-		_statusCode = EXO_STATUS_BAD_UUID;
-		return 0;
+		//
+		// Close the TCP connection.
+		//
+		tcp_close(psPcb);
+        if(psPcb == _pcb) {
+            _pcb = 0;
+        }
 	}
-	if (strlen(vendor) > _vendorNameSize) {
-		_statusCode = EXO_STATUS_BAD_VENDOR;
-		return 0;
-	}
-	if (strlen(model) > _modelNameSize) {
-		_statusCode = EXO_STATUS_BAD_MODEL;
-		return 0;
-	}
-
-	metaData::write((unsigned char *)struuid, uuid_len, META_UUID);
-
-	// read UUID into 'sn'
-	info_assemble(vendor, model, struuid);
-
-	exosite_initialized = 1;
-
-	_statusCode = EXO_STATUS_OK;
-
-	return 1;
 }
 
-void exosite::setCIK(char* pCIK) {
-	if (!exosite_initialized) {
-		_statusCode = EXO_STATUS_INIT;
-		return;
-	}
-	metaData::write((unsigned char *)pCIK, _CIKSize, META_CIK);
-	_statusCode = EXO_STATUS_OK;
-	return;
+err_t exositeManager::connectToServer() {
+	closeConnection(_pcb);
+
+	//
+	// Create a new TCP socket.
+	//
+	_pcb = tcp_new();
+
+    //
+    // Attempt to connect to the server directly.
+    //
+    return tcp_connect(_pcb, &_serverIP, serverPort, connectToServerCallback);
 }
 
-int exosite::getCIK(char* pCIK) {
-	unsigned char i;
-	char tempCIK[_CIKSize + 1];
+err_t exositeManager::sendRequest() {
+    err_t retVal = tcp_write(_pcb, _rxTxBuf.container, _rxTxBuf.len, TCP_WRITE_FLAG_COPY);
 
-	metaData::read((unsigned char *)tempCIK, _CIKSize, META_CIK);
-	tempCIK[_CIKSize] = 0;
+	//
+    //  Write data for sending (but does not send it immediately).
+    //
+    if(retVal == ERR_OK) {
+        //
+        // Find out what we can send and send it
+        //
+        retVal = tcp_output(_pcb);
+    }
 
-	for (i = 0; i < _CIKSize; i++)
+    return retVal;
+}
+
+void exositeManager::resolveHostCallback(const char* pcName, struct ip_addr* psIPAddr, void* vpArg) {
+	if(psIPAddr) {
+		_serverIP = *psIPAddr;
+	}
+}
+
+err_t exositeManager::connectToServerCallback(void *pvArg, struct tcp_pcb *psPcb, err_t iErr) {
+    //
+    // Check if there was a TCP error.
+    //
+    if(iErr != ERR_OK) {
+    	closeConnection(psPcb);
+        return (ERR_OK);
+    }
+
+    tcp_recv(psPcb, TCPReceiveCallback);
+    tcp_err(psPcb, TCPErrorCallback);
+    tcp_sent(psPcb, TCPSentCallback);
+
+    //
+    // Return a success code.
+    //
+    return(ERR_OK);
+}
+
+err_t exositeManager::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, struct pbuf* psBuf, err_t iErr) {
+	struct pbuf *psBufCur;
+
+	if(!psBuf) {
+		closeConnection(psPcb);
+		return(ERR_OK);
+	}
+
+	if(writeRequestSent == _state) {
+		_state = writeRequestProcessed;
+		exosite::parseWriteResult(psBuf);
+	}
+	else if(readRequestSent == _state) {
+		_state = readRequestProcessed;
+		exosite::parseReadResult(psBuf, requestFactory::response);
+	}
+
+	//
+	// Initialize the linked list pointer to parse.
+	//
+	psBufCur = psBuf;
+
+	//
+	// Free the buffers used since they have been processed.
+	//
+	while(psBufCur->len != 0)
 	{
-		if (!(tempCIK[i] >= 'a' && tempCIK[i] <= 'f' || tempCIK[i] >= '0' && tempCIK[i] <= '9'))
-		{
-			_statusCode = EXO_STATUS_BAD_CIK;
-			return 0;
+		//
+		// Indicate that you have received and processed this set of TCP data.
+		//
+		tcp_recved(psPcb, psBufCur->len);
+
+		//
+		// Go to the next buffer.
+		//
+		psBufCur = psBufCur->next;
+
+		//
+		// Terminate if there are no more buffers.
+		//
+		if(psBufCur == 0) {
+			break;
 		}
 	}
 
-	if (NULL != pCIK)
-		memcpy(pCIK, tempCIK, _CIKSize + 1);
+	//
+	// Free the memory space allocated for this receive.
+	//
+	pbuf_free(psBuf);
 
-	return 1;
+	//
+	// Return.
+	//
+	return(ERR_OK);
 }
 
-int exosite::info_assemble(const char* vendor, const char* model, const char* sn) {
-	int info_len = 0;
-	int assemble_len = 0;
-	char * vendor_info = _exositeProvisionInfo;
-
-	// verify the assembly length
-	assemble_len = strlen(_requestPartVendor) + strlen(vendor)
-	                		 + strlen(_requestPartModel) + strlen(model)
-	                		 + strlen(_requestPartSerialNumber) + 3;
-	if (assemble_len > 95)
-		return info_len;
-
-	// vendor=
-	memcpy(vendor_info, _requestPartVendor, strlen(_requestPartVendor));
-	info_len = strlen(_requestPartVendor);
-
-	// vendor="custom's vendor"
-	memcpy(&vendor_info[info_len], vendor, strlen(vendor));
-	info_len += strlen(vendor);
-
-	// vendor="custom's vendor"&
-	vendor_info[info_len] = '&'; // &
-	info_len += 1;
-
-	// vendor="custom's vendor"&model=
-	memcpy(&vendor_info[info_len], _requestPartModel, strlen(_requestPartModel));
-	info_len += strlen(_requestPartModel);
-
-	// vendor="custom's vendor"&model="custom's model"
-	memcpy(&vendor_info[info_len], model, strlen(model));
-	info_len += strlen(model);
-
-	// vendor="custom's vendor"&model="custom's model"&
-	vendor_info[info_len] = '&'; // &
-	info_len += 1;
-
-	// vendor="custom's vendor"&model="custom's model"&sn=
-	memcpy(&vendor_info[info_len], _requestPartSerialNumber, strlen(_requestPartSerialNumber));
-	info_len += strlen(_requestPartSerialNumber);
-
-	// vendor="custom's vendor"&model="custom's model"&sn="device's sn"
-	memcpy(&vendor_info[info_len], sn, strlen(sn));
-	info_len += strlen(sn);
-
-	vendor_info[info_len] = 0;
-
-	return info_len;
-}
-
-int exosite::getHTTPStatus(pbuf* buf) {
-	char rxBuf[12];
-
-	memcpy(rxBuf, buf->payload, 12);
-
-	// exampel '4','0','4' =>  404  (as number)
-	int code = (((rxBuf[9] - 0x30) * 100) +
-			((rxBuf[10] - 0x30) * 10) +
-			(rxBuf[11] - 0x30));
-	return code;
-}
-
-void exosite::sendLine(basicVector<u8, configuration::requestBufferSize>& buf, unsigned char LINE, const char* payload) {
-	char strBuf[70];
-	unsigned char strLen;
-
-	switch(LINE) {
-	case CIK_LINE:
-		strLen = sizeof(_requestPartCIKHeader) - 1;
-		memcpy(strBuf,_requestPartCIKHeader,strLen);
-		memcpy(&strBuf[strLen],payload, strlen(payload));
-		strLen += strlen(payload);
-		memcpy(&strBuf[strLen],_requestPartCRLF, 2);
-		strLen += sizeof(_requestPartCRLF) - 1;
-		break;
-	case HOST_LINE:
-		strLen = sizeof(_requestPartHost) - 1;
-		memcpy(strBuf,_requestPartHost,strLen);
-		break;
-	case CONTENT_LINE:
-		strLen = sizeof(_requestPartContent) - 1;
-		memcpy(strBuf,_requestPartContent,strLen);
-		break;
-	case ACCEPT_LINE:
-		strLen = sizeof(_requestPartAccept) - 1;
-		memcpy(strBuf,_requestPartAccept,strLen);
-		memcpy(&strBuf[strLen],payload, strlen(payload));
-		strLen += strlen(payload);
-		break;
-	case LENGTH_LINE: // Content-Length: NN
-		strLen = sizeof(_requestPartContentLength) - 1;
-		memcpy(strBuf,_requestPartContentLength,strLen);
-		memcpy(&strBuf[strLen],payload, strlen(payload));
-		strLen += strlen(payload);
-		memcpy(&strBuf[strLen],_requestPartCRLF, 2);
-		strLen += 2;
-		memcpy(&strBuf[strLen],_requestPartCRLF, 2);
-		strLen += 2;
-		break;
-	case GETDATA_LINE:
-		strLen = sizeof(_requestPartGetURL) - 1;
-		memcpy(strBuf,_requestPartGetURL,strLen);
-		memcpy(&strBuf[strLen],payload, strlen(payload));
-		strLen += strlen(payload);
-		memcpy(&strBuf[strLen], _requestPartHTTP, sizeof(_requestPartHTTP) - 1);
-		strLen += sizeof(_requestPartHTTP) - 1;
-		break;
-	case POSTDATA_LINE:
-		strLen = sizeof("POST ") - 1;
-		memcpy(strBuf,"POST ", strLen);
-		memcpy(&strBuf[strLen],payload, strlen(payload));
-		strLen += strlen(payload);
-		memcpy(&strBuf[strLen],_requestPartHTTP, sizeof(_requestPartHTTP) - 1);
-		strLen += sizeof(_requestPartHTTP) - 1;
-		break;
-	case EMPTY_LINE:
-		strLen = sizeof(_requestPartCRLF) - 1;
-		memcpy(strBuf,_requestPartCRLF,strLen);
-		break;
-	default:
-		break;
-	}
-
-	strBuf[strLen] = 0;
-	strncpy((s8*)(buf.container + buf.len), strBuf, strLen);
-	buf.len += strLen;
-
-	return;
+err_t exositeManager::TCPSentCallback(void* pvArg, struct tcp_pcb* psPcb, u16_t ui16Len) {return (ERR_OK);}
+void exositeManager::TCPErrorCallback(void*, err_t) {
 }
 
 // =============================================================================
 //! \file
 //! \copyright
-// ========================= end of file: exosite.cpp ==========================
+// ===================== end of file: exositemanager.cpp =======================
