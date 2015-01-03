@@ -54,23 +54,29 @@ void weather::task(void *pvParameters) {
 	}
 }
 
+void weather::closeConnection(tcp_pcb* psPcb) {
+	if(psPcb) {
+		//
+		// Clear out all of the TCP callbacks.
+		//
+		tcp_sent(psPcb, 0);
+		tcp_recv(psPcb, 0);
+		tcp_err(psPcb, 0);
+
+		//
+		// Close the TCP connection.
+		//
+		tcp_close(psPcb);
+        if(psPcb == _pcb) {
+            _pcb = 0;
+        }
+	}
+}
+
 err_t weather::connectToServer() {
-    if(_pcb)
-    {
-        //
-        // Initially clear out all of the TCP callbacks.
-        //
-        tcp_sent(_pcb, 0);
-        tcp_recv(_pcb, 0);
-        tcp_err(_pcb, 0);
+	closeConnection(_pcb);
 
-        //
-        // Make sure there is no lingering TCP connection.
-        //
-        tcp_close(_pcb);
-    }
-
-    //
+	//
     // Create a new TCP socket.
     //
     _pcb = tcp_new();
@@ -87,8 +93,7 @@ err_t weather::sendRequest() {
     //
     //  Write data for sending (but does not send it immediately).
     //
-    if(retVal == ERR_OK)
-    {
+    if(retVal == ERR_OK) {
         //
         // Find out what we can send and send it
         //
@@ -108,24 +113,8 @@ err_t weather::connectToServerCallback(void *pvArg, struct tcp_pcb *psPcb, err_t
     //
     // Check if there was a TCP error.
     //
-    if(iErr != ERR_OK)
-    {
-        //
-        // Clear out all of the TCP callbacks.
-        //
-        tcp_sent(psPcb, 0);
-        tcp_recv(psPcb, 0);
-        tcp_err(psPcb, 0);
-
-        //
-        // Close the TCP connection.
-        //
-        tcp_close(psPcb);
-        if(psPcb == _pcb)
-        {
-            _pcb = 0;
-        }
-
+    if(iErr != ERR_OK) {
+    	closeConnection(psPcb);
         return (ERR_OK);
     }
 
@@ -133,9 +122,6 @@ err_t weather::connectToServerCallback(void *pvArg, struct tcp_pcb *psPcb, err_t
     tcp_err(psPcb, TCPErrorCallback);
     tcp_sent(psPcb, TCPSentCallback);
 
-    //
-    // Return a success code.
-    //
     return(ERR_OK);
 }
 
@@ -143,23 +129,12 @@ err_t weather::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, struct pbu
 	struct pbuf *psBufCur;
 	int32_t i32Items;
 
-	if(!psBuf)
-	{
-		//
-		// Close out the port.
-		//
-		tcp_close(psPcb);
-
-		if(psPcb == _pcb)
-		{
-			_pcb = 0;
-		}
-
+	if(!psBuf) {
+		closeConnection(psPcb);
 		return(ERR_OK);
 	}
 
-	if(_request.type == currentRequest)
-	{
+	if(_request.type == currentRequest) {
 		//
 		// Read items from the buffer.
 		//
@@ -168,32 +143,27 @@ err_t weather::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, struct pbu
 		//
 		// Make sure some items were found.
 		//
-		if(i32Items > 0)
-		{
-			UARTprintf("Temperature: %i\n",	_report.Temp);
-			UARTprintf("Humidity: %i\n",	_report.Humidity);
-			UARTprintf("Pressure: %i\n",	_report.Pressure);
+		if(i32Items > 0) {
+			UARTprintf("Temperature: %d C\n",	_report.Temp);
+			UARTprintf("Humidity: %d %%\n",		_report.Humidity);
+			UARTprintf("Pressure: %d hpa\n",	_report.Pressure);
 		}
-		else if(i32Items < 0)
-		{
+		else if(i32Items < 0) {
 			UARTprintf("Invalid request arrived");
 		}
 	}
-	else if(_request.type == forecastRequest)
-	{
+	else if(_request.type == forecastRequest) {
 		//
 		// Read items from the buffer.
 		//
 		i32Items = JSONParseForecast(0, _report, psBuf);
 
-		if(i32Items > 0)
-		{
-			UARTprintf("Temperature: %i\n",	_report.Temp);
-			UARTprintf("Humidity: %i\n",	_report.Humidity);
-			UARTprintf("Pressure: %i\n",	_report.Pressure);
+		if(i32Items > 0) {
+			UARTprintf("Temperature: %d C\n",	_report.Temp);
+			UARTprintf("Humidity: %d %%\n",		_report.Humidity);
+			UARTprintf("Pressure: %d hpa\n",	_report.Pressure);
 		}
-		else if(i32Items < 0)
-		{
+		else if(i32Items < 0) {
 			UARTprintf("Invalid request arrived");
 		}
 	}
@@ -231,10 +201,6 @@ err_t weather::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, struct pbu
 	// Free the memory space allocated for this receive.
 	//
 	pbuf_free(psBuf);
-
-	//
-	// Return.
-	//
 	return(ERR_OK);
 }
 
