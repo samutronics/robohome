@@ -26,7 +26,7 @@ private: static bool extractValueByAlias(const char* pcAlias, char* pcBuffer, ch
 
 public: static basicVector<u8, requestBufferSize> writeRequestOutbound;
 public: static basicVector<u8, requestBufferSize> readRequestOutbound;
-public: static basicVector<u8, requestBufferSize> _response;
+public: static basicVector<u8, requestBufferSize> response;
 };
 
 } // exositeTask
