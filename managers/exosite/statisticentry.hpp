@@ -86,17 +86,14 @@ inline bool statisticEntry::getValue(s32& requestBuffer) const {
 inline void statisticEntry::requestFormat(char* requestBuffer) const {
 	switch (type) {
 	case STRING: {
-#pragma warning "synchronization may require";
 		sprintf(requestBuffer, "%s=%s", entryAliasInCloud, value);
 		break;
 	}
 	case INT: {
-#pragma warning "check the correct alignement in the value string"
 		sprintf(requestBuffer, "%s=%d", entryAliasInCloud, strtol(value, 0, 10));
 		break;
 	}
 	case HEX: {
-#pragma warning "check the correct alignement in the value string"
 		sprintf(requestBuffer, "%s=0x%x", entryAliasInCloud, strtol(value, 0, 16));
 		break;
 	}
