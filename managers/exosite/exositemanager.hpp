@@ -21,7 +21,7 @@ TO_BE_RUNABLE(exositeManager)
 
 private: static err_t connectToServer();
 private: static err_t sendRequest();
-private: static void closeConnection();
+private: static void closeConnection(tcp_pcb* psPcb);
 
 // =============================================================================
 // Callback methods

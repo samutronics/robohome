@@ -40,8 +40,6 @@ void exositeManager::task(void *pvParameters) {
 	EMACAddrGet(EMAC0_BASE, 0, pucMACAddr);
 	exosite::init("texasinstruments", "ek-tm4c1294xl", IF_ENET, pucMACAddr, 0);
 
-	requestFactory::makeDeviceSyncRequest();
-
 	connectToServer();
 
 	// wait for the proper connection state.
@@ -49,52 +47,68 @@ void exositeManager::task(void *pvParameters) {
 	while(ESTABLISHED != _pcb->state) {taskYIELD();}
 
 	while(1) {
-		if(0 != requestFactory::writeRequestOutbound.len) {
-			_state = writeRequestSent;
-			exosite::write(requestFactory::writeRequestOutbound, _rxTxBuf);
+		requestFactory::makeDeviceSyncRequest();
 
+		if((0 != requestFactory::writeRequestOutbound.len) && (_state == idle)) {
+			exosite::write(requestFactory::writeRequestOutbound, _rxTxBuf);
 			sendRequest();
+			_state = writeRequestSent;
 			_rxTxBuf.len = 0;
 			while(writeRequestProcessed != _state) {taskYIELD();}
+			_state = idle;
 		}
 
-		if(0 != requestFactory::readRequestOutbound.len) {
-			_state = readRequestSent;
-			exosite::read(requestFactory::readRequestOutbound, _rxTxBuf);
+		vTaskDelay(updatePeriode / 2);
 
+		if((0 != requestFactory::readRequestOutbound.len) && (_state == idle)) {
+			exosite::read(requestFactory::readRequestOutbound, _rxTxBuf);
 			sendRequest();
+			_state = readRequestSent;
 			_rxTxBuf.len = 0;
 			while(readRequestProcessed != _state) {taskYIELD();}
 
 		    deviceStatistic::reset();
 		    while(deviceStatistic::next()) {
+		    	vPortEnterCritical();
 		    	requestFactory::updateEntryByResponse(*deviceStatistic::current());
+
+		    	if(deviceStatistic::current()->entryName) {
+		    		static s8 value[statisticEntry::dataStringLength];
+		    		deviceStatistic::current()->getValue(value);
+		    		UARTprintf("%s=%s\n", deviceStatistic::current()->entryName, value);
+		    	}
+
+		    	vPortExitCritical();
 		    }
+
+		    _state = idle;
 		}
 
-		vTaskDelay(updatePeriode);
+		vTaskDelay(updatePeriode / 2);
 	}
 }
 
-void exositeManager::closeConnection() {
-	if(_pcb) {
+void exositeManager::closeConnection(tcp_pcb* psPcb) {
+	if(psPcb) {
 		//
 		// Clear out all of the TCP callbacks.
 		//
-		tcp_sent(_pcb, 0);
-		tcp_recv(_pcb, 0);
-		tcp_err(_pcb, 0);
+		tcp_sent(psPcb, 0);
+		tcp_recv(psPcb, 0);
+		tcp_err(psPcb, 0);
 
 		//
 		// Close the TCP connection.
 		//
-		tcp_close(_pcb);
-		_pcb = 0;
+		tcp_close(psPcb);
+        if(psPcb == _pcb) {
+            _pcb = 0;
+        }
 	}
 }
 
 err_t exositeManager::connectToServer() {
-	closeConnection();
+	closeConnection(_pcb);
 
 	//
 	// Create a new TCP socket.
@@ -134,21 +148,7 @@ err_t exositeManager::connectToServerCallback(void *pvArg, struct tcp_pcb *psPcb
     // Check if there was a TCP error.
     //
     if(iErr != ERR_OK) {
-        //
-        // Clear out all of the TCP callbacks.
-        //
-        tcp_sent(psPcb, 0);
-        tcp_recv(psPcb, 0);
-        tcp_err(psPcb, 0);
-
-        //
-        // Close the TCP connection.
-        //
-        tcp_close(psPcb);
-        if(psPcb == _pcb) {
-            _pcb = 0;
-        }
-
+    	closeConnection(psPcb);
         return (ERR_OK);
     }
 
@@ -166,14 +166,7 @@ err_t exositeManager::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, str
 	struct pbuf *psBufCur;
 
 	if(!psBuf) {
-		//
-		// Close out the port.
-		//
-		tcp_close(psPcb);
-		if(psPcb == _pcb) {
-			_pcb = 0;
-		}
-
+		closeConnection(psPcb);
 		return(ERR_OK);
 	}
 
@@ -209,8 +202,7 @@ err_t exositeManager::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, str
 		//
 		// Terminate if there are no more buffers.
 		//
-		if(psBufCur == 0)
-		{
+		if(psBufCur == 0) {
 			break;
 		}
 	}
