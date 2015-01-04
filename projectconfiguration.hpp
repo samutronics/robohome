@@ -128,7 +128,7 @@ const u32 IPGatheringStrategie = IPADDR_USE_DHCP;
 }  // configuration
 }  // networkTask
 
-namespace rtcTask {
+namespace sntpTask {
 namespace configuration {
 
 const u32 rtcQueueLength = 1;

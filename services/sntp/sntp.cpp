@@ -11,7 +11,7 @@
 #include "ipcQueue.hpp"
 
 using namespace communication::ipc;
-using namespace service::rtcTask;
+using namespace service::sntpTask;
 
 sntp::sntp() {
 	HibernateEnableExpClk(systemGlobal::currentSystemClockFrequency);

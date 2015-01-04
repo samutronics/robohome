@@ -19,7 +19,7 @@
 #include "exosite.hpp"
 #include "projectconfiguration.hpp"
 
-using namespace service::rtcTask;
+using namespace service::sntpTask;
 using namespace service::inboundTask;
 using namespace service::webTask;
 using namespace service::weatherTask;
