@@ -159,9 +159,6 @@ err_t exosite::connectToServerCallback(void *pvArg, struct tcp_pcb *psPcb, err_t
     tcp_err(psPcb, TCPErrorCallback);
     tcp_sent(psPcb, TCPSentCallback);
 
-    //
-    // Return a success code.
-    //
     return(ERR_OK);
 }
 
@@ -190,8 +187,7 @@ err_t exosite::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, struct pbu
 	//
 	// Free the buffers used since they have been processed.
 	//
-	while(psBufCur->len != 0)
-	{
+	while(psBufCur->len != 0) {
 		//
 		// Indicate that you have received and processed this set of TCP data.
 		//
@@ -205,9 +201,7 @@ err_t exosite::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, struct pbu
 		//
 		// Terminate if there are no more buffers.
 		//
-		if(psBufCur == 0) {
-			break;
-		}
+		if(!psBufCur) {break;}
 	}
 
 	//

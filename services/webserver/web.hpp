@@ -22,7 +22,7 @@ TO_BE_RUNABLE(web)
 
 } // networkTask
 
-} // manager
+} // service
 
 #endif // _WEB_HPP_
 // =============================================================================

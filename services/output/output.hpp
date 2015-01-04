@@ -24,7 +24,7 @@ private: xQueueHandle _queueOutbound;
 
 } // outboundTask
 
-} // manager
+} // service
 
 #endif // _OUTPUT_H_
 // =============================================================================

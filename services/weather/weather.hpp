@@ -48,7 +48,7 @@ private: static weatherRequest	_request;
 
 } // weatherTask
 
-} // manager
+} // service
 
 #endif // _WEATHER_H_
 // =============================================================================

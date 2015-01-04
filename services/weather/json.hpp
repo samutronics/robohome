@@ -39,6 +39,6 @@ int32_t JSONParseForecast(uint32_t ui32Index, report& psWeatherReport, struct pb
 
 } // weatherTask
 
-} // manager
+} // service
 
 #endif

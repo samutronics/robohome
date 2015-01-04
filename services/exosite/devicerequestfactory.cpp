@@ -170,8 +170,7 @@ bool deviceRequestFactory::addRequest(const char* pcNewRequest, basicVector<u8, 
         buf.container[buf.len] = 0;
         return true;
     }
-    else
-    {
+    else {
         //
         // If the input string is too long, return a zero.
         //
