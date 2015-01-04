@@ -15,7 +15,19 @@ namespace service {
 namespace webTask {
 
 class web: public IService {
+// =============================================================================
+//! \brief Initialize the hardware and necessary objects
+//!
+//!	Due to the singleton implementation, it will be done whitin the thread context.
+//! The initialization consist of the following steps:
+// =============================================================================
 private: web();
+
+// =============================================================================
+//! \brief Empty implementation of the task.
+//!
+//!	This basic implementation is required due to the architecture convenience.
+// =============================================================================
 private: virtual void task(void *pvParameters);
 TO_BE_RUNABLE(web)
 };
