@@ -69,7 +69,7 @@ void exosite::task(void *pvParameters) {
 
 		    deviceStatistic::reset();
 		    while(deviceStatistic::next()) {
-		    	taskEXIT_CRITICAL();
+				taskENTER_CRITICAL();
 		    	deviceRequestFactory::updateEntryByResponse(*deviceStatistic::current());
 
 				//Guard the message printing.
