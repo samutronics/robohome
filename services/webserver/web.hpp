@@ -5,8 +5,8 @@
 //! \date			03.12.2014.
 //! \note
 // =============================================================================
-#ifndef _NETWORKMANAGER_HPP_
-#define _NETWORKMANAGER_HPP_
+#ifndef _WEB_HPP_
+#define _WEB_HPP_
 
 #include "iservice.hpp"
 #include "../projectconfiguration.hpp"
@@ -24,7 +24,7 @@ TO_BE_RUNABLE(web)
 
 } // manager
 
-#endif // _NETWORKMANAGER_HPP_
+#endif // _WEB_HPP_
 // =============================================================================
 //! \file
 //! \copyright

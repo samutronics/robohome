@@ -5,8 +5,8 @@
 //! \date			15.12.2014.
 //! \note
 // =============================================================================
-#ifndef _RTCMANAGER_H_
-#define _RTCMANAGER_H_
+#ifndef _SNTP_HPP_
+#define _SNTP_HPP_
 
 #include "iservice.hpp"
 #include "../projectconfiguration.hpp"
@@ -26,7 +26,7 @@ DEFINE_TH
 
 } // manager
 
-#endif // _RTCMANAGER_H_
+#endif // _SNTP_HPP_
 // =============================================================================
 //! \file
 //! \copyright

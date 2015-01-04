@@ -5,8 +5,8 @@
 //! \date			29.12.2014.
 //! \note
 // =============================================================================
-#ifndef _WEATHERREPORT_H_
-#define _WEATHERREPORT_H_
+#ifndef _REPORT_H_
+#define _REPORT_H_
 
 #include "../projectconfiguration.hpp"
 
@@ -69,7 +69,7 @@ class report {
 
 } // manager
 
-#endif // _WEATHERREPORT_H_
+#endif // _REPORT_H_
 // =============================================================================
 //! \file
 //! \copyright

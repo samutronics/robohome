@@ -5,8 +5,8 @@
 //! \date			06.12.2014.
 //! \note
 // =============================================================================
-#ifndef _OUTPUTMANAGER_H_
-#define _OUTPUTMANAGER_H_
+#ifndef _OUTPUT_H_
+#define _OUTPUT_H_
 
 #include "iservice.hpp"
 #include "../projectconfiguration.hpp"
@@ -26,7 +26,7 @@ private: xQueueHandle _queueOutbound;
 
 } // manager
 
-#endif // _OUTPUTMANAGER_H_
+#endif // _OUTPUT_H_
 // =============================================================================
 //! \file
 //! \copyright

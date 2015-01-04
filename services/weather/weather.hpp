@@ -5,8 +5,8 @@
 //! \date			29.12.2014.
 //! \note
 // =============================================================================
-#ifndef _WEATHERMANAGER_H_
-#define _WEATHERMANAGER_H_
+#ifndef _WEATHER_H_
+#define _WEATHER_H_
 
 #include "report.hpp"
 #include "iservice.hpp"
@@ -50,7 +50,7 @@ private: static weatherRequest	_request;
 
 } // manager
 
-#endif // _WEATHERMANAGER_H_
+#endif // _WEATHER_H_
 // =============================================================================
 //! \file
 //! \copyright

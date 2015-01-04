@@ -5,8 +5,8 @@
 //! \date			03.12.2014.
 //! \note
 // =============================================================================
-#ifndef _LED_MANAGER_H_
-#define _LED_MANAGER_H_
+#ifndef _INPUT_H_
+#define _INPUT_H_
 
 #include "iservice.hpp"
 #include "../projectconfiguration.hpp"
@@ -25,7 +25,7 @@ DEFINE_TH
 
 }  // manager
 
-#endif //_LED_MANAGER_H_
+#endif //_INPUT_H_
 // =============================================================================
 //! \file
 //! \copyright
