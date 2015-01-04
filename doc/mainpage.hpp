@@ -18,6 +18,7 @@
 //! THBH: Top halve Bottom halve interrupt model, where:<br>
 //!     * top halve can be: IaaT<br>
 //!     * bottom halve can be: TaaT<br>
+//!	ITC: Inter Task Communication, similar to term IPC, applied to use only in multithreadding environment<br>
 
 // =============================================================================
 //! \file
