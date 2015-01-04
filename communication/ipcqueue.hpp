@@ -16,7 +16,6 @@
 #include "../projectconfiguration.hpp"
 
 namespace communication {
-
 namespace ipc {
 
 enum queueID {
@@ -45,6 +44,10 @@ private: xQueueHandle _q[last_queueID_element];
 
 private: static ipcQueue _singleton;
 };
+
+// =============================================================================
+// Inline function implementation
+// =============================================================================
 
 inline ipcQueue& ipcQueue::singleton() {
 	return _singleton;

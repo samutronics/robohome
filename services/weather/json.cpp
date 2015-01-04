@@ -26,7 +26,6 @@
 #include <stdio.h>
 #include <string.h>
 
-//#include "ustdlib.h"
 #include "lwiplib.h"
 #include "json.hpp"
 #include "images.hpp"

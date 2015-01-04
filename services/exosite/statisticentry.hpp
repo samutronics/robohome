@@ -49,7 +49,7 @@ private: valueType type;
 };
 
 // =============================================================================
-// section for impelentation of inpline methods
+// Inline method implementation
 // =============================================================================
 
 inline void statisticEntry::setValue(const char* requestBuffer) {
