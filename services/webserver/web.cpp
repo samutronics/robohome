@@ -34,6 +34,13 @@ web::web() {
     mac[5] = ((usr1 >> 16) & 0xff);
 
     lwIPInit(systemGlobal::currentSystemClockFrequency, mac, 0, 0, 0, IPGatheringStrategie);
+    while((0xFFFFFFFF == lwIPLocalIPAddrGet()) || (0x0 == lwIPLocalIPAddrGet())) {taskYIELD();}
+
+    //Guard the message printing.
+    taskENTER_CRITICAL();
+    u32 IP = lwIPLocalIPAddrGet();
+    UARTprintf("Device IP address: %d.%d.%d.%d\n", (IP & 0xff), ((IP >> 8) & 0xff), ((IP >> 16) & 0xff), ((IP >> 24) & 0xff));
+    taskEXIT_CRITICAL();
 
     httpd_init();
 }
