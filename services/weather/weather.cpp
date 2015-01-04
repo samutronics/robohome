@@ -24,32 +24,51 @@ weather::weather() {
 }
 
 void weather::task(void *pvParameters) {
-	// check the server IP address at the first start and resolve the URL
-    if(0 == _serverIP.addr || 0xFFFFFFFF == _serverIP.addr) {
-    	// very stupid solution: wait until the LwIP stack is initialized
-    	// it would be better, that the LwIP initialize can send some signal, like events, or semaphore.
-        while(ERR_ARG == dns_gethostbyname(weatherServerURL, &_serverIP, resolveHostCallback, 0)) {taskYIELD();}
-    }
+	// =============================================================================
+	//! * At this point, the excecution has to wait for the end of the
+	//!		inicialization of the dns module. Until that, argument error will be
+	//!		returned from the dns lookup.
+	//!	\note Refactoring of each of LwIP services would be nice to became queriable
+	//! the its state, or the service send eny kind of event.
+	// =============================================================================
+	while(ERR_ARG == dns_gethostbyname(weatherServerURL, &_serverIP, resolveHostCallback, 0)) {taskYIELD();}
 
-    // waiting for the server address
+	// =============================================================================
+	//! * Block the execution until the server IP will be resolved. It will be done
+	//! in the tcp thread.
+	// =============================================================================
 	while(0 == _serverIP.addr || 0xFFFFFFFF == _serverIP.addr) {taskYIELD();}
 
-	// create the request.
-	// Please note, that whitespaces aren't allowed in the request
+	// =============================================================================
+	//! * Create HTTP get request to query the actual weather informations. It has
+	//! to be done only once.
+	//! \warning Whitespaces are not allowed in the the request.
+	// =============================================================================
 	weatherRequestFactory::request(_request, "Budapest,HU", false, 0);
 
 	while(1) {
-		// send a connection request to the server
+		// =============================================================================
+		//! .
+		//! The further steps are excecuted periodically.
+		//! * Connect to the server, and block the execution until the connection will
+		//! be established.
+		// =============================================================================
 		connectToServer();
-
-		// wait for the proper connection state.
-		// it seems to be a suitable solution
 		while(ESTABLISHED != _pcb->state) {taskYIELD();}
 
-		// write the request into the TCP socket.
+		// =============================================================================
+		//! * Write the request to the tcp socket, and flush the data
+		// =============================================================================
 		sendRequest();
 
-		// block the task until the update time elapses.
+		// =============================================================================
+		//! * Close the socket, so that the LwIP resources are freed.
+		// =============================================================================
+		closeConnection(_pcb);
+
+		// =============================================================================
+		//! * Wait until the time of the next request
+		// =============================================================================
 		vTaskDelay(weatherReportUpdateTime);
 	}
 }
@@ -125,6 +144,13 @@ err_t weather::connectToServerCallback(void *pvArg, struct tcp_pcb *psPcb, err_t
     return(ERR_OK);
 }
 
+// =============================================================================
+//! If an empty buffer arrived, the callbeck will close the socket, and notify
+//! the service about the successful processing. In any other cases, checks the
+//! request type stored locally and parse as JSON object.
+//! In case of successful parsing, the important report items will be wrtitten
+//! into the terminal.
+// =============================================================================
 err_t weather::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, struct pbuf* psBuf, err_t iErr) {
 	struct pbuf *psBufCur;
 	int32_t i32Items;
