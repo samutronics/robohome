@@ -29,7 +29,7 @@ void weather::task(void *pvParameters) {
 	//!		inicialization of the dns module. Until that, argument error will be
 	//!		returned from the dns lookup.
 	//!	\note Refactoring of each of LwIP services would be nice to became queriable
-	//! the its state, or the service send eny kind of event.
+	//! about its state, or the service send any kind of event.
 	// =============================================================================
 	while(ERR_ARG == dns_gethostbyname(weatherServerURL, &_serverIP, resolveHostCallback, 0)) {taskYIELD();}
 
