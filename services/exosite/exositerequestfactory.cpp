@@ -344,4 +344,4 @@ void exositeRequestFactory::sendLine(basicVector<u8, configuration::requestBuffe
 // =============================================================================
 //! \file
 //! \copyright
-// ========================= end of file: exosite.cpp ==========================
+// ===================== end of file: exositerequestfactory.cpp ================

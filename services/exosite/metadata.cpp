@@ -117,4 +117,4 @@ void metaData::writeMetaItem(u8* pucBuffer, s32 iLength, s32 iOffset) {
 // =============================================================================
 //! \file
 //! \copyright
-// ========================= end of file: metadata.hpp =========================
+// ========================= end of file: metadata.cpp =========================

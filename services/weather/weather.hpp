@@ -54,4 +54,4 @@ private: static weatherRequest	_request;
 // =============================================================================
 //! \file
 //! \copyright
-// ==================== end of file: weathermanager.hpp ========================
+// ======================== end of file: weather.hpp ===========================

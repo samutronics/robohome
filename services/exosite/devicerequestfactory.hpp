@@ -36,4 +36,4 @@ public: static basicVector<u8, requestBufferSize> response;
 // =============================================================================
 //! \file
 //! \copyright
-// ===================== end of file: requestfactory.hpp =======================
+// ==================== end of file: devicerequestfactory.hpp ==================

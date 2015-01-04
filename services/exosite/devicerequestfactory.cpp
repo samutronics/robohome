@@ -181,4 +181,4 @@ bool deviceRequestFactory::addRequest(const char* pcNewRequest, basicVector<u8, 
 // =============================================================================
 //! \file
 //! \copyright
-// ========================= end of file: request.cpp ==========================
+// ==================== end of file: devicerequestfactory.cpp ==================

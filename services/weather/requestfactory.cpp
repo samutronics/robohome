@@ -55,4 +55,4 @@ void weatherRequestFactory::request(weatherRequest& request, const char* locatio
 // =============================================================================
 //! \file
 //! \copyright
-// ================ end of file: weatherrequestfactory.cpp =====================
+// ==================== end of file: requestfactory.cpp ========================

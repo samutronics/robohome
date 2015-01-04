@@ -48,4 +48,4 @@ private: static const char pcCount[];
 // =============================================================================
 //! \file
 //! \copyright
-// ================ end of file: weatherrequestfactory.hpp =====================
+// ==================== end of file: requestfactory.hpp ========================
