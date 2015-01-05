@@ -144,6 +144,7 @@ const char weatherServerURL[] = "api.openweathermap.org";
 const u32 weatherServerPort = 80;
 const u32 requestSize = 256;
 const u32 weatherReportUpdateTime = 1800000; //0.5 h with the current scheduler setting: 1000 Hz task preemtion.
+const u32 connectionTimeOut = 10000; //10 s with the current scheduler setting: 1000 Hz task preemtion.
 
 }  // configuration
 }  // weatherTask

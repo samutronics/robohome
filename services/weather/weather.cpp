@@ -19,11 +19,14 @@ report			weather::_report;
 ip_addr			weather::_serverIP;
 tcp_pcb*		weather::_pcb;
 weatherRequest	weather::_request;
+bool			weather::_tcpRequestReceived;
 
 weather::weather() {
 }
 
 void weather::task(void *pvParameters) {
+	UARTprintf("Weather task: waiting for IP address...\n");
+	while(0x0 == lwIPLocalIPAddrGet() || 0xFFFFFFFF == lwIPLocalIPAddrGet()) {taskYIELD();}
 	// =============================================================================
 	//! * At this point, the excecution has to wait for the end of the
 	//!		inicialization of the dns module. Until that, argument error will be
@@ -59,11 +62,14 @@ void weather::task(void *pvParameters) {
 		// =============================================================================
 		//! * Write the request to the tcp socket, and flush the data
 		// =============================================================================
+		_tcpRequestReceived = false;
 		sendRequest();
 
 		// =============================================================================
 		//! * Close the socket, so that the LwIP resources are freed.
 		// =============================================================================
+		vTaskDelay(connectionTimeOut);
+		if(!_tcpRequestReceived) {UARTprintf("Response of weather request failed, try again!");}
 		closeConnection(_pcb);
 
 		// =============================================================================
@@ -178,7 +184,7 @@ err_t weather::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, struct pbu
 			taskEXIT_CRITICAL();
 		}
 		else if(i32Items < 0) {
-			UARTprintf("Invalid request arrived");
+			UARTprintf("Invalid request arrived\n");
 		}
 	}
 	else if(_request.type == forecastRequest) {
@@ -196,9 +202,11 @@ err_t weather::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, struct pbu
 			taskEXIT_CRITICAL();
 		}
 		else if(i32Items < 0) {
-			UARTprintf("Invalid request arrived");
+			UARTprintf("Invalid request arrived\n");
 		}
 	}
+
+	_tcpRequestReceived = true;
 
 	//
 	// Initialize the linked list pointer to parse.

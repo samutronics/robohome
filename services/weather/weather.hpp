@@ -84,6 +84,7 @@ private: static report			_report;
 private: static ip_addr			_serverIP;
 private: static tcp_pcb*		_pcb;
 private: static weatherRequest	_request;
+private: static bool			_tcpRequestReceived;
 };
 
 } // weatherTask
