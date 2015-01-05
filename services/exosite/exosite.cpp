@@ -27,12 +27,9 @@ exosite::exosite() {
 
 void exosite::task(void *pvParameters) {
 	while(0x0 == lwIPLocalIPAddrGet() || 0xFFFFFFFF == lwIPLocalIPAddrGet()) {taskYIELD();}
-	// check the server IP address at the first start and resolve the URL
-    if(0 == _serverIP.addr || 0xFFFFFFFF == _serverIP.addr) {
-    	// very stupid solution: wait until the LwIP stack is initialized
-    	// it would be better, that the LwIP initialize can send some signal, like events, or semaphore.
-        while(ERR_ARG == dns_gethostbyname(serverURL, &_serverIP, resolveHostCallback, 0)) {taskYIELD();}
-    }
+	// very stupid solution: wait until the LwIP stack is initialized
+	// it would be better, that the LwIP initialize can send some signal, like events, or semaphore.
+	while(ERR_ARG == dns_gethostbyname(serverURL, &_serverIP, resolveHostCallback, 0)) {taskYIELD();}
 
     // waiting for the server address
 	while(0 == _serverIP.addr || 0xFFFFFFFF == _serverIP.addr) {taskYIELD();}
@@ -165,7 +162,6 @@ err_t exosite::connectToServerCallback(void *pvArg, struct tcp_pcb *psPcb, err_t
 
 err_t exosite::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, struct pbuf* psBuf, err_t iErr) {
 	struct pbuf *psBufCur;
-
 	if(!psBuf) {
 		closeConnection(psPcb);
 		return(ERR_OK);
@@ -209,10 +205,6 @@ err_t exosite::TCPReceiveCallback(void* pvArg, struct tcp_pcb* psPcb, struct pbu
 	// Free the memory space allocated for this receive.
 	//
 	pbuf_free(psBuf);
-
-	//
-	// Return.
-	//
 	return(ERR_OK);
 }
 
