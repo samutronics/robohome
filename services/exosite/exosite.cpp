@@ -26,6 +26,7 @@ exosite::exosite() {
 }
 
 void exosite::task(void *pvParameters) {
+	while(0x0 == lwIPLocalIPAddrGet() || 0xFFFFFFFF == lwIPLocalIPAddrGet()) {taskYIELD();}
 	// check the server IP address at the first start and resolve the URL
     if(0 == _serverIP.addr || 0xFFFFFFFF == _serverIP.addr) {
     	// very stupid solution: wait until the LwIP stack is initialized
