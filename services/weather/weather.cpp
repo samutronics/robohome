@@ -25,7 +25,6 @@ weather::weather() {
 }
 
 void weather::task(void *pvParameters) {
-	UARTprintf("Weather task: waiting for IP address...\n");
 	while(0x0 == lwIPLocalIPAddrGet() || 0xFFFFFFFF == lwIPLocalIPAddrGet()) {taskYIELD();}
 	// =============================================================================
 	//! * At this point, the excecution has to wait for the end of the
