@@ -55,8 +55,11 @@ void weather::task(void *pvParameters) {
 		//! * Connect to the server, and block the execution until the connection will
 		//! be established.
 		// =============================================================================
+		while(ESTABLISHED != _pcb->state) {
 		connectToServer();
-		while(ESTABLISHED != _pcb->state) {taskYIELD();}
+		vTaskDelay(connectionTimeOut);
+		if(ESTABLISHED != _pcb->state) {UARTprintf("Weather service: connect to server failed, try again!\n");}
+		}
 
 		// =============================================================================
 		//! * Write the request to the tcp socket, and flush the data
@@ -68,13 +71,14 @@ void weather::task(void *pvParameters) {
 		//! * Close the socket, so that the LwIP resources are freed.
 		// =============================================================================
 		vTaskDelay(connectionTimeOut);
-		if(!_tcpRequestReceived) {UARTprintf("Response of weather request failed, try again!");}
 		closeConnection(_pcb);
-
+		if(!_tcpRequestReceived) {UARTprintf("Response of weather request failed, try again!\n");}
+		else {
 		// =============================================================================
 		//! * Wait until the time of the next request
 		// =============================================================================
 		vTaskDelay(weatherReportUpdateTime);
+		}
 	}
 }
 

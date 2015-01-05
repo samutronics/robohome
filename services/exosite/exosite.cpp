@@ -38,11 +38,11 @@ void exosite::task(void *pvParameters) {
 	EMACAddrGet(EMAC0_BASE, 0, pucMACAddr);
 	exositeRequestFactory::init("texasinstruments", "ek-tm4c1294xl", IF_ENET, pucMACAddr, 0);
 
+	while(ESTABLISHED != _pcb->state) {
 	connectToServer();
-
-	// wait for the proper connection state.
-	// it seems to be a suitable solution
-	while(ESTABLISHED != _pcb->state) {taskYIELD();}
+	vTaskDelay(connectionTimeOut);
+	if(ESTABLISHED != _pcb->state) {UARTprintf("Exosite service: connect to server failed, try again!\n");}
+	}
 
 	while(1) {
 		deviceRequestFactory::makeDeviceSyncRequest();
