@@ -499,6 +499,39 @@ sys_mbox_free(sys_mbox_t *mbox)
 }
 
 /**
+ * Set an semaphore structure invalid so that sys_sem_valid returns 0
+ *
+ * @param mbox is the semaphore structure that will be invalidated
+ */
+void sys_sem_set_invalid(sys_sem_t *sem) {
+	sem->queue = SYS_SEM_NULL;
+}
+
+/**
+ * Checks the validity of a semaphore.
+ *
+ * @param sem is the semaphore structure whose validity is to be checked.
+ */
+int sys_sem_valid(sys_sem_t *sem) {
+	  /*Check if a semaphore has been created*/
+	  if(sem->queue == SYS_SEM_NULL){
+	      return 0;
+	  }
+	  else{
+	      return 1;
+	  }
+}
+
+/**
+ * Set an mbox invalid so that sys_mbox_valid returns 0
+ *
+ * @param mbox is the mailbox that will be invalidated
+ */
+void sys_mbox_set_invalid(sys_mbox_t *mbox) {
+	mbox->queue = SYS_MBOX_NULL;
+}
+
+/**
  * Checks the validity of a mailbox.
  *
  * @param mbox is the mailbox whose validity is to be checked.
