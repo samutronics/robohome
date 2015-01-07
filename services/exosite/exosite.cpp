@@ -42,12 +42,6 @@ void exosite::task(void *pvParameters) {
 			((_serverIP.addr >> 26) & 0xff),
 			((_serverIP.addr >> 24) & 0xff));
 
-
-//	while(ERR_ARG == dns_gethostbyname(serverURL, &_serverIP, resolveHostCallback, 0)) {taskYIELD();}
-
-    // waiting for the server address
-	while(0 == _serverIP.addr || 0xFFFFFFFF == _serverIP.addr) {taskYIELD();}
-
 	u8 pucMACAddr[6];
 	EMACAddrGet(EMAC0_BASE, 0, pucMACAddr);
 	exositeRequestFactory::init("texasinstruments", "ek-tm4c1294xl", IF_ENET, pucMACAddr, 0);
@@ -150,12 +144,6 @@ err_t exosite::sendRequest() {
     }
 
     return retVal;
-}
-
-void exosite::resolveHostCallback(const char* pcName, struct ip_addr* psIPAddr, void* vpArg) {
-	if(psIPAddr) {
-		_serverIP = *psIPAddr;
-	}
 }
 
 err_t exosite::connectToServerCallback(void *pvArg, struct tcp_pcb *psPcb, err_t iErr) {

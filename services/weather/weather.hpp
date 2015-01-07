@@ -49,11 +49,6 @@ private: static err_t sendRequest();
 private: static void closeConnection(tcp_pcb* psPcb);
 
 // =============================================================================
-//! \brief Assign the IP address to the _serverIP
-// =============================================================================
-private: static void resolveHostCallback(const char *pcName, struct ip_addr *psIPAddr, void *vpArg);
-
-// =============================================================================
 //! \brief Finalize the connection request
 //!
 //! Check the error state, and in case of any error, close the socket. If the

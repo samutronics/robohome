@@ -28,7 +28,6 @@ private: static void closeConnection(tcp_pcb* psPcb);
 // Callback methods
 // =============================================================================
 
-private: static void resolveHostCallback(const char *pcName, struct ip_addr *psIPAddr, void *vpArg);
 private: static err_t connectToServerCallback(void *pvArg, struct tcp_pcb *psPcb, err_t iErr);
 
 private: static err_t TCPReceiveCallback(void *pvArg, struct tcp_pcb *psPcb, struct pbuf *psBuf, err_t iErr);

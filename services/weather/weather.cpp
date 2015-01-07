@@ -43,14 +43,6 @@ void weather::task(void *pvParameters) {
 			((_serverIP.addr >> 26) & 0xff),
 			((_serverIP.addr >> 24) & 0xff));
 
-//	while(ERR_ARG == dns_gethostbyname(weatherServerURL, &_serverIP, resolveHostCallback, 0)) {taskYIELD();}
-
-	// =============================================================================
-	//! * Block the execution until the server IP will be resolved. It will be done
-	//! in the tcp thread.
-	// =============================================================================
-	while(0 == _serverIP.addr || 0xFFFFFFFF == _serverIP.addr) {taskYIELD();}
-
 	// =============================================================================
 	//! * Create HTTP get request to query the actual weather informations. It has
 	//! to be done only once.
@@ -139,12 +131,6 @@ err_t weather::sendRequest() {
     }
 
     return retVal;
-}
-
-void weather::resolveHostCallback(const char* pcName, struct ip_addr* psIPAddr, void* vpArg) {
-	if(psIPAddr) {
-		_serverIP = *psIPAddr;
-	}
 }
 
 err_t weather::connectToServerCallback(void *pvArg, struct tcp_pcb *psPcb, err_t iErr) {
