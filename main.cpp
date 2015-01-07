@@ -37,12 +37,12 @@ int main(void) {
 	SysCtlMOSCConfigSet(SYSCTL_MOSC_HIGHFREQ);
 	systemGlobal::currentSystemClockFrequency = SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN | SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480), 120000000);
 
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-	GPIOPinConfigure(GPIO_PA0_U0RX);
-	GPIOPinConfigure(GPIO_PA1_U0TX);
-	GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
+	GPIOPinConfigure(GPIO_PD4_U2RX);
+	GPIOPinConfigure(GPIO_PD5_U2TX);
+	GPIOPinTypeUART(GPIO_PORTD_BASE, GPIO_PIN_4 | GPIO_PIN_5);
 
-	UARTStdioConfig(0, 115200, systemGlobal::currentSystemClockFrequency);
+	UARTStdioConfig(2, 115200, systemGlobal::currentSystemClockFrequency);
     UARTprintf("\033[2J\033[H");
 	UARTprintf("application starts\n");
 
