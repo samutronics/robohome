@@ -6,9 +6,7 @@
 //! \note
 // =============================================================================
 #include "json.hpp"
-#include "lwIP/dns.h"
-#include "lwIP/tcp.h"
-#include "lwIP/pbuf.h"
+#include "lwip/api.h"
 #include "weather.hpp"
 #include "requestfactory.hpp"
 
@@ -33,7 +31,19 @@ void weather::task(void *pvParameters) {
 	//!	\note Refactoring of each of LwIP services would be nice to became queriable
 	//! about its state, or the service send any kind of event.
 	// =============================================================================
-	while(ERR_ARG == dns_gethostbyname(weatherServerURL, &_serverIP, resolveHostCallback, 0)) {taskYIELD();}
+	if(ERR_OK != netconn_gethostbyname(weatherServerURL, &_serverIP)) {
+		UARTprintf("weather: something went wrong to get dns address\n");
+		while(1);
+	}
+
+	UARTprintf("%s IP is: %d.%d.%d.%d\n",
+			weatherServerURL,
+			(_serverIP.addr & 0xff),
+			((_serverIP.addr >> 8) & 0xff),
+			((_serverIP.addr >> 26) & 0xff),
+			((_serverIP.addr >> 24) & 0xff));
+
+//	while(ERR_ARG == dns_gethostbyname(weatherServerURL, &_serverIP, resolveHostCallback, 0)) {taskYIELD();}
 
 	// =============================================================================
 	//! * Block the execution until the server IP will be resolved. It will be done

@@ -29,7 +29,21 @@ void exosite::task(void *pvParameters) {
 	while(0x0 == lwIPLocalIPAddrGet() || 0xFFFFFFFF == lwIPLocalIPAddrGet()) {taskYIELD();}
 	// very stupid solution: wait until the LwIP stack is initialized
 	// it would be better, that the LwIP initialize can send some signal, like events, or semaphore.
-	while(ERR_ARG == dns_gethostbyname(serverURL, &_serverIP, resolveHostCallback, 0)) {taskYIELD();}
+
+	if(ERR_OK != netconn_gethostbyname(serverURL, &_serverIP)) {
+		UARTprintf("exosite: something went wrong to get dns address\n");
+		while(1);
+	}
+
+	UARTprintf("%s IP is: %d.%d.%d.%d\n",
+			serverURL,
+			(_serverIP.addr & 0xff),
+			((_serverIP.addr >> 8) & 0xff),
+			((_serverIP.addr >> 26) & 0xff),
+			((_serverIP.addr >> 24) & 0xff));
+
+
+//	while(ERR_ARG == dns_gethostbyname(serverURL, &_serverIP, resolveHostCallback, 0)) {taskYIELD();}
 
     // waiting for the server address
 	while(0 == _serverIP.addr || 0xFFFFFFFF == _serverIP.addr) {taskYIELD();}
