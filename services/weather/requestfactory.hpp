@@ -13,7 +13,7 @@
 #include "../projectconfiguration.hpp"
 
 namespace service {
-namespace weatherTask {
+namespace weather {
 
 enum requestType {
 	currentRequest,

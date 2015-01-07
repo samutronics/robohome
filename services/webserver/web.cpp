@@ -9,8 +9,8 @@
 #include "httpd.h"
 #include "sntp.hpp"
 
-using namespace service::webTask;
-using namespace service::webTask::configuration;
+using namespace service::web;
+using namespace service::web::configuration;
 
 web::web() {
 	// =============================================================================

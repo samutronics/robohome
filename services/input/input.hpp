@@ -12,7 +12,7 @@
 #include "../projectconfiguration.hpp"
 
 namespace service {
-namespace inboundTask {
+namespace inbound {
 
 class input: public IService {
 private: input();
@@ -21,7 +21,7 @@ TO_BE_RUNABLE(input)
 DEFINE_TH
 };
 
-}  // inboundTask
+}  // inbound
 
 }  // service
 

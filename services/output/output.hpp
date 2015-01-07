@@ -12,7 +12,7 @@
 #include "../projectconfiguration.hpp"
 
 namespace service {
-namespace outboundTask {
+namespace outbound {
 
 class output: public IService{
 private: output();
@@ -22,7 +22,7 @@ TO_BE_RUNABLE(output)
 private: xQueueHandle _queueOutbound;
 };
 
-} // outboundTask
+} // outbound
 
 } // service
 

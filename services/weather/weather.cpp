@@ -12,8 +12,8 @@
 #include "weather.hpp"
 #include "requestfactory.hpp"
 
-using namespace service::weatherTask;
-using namespace service::weatherTask::configuration;
+using namespace service::weather;
+using namespace service::weather::configuration;
 
 report			weather::_report;
 ip_addr			weather::_serverIP;
@@ -33,7 +33,7 @@ void weather::task(void *pvParameters) {
 	//!	\note Refactoring of each of LwIP services would be nice to became queriable
 	//! about its state, or the service send any kind of event.
 	// =============================================================================
-	while(ERR_ARG == dns_gethostbyname(weatherServerURL, &_serverIP, resolveHostCallback, 0)) {taskYIELD();}
+	while(ERR_ARG == dns_gethostbyname(url, &_serverIP, resolveHostCallback, 0)) {taskYIELD();}
 
 	// =============================================================================
 	//! * Block the execution until the server IP will be resolved. It will be done
@@ -57,7 +57,7 @@ void weather::task(void *pvParameters) {
 		// =============================================================================
 		while(ESTABLISHED != _pcb->state) {
 		connectToServer();
-		vTaskDelay(connectionTimeOut);
+		vTaskDelay(timeOut);
 		if(ESTABLISHED != _pcb->state) {UARTprintf("Weather service: connect to server failed, try again!\n");}
 		}
 
@@ -70,14 +70,14 @@ void weather::task(void *pvParameters) {
 		// =============================================================================
 		//! * Close the socket, so that the LwIP resources are freed.
 		// =============================================================================
-		vTaskDelay(connectionTimeOut);
+		vTaskDelay(timeOut);
 		closeConnection(_pcb);
 		if(!_tcpRequestReceived) {UARTprintf("Response of weather request failed, try again!\n");}
 		else {
 		// =============================================================================
 		//! * Wait until the time of the next request
 		// =============================================================================
-		vTaskDelay(weatherReportUpdateTime);
+		vTaskDelay(updatePeriode);
 		}
 	}
 }
@@ -112,7 +112,7 @@ err_t weather::connectToServer() {
     //
     // Attempt to connect to the server directly.
     //
-    return tcp_connect(_pcb, &_serverIP, weatherServerPort, connectToServerCallback);
+    return tcp_connect(_pcb, &_serverIP, port, connectToServerCallback);
 }
 
 err_t weather::sendRequest() {

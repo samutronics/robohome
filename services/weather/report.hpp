@@ -11,7 +11,7 @@
 #include "../projectconfiguration.hpp"
 
 namespace service {
-namespace weatherTask {
+namespace weather {
 
 class report {
     //

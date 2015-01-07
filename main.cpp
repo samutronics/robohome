@@ -19,12 +19,12 @@
 #include "exosite.hpp"
 #include "projectconfiguration.hpp"
 
-using namespace service::sntpTask;
-using namespace service::inboundTask;
-using namespace service::webTask;
-using namespace service::weatherTask;
-using namespace service::exositeTask;
-using namespace service::outboundTask;
+using namespace service::sntp;
+using namespace service::inbound;
+using namespace service::web;
+using namespace service::weather;
+using namespace service::exosite;
+using namespace service::outbound;
 
 //! =============================================================================
 //! The main method is responsible for:

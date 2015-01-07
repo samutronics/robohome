@@ -13,7 +13,7 @@
 #include "../../projectconfiguration.hpp"
 
 namespace service {
-namespace exositeTask {
+namespace exosite {
 
 class exosite: public IService {
 private: exosite();
@@ -55,7 +55,7 @@ private: enum state {
 private: static state		_state;
 };
 
-} // exositeTask
+} // exosite
 
 } // manager
 

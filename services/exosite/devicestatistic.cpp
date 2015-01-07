@@ -7,7 +7,7 @@
 // =============================================================================
 #include "devicestatistic.hpp"
 
-using namespace service::exositeTask;
+using namespace service::exosite;
 
 statisticEntry sw0		("Button1", "usrsw1", INT, WRITE_ONLY);
 statisticEntry sw1		("Button2", "usrsw2", INT, WRITE_ONLY);

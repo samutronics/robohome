@@ -13,7 +13,7 @@
 #include "../../projectconfiguration.hpp"
 
 namespace service {
-namespace exositeTask {
+namespace exosite {
 
 class deviceRequestFactory {
 public: static const u32 requestBufferSize = 255;

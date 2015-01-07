@@ -11,7 +11,7 @@
 #include "../../projectconfiguration.hpp"
 
 namespace service {
-namespace exositeTask {
+namespace exosite {
 
 enum MetaElements {
 	META_CIK,

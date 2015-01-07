@@ -11,7 +11,7 @@
 #include "../../projectconfiguration.hpp"
 
 namespace service {
-namespace exositeTask {
+namespace exosite {
 
 enum accessMode {
     READ_ONLY,

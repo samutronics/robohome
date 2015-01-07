@@ -14,7 +14,7 @@
 #include "../projectconfiguration.hpp"
 
 namespace service {
-namespace weatherTask {
+namespace weather {
 
 class weather: public IService {
 // =============================================================================
@@ -87,7 +87,7 @@ private: static weatherRequest	_request;
 private: static bool			_tcpRequestReceived;
 };
 
-} // weatherTask
+} // weather
 
 } // service
 

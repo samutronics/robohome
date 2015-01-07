@@ -11,7 +11,7 @@
 #include "../../projectconfiguration.hpp"
 
 namespace service {
-namespace exositeTask {
+namespace exosite {
 
 static const u16 metaDataSize	= 256;
 static const u8 CIKSize			= 40;

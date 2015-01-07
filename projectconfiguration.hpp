@@ -102,64 +102,64 @@ static u32 currentSystemClockFrequency = 0;
 
 namespace service {
 
-namespace outboundTask {
+namespace outbound {
 namespace configuration {
 
 const u32 outboundQueueLength = 4;
 const u32 outboundQueueWidth = 1;
 
 }  // configuration
-}  // outboundTask
+}  // outbound
 
-namespace inboundTask {
+namespace inbound {
 namespace configuration {
 
 const u32 THQueueLength = 2;
 const u32 THQueueWidth = 1;
 
 }  // configuration
-}  // inboundTask
+}  // inbound
 
-namespace webTask {
+namespace web {
 namespace configuration {
 
 const u32 IPGatheringStrategie = IPADDR_USE_DHCP;
 
 }  // configuration
-}  // networkTask
+}  // web
 
-namespace sntpTask {
+namespace sntp {
 namespace configuration {
 
 const u32 rtcQueueLength = 1;
 const u32 rtcQueueWidth = sizeof(u32);
 
 }  // configuration
-}  // rtcTask
+}  // sntp
 
-namespace weatherTask {
+namespace weather {
 namespace configuration {
 
-const char weatherServerURL[] = "api.openweathermap.org";
-const u32 weatherServerPort = 80;
+const char url[] = "api.openweathermap.org";
+const u32 port = 80;
 const u32 requestSize = 256;
-const u32 weatherReportUpdateTime = 1800000; //0.5 h with the current scheduler setting: 1000 Hz task preemtion.
-const u32 connectionTimeOut = 10000; //10 s with the current scheduler setting: 1000 Hz task preemtion.
+const u32 updatePeriode = 1800000; //0.5 h with the current scheduler setting: 1000 Hz task preemtion.
+const u32 timeOut = 10000; //10 s with the current scheduler setting: 1000 Hz task preemtion.
 
 }  // configuration
-}  // weatherTask
+}  // weather
 
-namespace exositeTask {
+namespace exosite {
 namespace configuration {
 
-const char serverURL[] = "m2.exosite.com";
-const u32 serverPort = 80;
+const char url[] = "m2.exosite.com";
+const u32 port = 80;
 const u32 requestBufferSize = 4096;
 const u32 updatePeriode = 4000;
-const u32 connectionTimeOut = 10000; //10 s with the current scheduler setting: 1000 Hz task preemtion.
+const u32 timeOut = 10000; //10 s with the current scheduler setting: 1000 Hz task preemtion.
 
 }  // configuration
-}  // exositeTask
+}  // exosite
 
 }  // manager
 
