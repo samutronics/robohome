@@ -10,7 +10,7 @@
 #include "metadataentry.hpp"
 #include "exositerequestfactory.hpp"
 
-using namespace service::exositeTask;
+using namespace service::exosite;
 
 const s8 exositeRequestFactory::_requestPartCIKHeader[]		= "X-Exosite-CIK: ";
 const s8 exositeRequestFactory::_requestPartContentLength[]	= "Content-Length: ";

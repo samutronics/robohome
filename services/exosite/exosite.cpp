@@ -14,8 +14,8 @@
 #include "exositerequestfactory.hpp"
 #include "../projectconfiguration.hpp"
 
-using namespace service::exositeTask;
-using namespace service::exositeTask::configuration;
+using namespace service::exosite;
+using namespace service::exosite::configuration;
 
 ip_addr									exosite::_serverIP;
 tcp_pcb*								exosite::_pcb;
@@ -30,13 +30,13 @@ void exosite::task(void *pvParameters) {
 	// very stupid solution: wait until the LwIP stack is initialized
 	// it would be better, that the LwIP initialize can send some signal, like events, or semaphore.
 
-	if(ERR_OK != netconn_gethostbyname(serverURL, &_serverIP)) {
+	if(ERR_OK != netconn_gethostbyname(url, &_serverIP)) {
 		UARTprintf("exosite: something went wrong to get dns address\n");
 		while(1);
 	}
 
 	UARTprintf("%s IP is: %d.%d.%d.%d\n",
-			serverURL,
+			url,
 			(_serverIP.addr & 0xff),
 			((_serverIP.addr >> 8) & 0xff),
 			((_serverIP.addr >> 26) & 0xff),
@@ -48,7 +48,7 @@ void exosite::task(void *pvParameters) {
 
 	while(ESTABLISHED != _pcb->state) {
 	connectToServer();
-	vTaskDelay(connectionTimeOut);
+	vTaskDelay(timeOut);
 	if(ESTABLISHED != _pcb->state) {UARTprintf("Exosite service: connect to server failed, try again!\n");}
 	}
 
@@ -127,7 +127,7 @@ err_t exosite::connectToServer() {
     //
     // Attempt to connect to the server directly.
     //
-    return tcp_connect(_pcb, &_serverIP, serverPort, connectToServerCallback);
+    return tcp_connect(_pcb, &_serverIP, port, connectToServerCallback);
 }
 
 err_t exosite::sendRequest() {

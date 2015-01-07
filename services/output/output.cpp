@@ -10,8 +10,8 @@
 #include "../projectconfiguration.hpp"
 
 using namespace communication::ipc;
-using namespace service::outboundTask;
-using namespace service::outboundTask::configuration;
+using namespace service::outbound;
+using namespace service::outbound::configuration;
 
 output::output() {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPION);

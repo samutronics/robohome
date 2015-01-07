@@ -32,7 +32,7 @@
 #define INVALID_INT             ((int32_t)(0x80000000))
 
 namespace service {
-namespace weatherTask {
+namespace weather {
 
 int32_t JSONParseCurrent(uint32_t ui32Index, report& psWeatherReport, struct pbuf *psBuf);
 int32_t JSONParseForecast(uint32_t ui32Index, report& psWeatherReport, struct pbuf *psBuf);

@@ -12,7 +12,7 @@
 #include "../../projectconfiguration.hpp"
 
 namespace service {
-namespace exositeTask {
+namespace exosite {
 
 class deviceStatistic {
 public: static inline statisticEntry* current() {return _entries[_index];}

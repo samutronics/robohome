@@ -14,7 +14,7 @@
 #include "../../projectconfiguration.hpp"
 
 namespace service {
-namespace exositeTask {
+namespace exosite {
 
 enum UUIDInterfaceTypes {
     IF_WIFI,

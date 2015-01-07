@@ -12,7 +12,7 @@
 #include "../projectconfiguration.hpp"
 
 namespace service {
-namespace webTask {
+namespace web {
 
 class web: public IService {
 // =============================================================================
@@ -32,7 +32,7 @@ private: virtual void task(void *pvParameters);
 TO_BE_RUNABLE(web)
 };
 
-} // networkTask
+} // web
 
 } // service
 

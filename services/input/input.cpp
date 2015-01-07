@@ -10,8 +10,8 @@
 #include "../projectconfiguration.hpp"
 
 using namespace communication::ipc;
-using namespace service::inboundTask;
-using namespace service::inboundTask::configuration;
+using namespace service::inbound;
+using namespace service::inbound::configuration;
 
 DECLARE_TH(input)
 

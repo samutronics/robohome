@@ -9,7 +9,7 @@
 #include "devicestatistic.hpp"
 #include "devicerequestFactory.hpp"
 
-using namespace service::exositeTask;
+using namespace service::exosite;
 
 basicVector<u8, deviceRequestFactory::requestBufferSize> deviceRequestFactory::writeRequestOutbound;
 basicVector<u8, deviceRequestFactory::requestBufferSize> deviceRequestFactory::readRequestOutbound;

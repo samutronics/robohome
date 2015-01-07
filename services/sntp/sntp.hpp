@@ -12,7 +12,7 @@
 #include "../projectconfiguration.hpp"
 
 namespace service {
-namespace sntpTask {
+namespace sntp {
 
 class sntp: public IService {
 private: sntp();
@@ -22,7 +22,7 @@ TO_BE_RUNABLE(sntp)
 DEFINE_TH
 };
 
-} // sntpTask
+} // sntp
 
 } // service
 
