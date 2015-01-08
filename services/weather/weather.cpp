@@ -57,6 +57,82 @@ void weather::task(void *pvParameters) {
 		//! * Connect to the server, and block the execution until the connection will
 		//! be established.
 		// =============================================================================
+
+
+
+
+
+		netconn* connection = NULL;
+		connection = netconn_new(NETCONN_TCP);
+		if (connection == NULL) {UARTprintf("failed to create new connection\n"); while(1);}
+
+//		local_ip.addr = <get IP of this device>
+
+//		ip_addr addr;
+//		addr.addr = lwIPLocalIPAddrGet();
+//		netconn_bind(connection, &addr, 40000);
+
+//		remote_ip.addr = xRemoteIp; // static or by netconn_gethostbyname ()
+//		rc2 = ;
+
+		if (ERR_OK != netconn_connect(connection, &_serverIP, port)) {UARTprintf("failed to connect server\n"); while(1);}
+
+//		  netconn_delete ( xNetConn );
+
+
+		UARTprintf("Successful connection to the server\n");
+
+		UARTprintf("state: %d\n", connection->state);
+
+		if (ERR_OK != netconn_write(connection, _request.request, _request.len, NETCONN_COPY)) {while(1);}
+		UARTprintf("data is sent successful\n");
+
+		UARTprintf("state: %d\n", connection->state);
+
+		UARTprintf("local IP: %d\n", lwIPLocalIPAddrGet());
+		UARTprintf("local IP: %d\n", connection->pcb.tcp->local_ip.addr);
+		UARTprintf("local port: %d\n", connection->pcb.tcp->local_port);
+		UARTprintf("remote IP: %d\n", connection->pcb.tcp->remote_ip.addr);
+		UARTprintf("remote port: %d\n", connection->pcb.tcp->remote_port);
+
+		netbuf* buf = NULL;
+		while(1) {
+			if (ERR_OK == netconn_recv(connection, &buf)) {
+
+			UARTwrite((char*)buf->p->payload, buf->p->len);
+			UARTprintf("===============================================================================================================================\n");
+			UARTwrite((char*)buf->ptr->payload, buf->ptr->len);
+			}
+		}
+
+
+
+
+		while(1);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		while(ESTABLISHED != _pcb->state) {
 		connectToServer();
 		vTaskDelay(timeOut);
