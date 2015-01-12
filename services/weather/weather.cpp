@@ -31,17 +31,7 @@ void weather::task(void *pvParameters) {
 	//!	\note Refactoring of each of LwIP services would be nice to became queriable
 	//! about its state, or the service send any kind of event.
 	// =============================================================================
-	if(ERR_OK != netconn_gethostbyname(url, &_serverIP)) {
-		UARTprintf("weather: something went wrong to get dns address\n");
-		while(1);
-	}
-
-	UARTprintf("%s IP is: %d.%d.%d.%d\n",
-			url,
-			(_serverIP.addr & 0xff),
-			((_serverIP.addr >> 8) & 0xff),
-			((_serverIP.addr >> 26) & 0xff),
-			((_serverIP.addr >> 24) & 0xff));
+	if(ERR_OK != netconn_gethostbyname(url, &_serverIP)) {UARTprintf("weather: something went wrong to get dns address\n"); while(1);}
 
 	// =============================================================================
 	//! * Create HTTP get request to query the actual weather informations. It has
@@ -57,106 +47,34 @@ void weather::task(void *pvParameters) {
 		//! * Connect to the server, and block the execution until the connection will
 		//! be established.
 		// =============================================================================
-
-
-
-
-
-		netconn* connection = NULL;
-		connection = netconn_new(NETCONN_TCP);
+		netconn* connection = netconn_new(NETCONN_TCP);
 		if (connection == NULL) {UARTprintf("failed to create new connection\n"); while(1);}
-
-//		local_ip.addr = <get IP of this device>
-
-//		ip_addr addr;
-//		addr.addr = lwIPLocalIPAddrGet();
-//		netconn_bind(connection, &addr, 40000);
-
-//		remote_ip.addr = xRemoteIp; // static or by netconn_gethostbyname ()
-//		rc2 = ;
 
 		if (ERR_OK != netconn_connect(connection, &_serverIP, port)) {UARTprintf("failed to connect server\n"); while(1);}
 
-//		  netconn_delete ( xNetConn );
-
-
-		UARTprintf("Successful connection to the server\n");
-
-		UARTprintf("state: %d\n", connection->state);
-
-		if (ERR_OK != netconn_write(connection, _request.request, _request.len, NETCONN_COPY)) {while(1);}
-		UARTprintf("data is sent successful\n");
-
-		UARTprintf("state: %d\n", connection->state);
-
-		UARTprintf("local IP: %d\n", lwIPLocalIPAddrGet());
-		UARTprintf("local IP: %d\n", connection->pcb.tcp->local_ip.addr);
-		UARTprintf("local port: %d\n", connection->pcb.tcp->local_port);
-		UARTprintf("remote IP: %d\n", connection->pcb.tcp->remote_ip.addr);
-		UARTprintf("remote port: %d\n", connection->pcb.tcp->remote_port);
+		if (ERR_OK != netconn_write(connection, _request.request, _request.len, NETCONN_COPY)) {UARTprintf("failed to write into connection\n"); while(1);}
 
 		netbuf* buf = NULL;
-		while(1) {
-			if (ERR_OK == netconn_recv(connection, &buf)) {
+		if (ERR_OK != netconn_recv(connection, &buf)) {UARTprintf("failed to receive from connection\n"); while(1);}
 
-			UARTwrite((char*)buf->p->payload, buf->p->len);
-			UARTprintf("===============================================================================================================================\n");
-			UARTwrite((char*)buf->ptr->payload, buf->ptr->len);
-			}
+		u32 itemCount = JSONParseCurrent(0, _report, buf->p);
+		if(0 < itemCount) {
+			//Guard the message printing.
+			taskENTER_CRITICAL();
+			UARTprintf("Temperature: %d C\n",	_report.Temp);
+			UARTprintf("Humidity: %d %%\n",		_report.Humidity);
+			UARTprintf("Pressure: %d hpa\n",	_report.Pressure);
+			taskEXIT_CRITICAL();
 		}
-
-
-
-
-		while(1);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		while(ESTABLISHED != _pcb->state) {
-		connectToServer();
-		vTaskDelay(timeOut);
-		if(ESTABLISHED != _pcb->state) {UARTprintf("Weather service: connect to server failed, try again!\n");}
-		}
-
-		// =============================================================================
-		//! * Write the request to the tcp socket, and flush the data
-		// =============================================================================
-		_tcpRequestReceived = false;
-		sendRequest();
-
-		// =============================================================================
-		//! * Close the socket, so that the LwIP resources are freed.
-		// =============================================================================
-		vTaskDelay(timeOut);
-		closeConnection(_pcb);
-		if(!_tcpRequestReceived) {UARTprintf("Response of weather request failed, try again!\n");}
 		else {
+			UARTprintf("Failed to parse request");
+		}
+		netconn_close(connection);
+		netconn_delete(connection);
 		// =============================================================================
 		//! * Wait until the time of the next request
 		// =============================================================================
 		vTaskDelay(updatePeriode);
-		}
 	}
 }
 
