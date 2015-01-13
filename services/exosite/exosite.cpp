@@ -5,9 +5,7 @@
 //! \date			30.12.2014.
 //! \note
 // =============================================================================
-#include "lwIP/err.h"
-#include "lwIP/ip_addr.h"
-#include "lwIP/dns.h"
+#include "lwip/api.h"
 #include "exosite.hpp"
 #include "requestFactory.hpp"
 #include "devicestatistic.hpp"
@@ -30,26 +28,21 @@ void exosite::task(void *pvParameters) {
 	// very stupid solution: wait until the LwIP stack is initialized
 	// it would be better, that the LwIP initialize can send some signal, like events, or semaphore.
 
-	if(ERR_OK != netconn_gethostbyname(url, &_serverIP)) {
-		UARTprintf("exosite: something went wrong to get dns address\n");
-		while(1);
-	}
-
-	UARTprintf("%s IP is: %d.%d.%d.%d\n",
-			url,
-			(_serverIP.addr & 0xff),
-			((_serverIP.addr >> 8) & 0xff),
-			((_serverIP.addr >> 26) & 0xff),
-			((_serverIP.addr >> 24) & 0xff));
-
 	u8 pucMACAddr[6];
 	EMACAddrGet(EMAC0_BASE, 0, pucMACAddr);
 	exositeRequestFactory::init("texasinstruments", "ek-tm4c1294xl", IF_ENET, pucMACAddr, 0);
 
-	while(ESTABLISHED != _pcb->state) {
-	connectToServer();
-	vTaskDelay(timeOut);
-	if(ESTABLISHED != _pcb->state) {UARTprintf("Exosite service: connect to server failed, try again!\n");}
+	if(ERR_OK != netconn_gethostbyname(url, &_serverIP)) {UARTprintf("exosite: something went wrong to get dns address\n"); while(1);}
+
+	netconn* connection = netconn_new(NETCONN_TCP);
+	if (connection == NULL) {UARTprintf("failed to create new connection\n"); while(1);}
+
+//	if (ERR_OK != netconn_connect(connection, &_serverIP, port)) {UARTprintf("failed to connect server\n"); while(1);}
+	while(true) {
+		if (ERR_OK == netconn_connect(connection, &_serverIP, port)) {break;}
+			UARTprintf("failed to connect server\n");
+			vTaskDelay(1500);
+//			while(1);
 	}
 
 	while(1) {
@@ -57,21 +50,37 @@ void exosite::task(void *pvParameters) {
 
 		if((0 != deviceRequestFactory::writeRequestOutbound.len) && (_state == idle)) {
 			exositeRequestFactory::write(deviceRequestFactory::writeRequestOutbound, _rxTxBuf);
-			sendRequest();
+			if (ERR_OK != netconn_write(connection, _rxTxBuf.container, _rxTxBuf.len, NETCONN_COPY)) {UARTprintf("failed to write into connection\n"); while(1);}
 			_state = writeRequestSent;
 			_rxTxBuf.len = 0;
-			while(writeRequestProcessed != _state) {taskYIELD();}
+
+			netbuf* buf = NULL;
+			if (ERR_OK != netconn_recv(connection, &buf)) {UARTprintf("failed to receive from connection\n"); while(1);}
+			exositeRequestFactory::parseWriteResult(buf->p);
+			netbuf_delete(buf);
+
+//			while(writeRequestProcessed != _state) {taskYIELD();}
 			_state = idle;
 		}
 
-		vTaskDelay(updatePeriode / 2);
+		vTaskDelay(updatePeriode);
 
 		if((0 != deviceRequestFactory::readRequestOutbound.len) && (_state == idle)) {
 			exositeRequestFactory::read(deviceRequestFactory::readRequestOutbound, _rxTxBuf);
-			sendRequest();
+			if (ERR_OK != netconn_write(connection, _rxTxBuf.container, _rxTxBuf.len, NETCONN_COPY)) {UARTprintf("failed to write into connection\n"); while(1);}
 			_state = readRequestSent;
 			_rxTxBuf.len = 0;
-			while(readRequestProcessed != _state) {taskYIELD();}
+			netbuf* buf = NULL;
+			if (ERR_OK != netconn_recv(connection, &buf)) {UARTprintf("failed to receive from connection\n"); while(1);}
+
+			UARTprintf("\n");
+			UARTwrite((char*)buf->p->payload, buf->p->len);
+			UARTprintf("\n");
+
+			exositeRequestFactory::parseReadResult(buf->p, deviceRequestFactory::response);
+			netbuf_delete(buf);
+
+//			while(readRequestProcessed != _state) {taskYIELD();}
 
 		    deviceStatistic::reset();
 		    while(deviceStatistic::next()) {
@@ -93,7 +102,7 @@ void exosite::task(void *pvParameters) {
 		    _state = idle;
 		}
 
-		vTaskDelay(updatePeriode / 2);
+		vTaskDelay(updatePeriode);
 	}
 }
 
