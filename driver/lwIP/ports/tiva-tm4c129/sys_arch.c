@@ -288,12 +288,22 @@ sys_arch_sem_wait(sys_sem_t *sem, u32_t timeout)
 void
 sys_sem_free(sys_sem_t *sem)
 {
-  /* Clear the queue handle. */
-  sem->queue = 0;
+	/* Find a semaphore that would be freed. */
+	u32_t i;
+	for(i = 0; i < SYS_SEM_MAX; i++) {
+		if(sems[i].queue == sem->queue) {
+			sems[i].queue = SYS_SEM_NULL;
+			sem->queue = 0;
+			return;
+		}
+	}
 
-  /* Update the semaphore statistics. */
+	/* Clear the queue handle. */
+	sem->queue = 0;
+
+	/* Update the semaphore statistics. */
 #if SYS_STATS
-  STATS_DEC(sys.sem.used);
+	STATS_DEC(sys.sem.used);
 #endif /* SYS_STATS */
 }
 
@@ -488,6 +498,16 @@ sys_mbox_free(sys_mbox_t *mbox)
     STATS_INC(sys.mbox.err);
 #endif /* SYS_STATS */
   }
+
+	/* Find a semaphore that would be freed. */
+	u32_t i;
+	for(i = 0; i < SYS_MBOX_MAX; i++) {
+		if(mboxes[i].queue == mbox->queue) {
+			mboxes[i].queue = SYS_MBOX_NULL;
+			mbox->queue = 0;
+			return;
+		}
+	}
 
   /* Clear the queue handle. */
   mbox->queue = 0;
