@@ -12,12 +12,15 @@
 #include "basicvector.hpp"
 #include "../../projectconfiguration.hpp"
 
+struct netconn;
+
 namespace service {
 namespace exosite {
 
 class exosite: public IService {
 private: exosite();
 private: virtual void task(void *pvParameters);
+private: void retryContext(netconn*& connection, s32& error);
 TO_BE_RUNABLE(exosite)
 
 // =============================================================================
