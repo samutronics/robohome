@@ -293,6 +293,7 @@ sys_sem_free(sys_sem_t *sem)
 	for(i = 0; i < SYS_SEM_MAX; i++) {
 		if(sems[i].queue == sem->queue) {
 			sems[i].queue = SYS_SEM_NULL;
+			vSemaphoreDelete(sem->queue);
 			sem->queue = 0;
 			return;
 		}
@@ -504,6 +505,7 @@ sys_mbox_free(sys_mbox_t *mbox)
 	for(i = 0; i < SYS_MBOX_MAX; i++) {
 		if(mboxes[i].queue == mbox->queue) {
 			mboxes[i].queue = SYS_MBOX_NULL;
+			vSemaphoreDelete(mbox->queue);
 			mbox->queue = 0;
 			return;
 		}
