@@ -39,10 +39,10 @@ private: static void TCPErrorCallback(void *vPArg, err_t iErr);
 // Member declarations
 // =============================================================================
 
-private: static const u16						_rxTxBufSize = 4096;
-private: static basicVector<u8, _rxTxBufSize>	_rxTxBuf;
-private: static ip_addr							_serverIP;
-private: static tcp_pcb*						_pcb;
+private: static const u16	_rxTxBufSize = 4096;
+private: static std::string	_rxTxBuf;
+private: static ip_addr		_serverIP;
+private: static tcp_pcb*	_pcb;
 
 private: enum state {
 	readRequestSent,

@@ -34,7 +34,7 @@ public: inline statisticEntry(const char* name, const char* alias, valueType t, 
 	memset(value, 0, dataStringLength);
 }
 
-public: inline void requestFormat(char* requestBuffer) const;
+public: inline void requestFormat(std::string& str) const;
 
 public: inline void setValue(const char* requestBuffer);
 public: inline bool getValue(char* requestBuffer) const;
@@ -82,18 +82,22 @@ inline bool statisticEntry::getValue(s32& requestBuffer) const {
 	return true;
 }
 
-inline void statisticEntry::requestFormat(char* requestBuffer) const {
+inline void statisticEntry::requestFormat(std::string& str) const {
+	str.append(entryAliasInCloud);
+	str += '=';
 	switch (type) {
 	case STRING: {
-		sprintf(requestBuffer, "%s=%s", entryAliasInCloud, value);
+		str.append(value);
 		break;
 	}
 	case INT: {
-		sprintf(requestBuffer, "%s=%d", entryAliasInCloud, strtol(value, 0, 10));
+		str.append(value);
+//		sprintf(requestBuffer, "%s=%d", entryAliasInCloud, strtol(value, 0, 10));
 		break;
 	}
 	case HEX: {
-		sprintf(requestBuffer, "%s=0x%x", entryAliasInCloud, strtol(value, 0, 16));
+		str.append(value);
+//		sprintf(requestBuffer, "%s=0x%x", entryAliasInCloud, strtol(value, 0, 16));
 		break;
 	}
 	default: {

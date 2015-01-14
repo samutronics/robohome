@@ -14,13 +14,14 @@
 #include "exositerequestfactory.hpp"
 #include "../projectconfiguration.hpp"
 
+using namespace std;
 using namespace service::exosite;
 using namespace service::exosite::configuration;
 
-ip_addr									exosite::_serverIP;
-tcp_pcb*								exosite::_pcb;
-exosite::state							exosite::_state = idle;
-basicVector<u8, exosite::_rxTxBufSize>	exosite::_rxTxBuf;
+ip_addr			exosite::_serverIP;
+tcp_pcb*		exosite::_pcb;
+exosite::state	exosite::_state = idle;
+string			exosite::_rxTxBuf;
 
 exosite::exosite() {
 }
@@ -47,22 +48,22 @@ void exosite::task(void *pvParameters) {
 	while(1) {
 		deviceRequestFactory::makeDeviceSyncRequest();
 
-		if((0 != deviceRequestFactory::writeRequestOutbound.len) && (_state == idle)) {
+		if((0 != deviceRequestFactory::writeRequestOutbound.length()) && (_state == idle)) {
 			exositeRequestFactory::write(deviceRequestFactory::writeRequestOutbound, _rxTxBuf);
 			sendRequest();
 			_state = writeRequestSent;
-			_rxTxBuf.len = 0;
+			_rxTxBuf.clear();
 			while(writeRequestProcessed != _state) {taskYIELD();}
 			_state = idle;
 		}
 
 		vTaskDelay(updatePeriode / 2);
 
-		if((0 != deviceRequestFactory::readRequestOutbound.len) && (_state == idle)) {
+		if((0 != deviceRequestFactory::readRequestOutbound.length()) && (_state == idle)) {
 			exositeRequestFactory::read(deviceRequestFactory::readRequestOutbound, _rxTxBuf);
 			sendRequest();
 			_state = readRequestSent;
-			_rxTxBuf.len = 0;
+			_rxTxBuf.clear();
 			while(readRequestProcessed != _state) {taskYIELD();}
 
 		    deviceStatistic::reset();
@@ -123,7 +124,7 @@ err_t exosite::connectToServer() {
 }
 
 err_t exosite::sendRequest() {
-    err_t retVal = tcp_write(_pcb, _rxTxBuf.container, _rxTxBuf.len, TCP_WRITE_FLAG_COPY);
+    err_t retVal = tcp_write(_pcb, _rxTxBuf.data(), _rxTxBuf.length(), TCP_WRITE_FLAG_COPY);
 
 	//
     //  Write data for sending (but does not send it immediately).

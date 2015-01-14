@@ -22,10 +22,10 @@ public: static bool makeDeviceSyncRequest();
 public: static bool makeSyncRequest(const statisticEntry& entry);
 public: static bool updateEntryByResponse(statisticEntry& entry);
 
-private: static bool addRequest(const char* pcNewRequest, basicVector<u8, requestBufferSize>& buf, uint32_t ui32Size);
+private: static bool addRequest(const std::string& pcNewRequest, std::string& buf);
 
-public: static basicVector<u8, requestBufferSize> writeRequestOutbound;
-public: static basicVector<u8, requestBufferSize> readRequestOutbound;
+public: static std::string writeRequestOutbound;
+public: static std::string readRequestOutbound;
 public: static basicVector<u8, requestBufferSize> response;
 };
 

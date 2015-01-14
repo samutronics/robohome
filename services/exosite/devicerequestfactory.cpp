@@ -9,18 +9,19 @@
 #include "devicestatistic.hpp"
 #include "devicerequestFactory.hpp"
 
+using namespace std;
 using namespace service::exosite;
 
-basicVector<u8, deviceRequestFactory::requestBufferSize> deviceRequestFactory::writeRequestOutbound;
-basicVector<u8, deviceRequestFactory::requestBufferSize> deviceRequestFactory::readRequestOutbound;
+string deviceRequestFactory::writeRequestOutbound;
+string deviceRequestFactory::readRequestOutbound;
 basicVector<u8, deviceRequestFactory::requestBufferSize> deviceRequestFactory::response;
 
 bool deviceRequestFactory::makeDeviceSyncRequest() {
     //
     // Clear the request buffers
     //
-    readRequestOutbound.len = 0;
-    writeRequestOutbound.len = 0;
+    readRequestOutbound.clear();
+    writeRequestOutbound.clear();
 
     //
     // Loop over all statistics in the list, and add them to the request
@@ -96,8 +97,6 @@ bool deviceRequestFactory::updateEntryByResponse(statisticEntry& entry) {
 }
 
 bool deviceRequestFactory::makeSyncRequest(const statisticEntry& entry) {
-	char pcFormattedRequest[100];
-
 	//
 	// Only interact with the server if the entry has an alias
 	//
@@ -110,12 +109,14 @@ bool deviceRequestFactory::makeSyncRequest(const statisticEntry& entry) {
 		//
 		// Format a request to write the current value of this stat.
 		//
-		entry.requestFormat(pcFormattedRequest);
+		string str;
+		str.reserve(100);
+		entry.requestFormat(str);
 
 		//
 		// If the request didn't fit, report failure.
 		//
-		if(!addRequest(pcFormattedRequest, writeRequestOutbound, strlen(pcFormattedRequest))) {
+		if(!addRequest(str, writeRequestOutbound)) {
 			return false;
 		}
 
@@ -125,7 +126,7 @@ bool deviceRequestFactory::makeSyncRequest(const statisticEntry& entry) {
 		//
 		// If the request didn't fit, report failure.
 		//
-		if(!addRequest(entry.entryAliasInCloud, readRequestOutbound, strlen(entry.entryAliasInCloud))) {
+		if(!addRequest(entry.entryAliasInCloud, readRequestOutbound)) {
 			return false;
 		}
 	}
@@ -136,46 +137,44 @@ bool deviceRequestFactory::makeSyncRequest(const statisticEntry& entry) {
 	return true;
 }
 
-bool deviceRequestFactory::addRequest(const char* pcNewRequest, basicVector<u8, requestBufferSize>& buf, uint32_t ui32Size) {
+bool deviceRequestFactory::addRequest(const std::string& pcNewRequest, std::string& buf) {
     //
     // Check to make sure that the buffer is not full.
     //
-    if(buf.len >= requestBufferSize) {
+//    if(buf.len >= requestBufferSize) {
         //
         // If the buffer was already full, return a zero to indicate failure.
         //
-        buf.container[buf.len - 1] = 0;
-        return false;
-    }
+//        buf.container[buf.len - 1] = 0;
+//        return false;
+//    }
 
     //
     // Check to make sure that the new request is small enough to fit in the
     // buffer, even if we have to add an ampersand and a null terminator.
     //
-    if(ui32Size < (requestBufferSize - buf.len - 2)) {
-        if(buf.len != 0) {
+//    if(ui32Size < (requestBufferSize - buf.len - 2)) {
+        if(buf.length() != 0) {
             //
             // If the buffer has any data in it, add an ampersand to separate
             // this request from any previous requests.
             //
-            buf.container[buf.len++] = '&';
+            buf += '&';
         }
 
         //
         // Append the data from the new request to the request buffer, and make
         // sure to put a terminator after it.
         //
-        strncpy((s8*)(buf.container + buf.len), pcNewRequest, ui32Size);
-        buf.len += ui32Size;
-        buf.container[buf.len] = 0;
+        buf.append(pcNewRequest);
         return true;
-    }
-    else {
+//    }
+//    else {
         //
         // If the input string is too long, return a zero.
         //
-        return false;
-    }
+//        return false;
+//    }
 }
 // =============================================================================
 //! \file
