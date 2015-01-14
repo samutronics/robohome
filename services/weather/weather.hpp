@@ -28,6 +28,7 @@ private: weather();
 //! The task manages the client - server HTTP communication.
 // =============================================================================
 private: virtual void task(void *pvParameters);
+private: void retryContext(netconn*& connection, s32& error);
 TO_BE_RUNABLE(weather)
 
 // =============================================================================

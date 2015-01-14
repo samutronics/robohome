@@ -18,6 +18,26 @@ weather::weather() {
 
 void weather::task(void *pvParameters) {
 	while(0x0 == lwIPLocalIPAddrGet() || 0xFFFFFFFF == lwIPLocalIPAddrGet()) {taskYIELD();}
+	netconn* connection = NULL;
+	s32 error = ERR_OK;
+	while(true) {
+		retryContext(connection, error);
+		if(!connection) {
+			UARTprintf("Out of memory, retry later\n");
+		}
+
+		if(error != ERR_OK) {
+			UARTprintf("Error occured: %d\n", error);
+			netconn_close(connection);
+			netconn_delete(connection);
+			connection = NULL;
+		}
+
+		vTaskDelay(5000);
+	}
+}
+
+void weather::retryContext(netconn*& connection, s32& error) {
 	// =============================================================================
 	//! * At this point, the excecution has to wait for the end of the
 	//!		inicialization of the dns module. Until that, argument error will be
@@ -25,7 +45,8 @@ void weather::task(void *pvParameters) {
 	//!	\note Refactoring of each of LwIP services would be nice to became queriable
 	//! about its state, or the service send any kind of event.
 	// =============================================================================
-	if(ERR_OK != netconn_gethostbyname(url, &_serverIP)) {UARTprintf("weather: something went wrong to get dns address\n"); while(1);}
+	error = netconn_gethostbyname(url, &_serverIP);
+	if(ERR_OK != error) {return;}
 
 	// =============================================================================
 	//! * Create HTTP get request to query the actual weather informations. It has
@@ -41,15 +62,18 @@ void weather::task(void *pvParameters) {
 		//! * Connect to the server, and block the execution until the connection will
 		//! be established.
 		// =============================================================================
-		netconn* connection = netconn_new(NETCONN_TCP);
-		if (connection == NULL) {UARTprintf("failed to create new connection\n"); while(1);}
+		connection = netconn_new(NETCONN_TCP);
+		if (connection == NULL) {return;}
 
-		if (ERR_OK != netconn_connect(connection, &_serverIP, port)) {UARTprintf("failed to connect server\n"); while(1);}
+		error = netconn_connect(connection, &_serverIP, port);
+		if (ERR_OK != error) {return;}
 
-		if (ERR_OK != netconn_write(connection, _request.request, _request.len, NETCONN_COPY)) {UARTprintf("failed to write into connection\n"); while(1);}
+		error = netconn_write(connection, _request.request, _request.len, NETCONN_COPY);
+		if (ERR_OK != error) {return;}
 
 		netbuf* buf = NULL;
-		if (ERR_OK != netconn_recv(connection, &buf)) {UARTprintf("failed to receive from connection\n"); while(1);}
+		error = netconn_recv(connection, &buf);
+		if (ERR_OK != error) {netbuf_delete(buf); return;}
 
 		u32 itemCount = JSONParseCurrent(0, _report, buf->p);
 
@@ -76,7 +100,6 @@ void weather::task(void *pvParameters) {
 		vTaskDelay(updatePeriode);
 	}
 }
-
 // =============================================================================
 //! \file
 //! \copyright

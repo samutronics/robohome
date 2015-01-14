@@ -50,7 +50,7 @@ int main(void) {
 	if(pdPASS != xTaskCreate(&output::start,	"TaaT_Output",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
 	if(pdPASS != xTaskCreate(&web::start,		"TaaT_THBH_NP",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
 //	if(pdPASS != xTaskCreate(&sntp::start,		"TaaT_RTC",			configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
-//	if(pdPASS != xTaskCreate(&weather::start,	"TaaT_WEATHER",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
+	if(pdPASS != xTaskCreate(&weather::start,	"TaaT_WEATHER",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
 	if(pdPASS != xTaskCreate(&exosite::start,	"TaaT_Exosite",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(1);}
 
 	vTaskStartScheduler();

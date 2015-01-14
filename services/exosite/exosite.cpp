@@ -37,6 +37,9 @@ void exosite::task(void *pvParameters) {
 
 		if(error != ERR_OK) {
 			UARTprintf("Error occured: %d\n", error);
+			netconn_close(connection);
+			netconn_delete(connection);
+			connection = NULL;
 		}
 
 		vTaskDelay(5000);
