@@ -63,13 +63,9 @@ private: static int exosite_initialized;
 private: static const u8	_vendorNameSize = 20;
 private: static const u8	_modelNameSize = 20;
 private: static const u8	_serialNumberSize = 25;
-private: static const u16	_updateInterval = 4000;
 private: static const u8	_CIKSize = 40;
 
-private: static const u8	_maxConnectRetryCount = 5;
 private: static const u8	_length = _serialNumberSize + _modelNameSize + _vendorNameSize;
-private: static const u8	_receiveSize = 50;
-private: static const u8	_MACLength = 6;
 
 private: static s8			_exositeProvisionInfo[_length];
 
