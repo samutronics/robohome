@@ -99,7 +99,7 @@ bool deviceRequestFactory::makeSyncRequest(const statisticEntry& entry) {
 	char pcFormattedRequest[100];
 
 	//
-	// Only interact with the server if the stat has an alias
+	// Only interact with the server if the entry has an alias
 	//
 	if(entry.entryAliasInCloud == 0) {return true;}
 
