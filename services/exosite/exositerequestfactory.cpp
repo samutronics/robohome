@@ -14,12 +14,12 @@ using namespace service::exosite;
 
 const s8 exositeRequestFactory::_requestPartCIKHeader[]		= "X-Exosite-CIK: ";
 const s8 exositeRequestFactory::_requestPartContentLength[]	= "Content-Length: ";
-const s8 exositeRequestFactory::_requestPartGetURL[]			= "GET /onep:v1/stack/alias?";
+const s8 exositeRequestFactory::_requestPartGetURL[]		= "GET /onep:v1/stack/alias?";
 const s8 exositeRequestFactory::_requestPartHTTP[]			= "  HTTP/1.1\r\n";
 const s8 exositeRequestFactory::_requestPartHost[]			= "Host: m2.exosite.com\r\n";
-const s8 exositeRequestFactory::_requestPartAccept[]			= "Accept: application/x-www-form-urlencoded; charset=utf-8\r\n";
-const s8 exositeRequestFactory::_requestPartContent[]			= "Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n";
-const s8 exositeRequestFactory::_requestPartVendor[]			= "vendor=";
+const s8 exositeRequestFactory::_requestPartAccept[]		= "Accept: application/x-www-form-urlencoded; charset=utf-8\r\n";
+const s8 exositeRequestFactory::_requestPartContent[]		= "Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n";
+const s8 exositeRequestFactory::_requestPartVendor[]		= "vendor=";
 const s8 exositeRequestFactory::_requestPartModel[]			= "model=";
 const s8 exositeRequestFactory::_requestPartSerialNumber[]	= "sn=";
 const s8 exositeRequestFactory::_requestPartCRLF[]			= "\r\n";
@@ -124,10 +124,6 @@ void exositeRequestFactory::parseReadResult(pbuf* buf, std::string& result) {
 		// The body is "<key>=<value>"
 		if (4 == crlf) {
 			// read in the rest of the body as the value
-//			result.len = buf->len - index;
-//			strncpy((s8*)result.container, static_cast<s8*>(buf->payload) + index, result.len);
-//			UARTwrite(static_cast<s8*>(buf->payload) + index, buf->len - index);
-//			UARTprintf("\n");
 			result.append(static_cast<s8*>(buf->payload) + index, buf->len - index);
 		}
 

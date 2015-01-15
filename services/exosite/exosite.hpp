@@ -56,7 +56,6 @@ private: static state		_state;
 };
 
 } // exosite
-
 } // manager
 
 #endif // _EXOSITEMANAGER_H_

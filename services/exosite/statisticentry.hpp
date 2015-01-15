@@ -37,7 +37,6 @@ public: inline void requestFormat(std::string& str) const;
 
 public: inline void setValue(const std::string& value);
 public: inline const std::string& getValue() const;
-//public: inline s32 getValue() const;
 
 public: const char* entryName;
 public: const char* entryAliasInCloud;
@@ -58,24 +57,7 @@ inline void statisticEntry::setValue(const std::string& value) {
 inline const std::string& statisticEntry::getValue() const {
 	return _value;
 }
-/*
-inline s32 statisticEntry::getValue() const {
-	switch (type) {
-	case STRING: {
-		return 0;
-	}
-	case INT: {
-		return std::stoi(_value, 0, 10);
-	}
-	case HEX: {
-		return std::stoi(_value, 0, 16);
-	}
-	default: {
-		while(true);
-	}
-	}
-}
-*/
+
 inline void statisticEntry::requestFormat(std::string& str) const {
 	str.append(entryAliasInCloud);
 	str += '=';
@@ -86,12 +68,10 @@ inline void statisticEntry::requestFormat(std::string& str) const {
 	}
 	case INT: {
 		str.append(_value);
-//		sprintf(requestBuffer, "%s=%d", entryAliasInCloud, strtol(_value, 0, 10));
 		break;
 	}
 	case HEX: {
 		str.append(_value);
-//		sprintf(requestBuffer, "%s=0x%x", entryAliasInCloud, strtol(value, 0, 16));
 		break;
 	}
 	default: {
