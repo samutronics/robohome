@@ -26,12 +26,12 @@ TO_BE_RUNABLE(exosite)
 // =============================================================================
 // Member declarations
 // =============================================================================
-private: basicVector<u8, 4096>	_rxTxBuf;
-private: ip_addr				_serverIP;
+
+private: std::string	_rxTxBuf;
+private: ip_addr		_serverIP;
 };
 
 } // exosite
-
 } // manager
 
 #endif // _EXOSITEMANAGER_H_

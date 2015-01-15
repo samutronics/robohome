@@ -42,10 +42,10 @@ enum ExositeStatusCodes {
 };
 
 class exositeRequestFactory {
-public: static bool write(const basicVector<u8, deviceRequestFactory::requestBufferSize>& request, basicVector<u8, configuration::requestBufferSize>& buf);
+public: static bool write(const std::string& request, std::string& buf);
 public: static void parseWriteResult(pbuf* buf);
-public: static int read(const basicVector<u8, deviceRequestFactory::requestBufferSize>& request, basicVector<u8, configuration::requestBufferSize>& buf);
-public: static void parseReadResult(pbuf* buf, basicVector<u8, deviceRequestFactory::requestBufferSize>& result);
+public: static int read(const std::string& request, std::string& buf);
+public: static void parseReadResult(pbuf* buf, std::string& result);
 
 public: static int init(const s8* vendor, const s8* model, const u8 if_nbr, u8* pui8MACAddr, s32 reset);
 public: static void setCIK(char* pCIK);
@@ -55,21 +55,16 @@ public: static inline ExositeStatusCodes statusCode() {return _statusCode;}
 private: static int info_assemble(const char* vendor, const char* model, const char* sn);
 private: static inline void update_m2ip() {return;}
 private: static int getHTTPStatus(pbuf* buf);
-private: static void sendLine(basicVector<u8, configuration::requestBufferSize>& buf, unsigned char LINE, const char* payload);
+private: static void sendLine(std::string& buf, unsigned char LINE, const char* payload);
 
 private: static ExositeStatusCodes _statusCode;
-private: static int exosite_initialized;
 
 private: static const u8	_vendorNameSize = 20;
 private: static const u8	_modelNameSize = 20;
 private: static const u8	_serialNumberSize = 25;
-private: static const u16	_updateInterval = 4000;
 private: static const u8	_CIKSize = 40;
 
-private: static const u8	_maxConnectRetryCount = 5;
 private: static const u8	_length = _serialNumberSize + _modelNameSize + _vendorNameSize;
-private: static const u8	_receiveSize = 50;
-private: static const u8	_MACLength = 6;
 
 private: static s8			_exositeProvisionInfo[_length];
 

@@ -12,6 +12,7 @@
 #include "exositerequestfactory.hpp"
 #include "../projectconfiguration.hpp"
 
+using namespace std;
 using namespace service::exosite;
 using namespace service::exosite::configuration;
 
@@ -58,12 +59,12 @@ void exosite::retryContext(netconn*& connection, s32& error) {
 
 	while(1) {
 		deviceRequestFactory::makeDeviceSyncRequest();
-		if(0 != deviceRequestFactory::writeRequestOutbound.len) {
+		if(!deviceRequestFactory::writeRequestOutbound.empty()) {
 			exositeRequestFactory::write(deviceRequestFactory::writeRequestOutbound, _rxTxBuf);
-			error = netconn_write(connection, _rxTxBuf.container, _rxTxBuf.len, NETCONN_COPY);
+			error = netconn_write(connection, _rxTxBuf.data(), _rxTxBuf.length(), NETCONN_COPY);
 			if (ERR_OK != error) {return;}
 
-			_rxTxBuf.len = 0;
+			_rxTxBuf.clear();
 			netbuf* buf = NULL;
 			error = netconn_recv(connection, &buf);
 			if (ERR_OK != error) {netbuf_delete(buf); return;}
@@ -73,12 +74,12 @@ void exosite::retryContext(netconn*& connection, s32& error) {
 
 		vTaskDelay(updatePeriode);
 
-		if(0 != deviceRequestFactory::readRequestOutbound.len) {
+		if(!deviceRequestFactory::readRequestOutbound.empty()) {
 			exositeRequestFactory::read(deviceRequestFactory::readRequestOutbound, _rxTxBuf);
-			error = netconn_write(connection, _rxTxBuf.container, _rxTxBuf.len, NETCONN_COPY);
+			error = netconn_write(connection, _rxTxBuf.data(), _rxTxBuf.length(), NETCONN_COPY);
 			if (ERR_OK != error) {return;}
 
-			_rxTxBuf.len = 0;
+			_rxTxBuf.clear();
 			netbuf* buf = NULL;
 			error = netconn_recv(connection, &buf);
 			if (ERR_OK != error) {netbuf_delete(buf); return;}
@@ -93,9 +94,7 @@ void exosite::retryContext(netconn*& connection, s32& error) {
 				//Guard the message printing.
 				taskENTER_CRITICAL();
 		    	if(deviceStatistic::current()->entryName) {
-		    		static s8 value[statisticEntry::dataStringLength];
-		    		deviceStatistic::current()->getValue(value);
-		    		UARTprintf("%s=%s\n", deviceStatistic::current()->entryName, value);
+		    		UARTprintf("%s=%s\n", deviceStatistic::current()->entryName, deviceStatistic::current()->getValue().c_str());
 		    	}
 		    	taskEXIT_CRITICAL(); //this is only for the systematic usage of print guarding
 

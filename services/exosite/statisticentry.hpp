@@ -27,24 +27,22 @@ enum valueType {
 };
 
 class statisticEntry {
-public: static const u32 dataStringLength = 32;
-
 public: inline statisticEntry(const char* name, const char* alias, valueType t, accessMode a):
 				entryName(name), entryAliasInCloud(alias), type(t), access(a) {
-	memset(value, 0, dataStringLength);
+	_value.clear();
+	_value.reserve(32);
 }
 
-public: inline void requestFormat(char* requestBuffer) const;
+public: inline void requestFormat(std::string& str) const;
 
-public: inline void setValue(const char* requestBuffer);
-public: inline bool getValue(char* requestBuffer) const;
-public: inline bool getValue(s32& requestBuffer) const;
+public: inline void setValue(const std::string& value);
+public: inline const std::string& getValue() const;
 
 public: const char* entryName;
 public: const char* entryAliasInCloud;
 public: accessMode access;
 
-private: s8 value[dataStringLength];
+private: std::string _value;
 private: valueType type;
 };
 
@@ -52,48 +50,28 @@ private: valueType type;
 // Inline method implementation
 // =============================================================================
 
-inline void statisticEntry::setValue(const char* requestBuffer) {
-	strcpy(value, requestBuffer);
+inline void statisticEntry::setValue(const std::string& value) {
+	_value = value;
 }
 
-inline bool statisticEntry::getValue(char* requestBuffer) const {
-	strcpy(requestBuffer, value);
-	return true;
+inline const std::string& statisticEntry::getValue() const {
+	return _value;
 }
 
-inline bool statisticEntry::getValue(s32& requestBuffer) const {
+inline void statisticEntry::requestFormat(std::string& str) const {
+	str.append(entryAliasInCloud);
+	str += '=';
 	switch (type) {
 	case STRING: {
-		return false;
-	}
-	case INT: {
-		requestBuffer = strtol(value, 0, 10);
-		break;
-	}
-	case HEX: {
-		requestBuffer = strtol(value, 0, 16);
-		break;
-	}
-	default: {
-		while(true);
-	}
-	}
-
-	return true;
-}
-
-inline void statisticEntry::requestFormat(char* requestBuffer) const {
-	switch (type) {
-	case STRING: {
-		sprintf(requestBuffer, "%s=%s", entryAliasInCloud, value);
+		str.append(_value);
 		break;
 	}
 	case INT: {
-		sprintf(requestBuffer, "%s=%d", entryAliasInCloud, strtol(value, 0, 10));
+		str.append(_value);
 		break;
 	}
 	case HEX: {
-		sprintf(requestBuffer, "%s=0x%x", entryAliasInCloud, strtol(value, 0, 16));
+		str.append(_value);
 		break;
 	}
 	default: {

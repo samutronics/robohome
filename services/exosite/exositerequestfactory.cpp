@@ -14,28 +14,22 @@ using namespace service::exosite;
 
 const s8 exositeRequestFactory::_requestPartCIKHeader[]		= "X-Exosite-CIK: ";
 const s8 exositeRequestFactory::_requestPartContentLength[]	= "Content-Length: ";
-const s8 exositeRequestFactory::_requestPartGetURL[]			= "GET /onep:v1/stack/alias?";
+const s8 exositeRequestFactory::_requestPartGetURL[]		= "GET /onep:v1/stack/alias?";
 const s8 exositeRequestFactory::_requestPartHTTP[]			= "  HTTP/1.1\r\n";
 const s8 exositeRequestFactory::_requestPartHost[]			= "Host: m2.exosite.com\r\n";
-const s8 exositeRequestFactory::_requestPartAccept[]			= "Accept: application/x-www-form-urlencoded; charset=utf-8\r\n";
-const s8 exositeRequestFactory::_requestPartContent[]			= "Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n";
-const s8 exositeRequestFactory::_requestPartVendor[]			= "vendor=";
+const s8 exositeRequestFactory::_requestPartAccept[]		= "Accept: application/x-www-form-urlencoded; charset=utf-8\r\n";
+const s8 exositeRequestFactory::_requestPartContent[]		= "Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n";
+const s8 exositeRequestFactory::_requestPartVendor[]		= "vendor=";
 const s8 exositeRequestFactory::_requestPartModel[]			= "model=";
 const s8 exositeRequestFactory::_requestPartSerialNumber[]	= "sn=";
 const s8 exositeRequestFactory::_requestPartCRLF[]			= "\r\n";
 
 s8 exositeRequestFactory::_exositeProvisionInfo[_length];
 ExositeStatusCodes exositeRequestFactory::_statusCode;
-int exositeRequestFactory::exosite_initialized;
 
-bool exositeRequestFactory::write(const basicVector<u8, deviceRequestFactory::requestBufferSize>& request, basicVector<u8, configuration::requestBufferSize>& buf) {
+bool exositeRequestFactory::write(const std::string& request, std::string& buf) {
 	char bufCIK[41];
 	char strBuf[10];
-
-	if (!exosite_initialized) {
-		_statusCode = EXO_STATUS_INIT;
-		return false;
-	}
 
 	if (!getCIK(bufCIK)) {
 		return false;
@@ -49,7 +43,7 @@ bool exositeRequestFactory::write(const basicVector<u8, deviceRequestFactory::re
 	//  s.send('Content-Length: 6\r\n\r\n')
 	//  s.send('temp=2')
 
-	sprintf(strBuf, "%d", request.len);
+	sprintf(strBuf, "%d", request.length());
 
 	sendLine(buf, POSTDATA_LINE, "/onep:v1/stack/alias");
 	sendLine(buf, HOST_LINE, 0);
@@ -57,9 +51,7 @@ bool exositeRequestFactory::write(const basicVector<u8, deviceRequestFactory::re
 	sendLine(buf, CONTENT_LINE, 0);
 	sendLine(buf, LENGTH_LINE, strBuf);
 
-	strncpy((s8*)(buf.container + buf.len), (s8*)request.container, request.len);
-	buf.len += request.len;
-
+	buf.append(request);
 	return true;
 }
 
@@ -73,22 +65,16 @@ void exositeRequestFactory::parseWriteResult(pbuf* buf) {
 	}
 }
 
-int exositeRequestFactory::read(const basicVector<u8, deviceRequestFactory::requestBufferSize>& request, basicVector<u8, configuration::requestBufferSize>& buf) {
+int exositeRequestFactory::read(const std::string& request, std::string& buf) {
 	//
 	// Modified by Texas Instruments, DGT, changed buflen from unsigned char to
 	// unsigned int. comment out declaration of *pcheck to prevent warnings
 	// created by CAJ changes below.
 	//
-	int success = 0;
 	char bufCIK[41];
 
-	if (!exosite_initialized) {
-		_statusCode = EXO_STATUS_INIT;
-		return success;
-	}
-
 	if (!getCIK(bufCIK)) {
-		return success;
+		return false;
 	}
 
 	// This is an example read GET
@@ -97,7 +83,7 @@ int exositeRequestFactory::read(const basicVector<u8, deviceRequestFactory::requ
 	//  s.send('X-Exosite-CIK: 5046454a9a1666c3acfae63bc854ec1367167815\r\n')
 	//  s.send('Accept: application/x-www-form-urlencoded; charset=utf-8\r\n\r\n')
 
-	sendLine(buf, GETDATA_LINE, (s8*)request.container);
+	sendLine(buf, GETDATA_LINE, request.c_str());
 	sendLine(buf, HOST_LINE, 0);
 	sendLine(buf, CIK_LINE, bufCIK);
 	sendLine(buf, ACCEPT_LINE, "\r\n");
@@ -105,9 +91,10 @@ int exositeRequestFactory::read(const basicVector<u8, deviceRequestFactory::requ
 	return 1;
 }
 
-void exositeRequestFactory::parseReadResult(pbuf* buf, basicVector<u8, deviceRequestFactory::requestBufferSize>& result) {
+void exositeRequestFactory::parseReadResult(pbuf* buf, std::string& result) {
 	int http_status = getHTTPStatus(buf);
 	if (200 == http_status) {
+		result.clear();
 		u8 crlf = 0;
 		u32 index = 0;
 
@@ -126,8 +113,7 @@ void exositeRequestFactory::parseReadResult(pbuf* buf, basicVector<u8, deviceReq
 		// The body is "<key>=<value>"
 		if (4 == crlf) {
 			// read in the rest of the body as the value
-			result.len = buf->len - index;
-			strncpy((s8*)result.container, static_cast<s8*>(buf->payload) + index, result.len);
+			result.append(static_cast<s8*>(buf->payload) + index, buf->len - index);
 		}
 
 		_statusCode = EXO_STATUS_OK;
@@ -173,18 +159,12 @@ int exositeRequestFactory::init(const s8* vendor, const s8* model, const u8 if_n
 	// read UUID into 'sn'
 	info_assemble(vendor, model, struuid);
 
-	exosite_initialized = 1;
-
 	_statusCode = EXO_STATUS_OK;
 
 	return 1;
 }
 
 void exositeRequestFactory::setCIK(char* pCIK) {
-	if (!exosite_initialized) {
-		_statusCode = EXO_STATUS_INIT;
-		return;
-	}
 	metaData::write((unsigned char *)pCIK, _CIKSize, META_CIK);
 	_statusCode = EXO_STATUS_OK;
 	return;
@@ -273,70 +253,44 @@ int exositeRequestFactory::getHTTPStatus(pbuf* buf) {
 	return code;
 }
 
-void exositeRequestFactory::sendLine(basicVector<u8, configuration::requestBufferSize>& buf, unsigned char LINE, const char* payload) {
-	char strBuf[70];
-	unsigned char strLen;
-
+void exositeRequestFactory::sendLine(std::string& buf, unsigned char LINE, const char* payload) {
 	switch(LINE) {
 	case CIK_LINE:
-		strLen = sizeof(_requestPartCIKHeader) - 1;
-		memcpy(strBuf,_requestPartCIKHeader,strLen);
-		memcpy(&strBuf[strLen],payload, strlen(payload));
-		strLen += strlen(payload);
-		memcpy(&strBuf[strLen],_requestPartCRLF, 2);
-		strLen += sizeof(_requestPartCRLF) - 1;
+		buf.append(_requestPartCIKHeader);
+		buf.append(payload);
+		buf.append(_requestPartCRLF);
 		break;
 	case HOST_LINE:
-		strLen = sizeof(_requestPartHost) - 1;
-		memcpy(strBuf,_requestPartHost,strLen);
+		buf.append(_requestPartHost);
 		break;
 	case CONTENT_LINE:
-		strLen = sizeof(_requestPartContent) - 1;
-		memcpy(strBuf,_requestPartContent,strLen);
+		buf.append(_requestPartContent);
 		break;
 	case ACCEPT_LINE:
-		strLen = sizeof(_requestPartAccept) - 1;
-		memcpy(strBuf,_requestPartAccept,strLen);
-		memcpy(&strBuf[strLen],payload, strlen(payload));
-		strLen += strlen(payload);
+		buf.append(_requestPartAccept);
+		buf.append(payload);
 		break;
 	case LENGTH_LINE: // Content-Length: NN
-		strLen = sizeof(_requestPartContentLength) - 1;
-		memcpy(strBuf,_requestPartContentLength,strLen);
-		memcpy(&strBuf[strLen],payload, strlen(payload));
-		strLen += strlen(payload);
-		memcpy(&strBuf[strLen],_requestPartCRLF, 2);
-		strLen += 2;
-		memcpy(&strBuf[strLen],_requestPartCRLF, 2);
-		strLen += 2;
+		buf.append(_requestPartContentLength);
+		buf.append(payload);
+		buf.append("\r\n\r\n");
 		break;
 	case GETDATA_LINE:
-		strLen = sizeof(_requestPartGetURL) - 1;
-		memcpy(strBuf,_requestPartGetURL,strLen);
-		memcpy(&strBuf[strLen],payload, strlen(payload));
-		strLen += strlen(payload);
-		memcpy(&strBuf[strLen], _requestPartHTTP, sizeof(_requestPartHTTP) - 1);
-		strLen += sizeof(_requestPartHTTP) - 1;
+		buf.append(_requestPartGetURL);
+		buf.append(payload);
+		buf.append(_requestPartHTTP);
 		break;
 	case POSTDATA_LINE:
-		strLen = sizeof("POST ") - 1;
-		memcpy(strBuf,"POST ", strLen);
-		memcpy(&strBuf[strLen],payload, strlen(payload));
-		strLen += strlen(payload);
-		memcpy(&strBuf[strLen],_requestPartHTTP, sizeof(_requestPartHTTP) - 1);
-		strLen += sizeof(_requestPartHTTP) - 1;
+		buf.append("POST ");
+		buf.append(payload);
+		buf.append(_requestPartHTTP);
 		break;
 	case EMPTY_LINE:
-		strLen = sizeof(_requestPartCRLF) - 1;
-		memcpy(strBuf,_requestPartCRLF,strLen);
+		buf.append(_requestPartCRLF);
 		break;
 	default:
-		break;
+		while(true);
 	}
-
-	strBuf[strLen] = 0;
-	strncpy((s8*)(buf.container + buf.len), strBuf, strLen);
-	buf.len += strLen;
 
 	return;
 }

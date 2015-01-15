@@ -35,7 +35,6 @@ private: static const char _exomark[];
 };
 
 } // exositeTask
-
 } // manager
 
 #endif // _METADATA_H_

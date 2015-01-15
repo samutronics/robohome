@@ -24,18 +24,17 @@ static const u8 RSVDSize		= 48;
 static const u8 MFRSize			= 128;
 
 class metaDataEntry {
-public: char cik	[CIKSize];                   // our client interface key
-public: char server	[serverIPSize];           // ip address of m2.exosite.com (not using DNS at this stage)
-public: char pad0	[PAD0Size];                 // pad 'server' to 8 bytes
-public: char mark	[markSize];                 // watermark
-public: char uuid	[UUIDSize];                 // UUID in ascii
-public: char pad1	[PAD1Size];                 // pad 'uuid' to 16 bytes
-public: char rsvd	[RSVDSize];                 // reserved space - pad to ensure mfr is at end of RDK_META_SIZE
-public: char mfr	[MFRSize];                   // manufacturer data structure
+public: char cik	[CIKSize];      // our client interface key
+public: char server	[serverIPSize];	// ip address of m2.exosite.com (not using DNS at this stage)
+public: char pad0	[PAD0Size];     // pad 'server' to 8 bytes
+public: char mark	[markSize];     // watermark
+public: char uuid	[UUIDSize];     // UUID in ascii
+public: char pad1	[PAD1Size];     // pad 'uuid' to 16 bytes
+public: char rsvd	[RSVDSize];     // reserved space - pad to ensure mfr is at end of RDK_META_SIZE
+public: char mfr	[MFRSize];      // manufacturer data structure
 };
 
 } // exositeTask
-
 } // manager
 
 #endif // _METADATAENTRY_H_
