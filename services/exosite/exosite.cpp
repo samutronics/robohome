@@ -74,9 +74,7 @@ void exosite::task(void *pvParameters) {
 				//Guard the message printing.
 				taskENTER_CRITICAL();
 		    	if(deviceStatistic::current()->entryName) {
-		    		static s8 value[statisticEntry::dataStringLength];
-		    		deviceStatistic::current()->getValue(value);
-		    		UARTprintf("%s=%s\n", deviceStatistic::current()->entryName, value);
+		    		UARTprintf("%s=%s\n", deviceStatistic::current()->entryName, deviceStatistic::current()->getValue().c_str());
 		    	}
 		    	taskEXIT_CRITICAL(); //this is only for the systematic usage of print guarding
 

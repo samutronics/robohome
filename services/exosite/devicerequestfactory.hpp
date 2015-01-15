@@ -26,7 +26,7 @@ private: static bool addRequest(const std::string& pcNewRequest, std::string& bu
 
 public: static std::string writeRequestOutbound;
 public: static std::string readRequestOutbound;
-public: static basicVector<u8, requestBufferSize> response;
+public: static std::string response;
 };
 
 } // exositeTask

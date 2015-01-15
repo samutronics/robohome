@@ -45,7 +45,7 @@ class exositeRequestFactory {
 public: static bool write(const std::string& request, std::string& buf);
 public: static void parseWriteResult(pbuf* buf);
 public: static int read(const std::string& request, std::string& buf);
-public: static void parseReadResult(pbuf* buf, basicVector<u8, deviceRequestFactory::requestBufferSize>& result);
+public: static void parseReadResult(pbuf* buf, std::string& result);
 
 public: static int init(const s8* vendor, const s8* model, const u8 if_nbr, u8* pui8MACAddr, s32 reset);
 public: static void setCIK(char* pCIK);

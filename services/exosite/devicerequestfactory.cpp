@@ -14,7 +14,7 @@ using namespace service::exosite;
 
 string deviceRequestFactory::writeRequestOutbound;
 string deviceRequestFactory::readRequestOutbound;
-basicVector<u8, deviceRequestFactory::requestBufferSize> deviceRequestFactory::response;
+string deviceRequestFactory::response;
 
 bool deviceRequestFactory::makeDeviceSyncRequest() {
     //
@@ -44,56 +44,64 @@ bool deviceRequestFactory::makeDeviceSyncRequest() {
 }
 
 bool deviceRequestFactory::updateEntryByResponse(statisticEntry& entry) {
-    char *pcValueStart;
-
     //
     // Find the desired alias in the buffer.
     //
-    pcValueStart = strstr((s8*)response.container, entry.entryAliasInCloud);
+    u32 pcValueStart = response.find(entry.entryAliasInCloud);
 
     //
     // If we couldn't find it, return a zero. Otherwise, continue extracting
     // the value.
     //
-    if(!pcValueStart) {return false;}
+    if(string::npos == pcValueStart) {return false;}
 
     //
     // Find the equals-sign, which should be just before the start of the
     // value.
     //
-    pcValueStart = strstr(pcValueStart, "=");
+    pcValueStart = response.find('=', pcValueStart);
 
-    if(!pcValueStart) {return false;}
+    if(string::npos == pcValueStart) {return false;}
 
     //
     // Advance to the first character of the value.
     //
     pcValueStart++;
 
+    u32 pcValueEnd = response.find('&', pcValueStart);
+
+    if(pcValueStart == pcValueEnd) {
+        entry.setValue("");
+        return true;
+    }
+
+    if(string::npos == pcValueEnd) {pcValueEnd = response.length();}
+
     //
     // Loop through the input value from the buffer, and copy characters to the
     // destination string.
     //
-    s8 pcDestString[statisticEntry::dataStringLength];
-    for(u32 index = 0; index < response.len; index++) {
+//    s8 pcDestString[statisticEntry::dataStringLength];
+//    for(u32 index = 0; index < response.len; index++) {
         //
         // Check for the end of the value string.
         //
-        if((pcValueStart[index] == '&') || (pcValueStart[index] == 0)) {
+//        if((pcValueStart[index] == '&') || (pcValueStart[index] == 0)) {
             //
             // If we have reached the end of the value, null-terminate the
             // destination string, and return.
             //
-            pcDestString[index] = 0;
-            entry.setValue(pcDestString);
+//            pcDestString[index] = 0;
+//    UARTprintf("%s\n", response.c_str());
+            entry.setValue(response.substr(pcValueStart, pcValueEnd - pcValueStart));
             return true;
-        }
-        else {
-            pcDestString[index] = pcValueStart[index];
-        }
-    }
+//        }
+//        else {
+//            pcDestString[index] = pcValueStart[index];
+//        }
+//    }
 
-    return true;
+//    return true;
 }
 
 bool deviceRequestFactory::makeSyncRequest(const statisticEntry& entry) {

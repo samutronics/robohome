@@ -102,9 +102,10 @@ int exositeRequestFactory::read(const std::string& request, std::string& buf) {
 	return 1;
 }
 
-void exositeRequestFactory::parseReadResult(pbuf* buf, basicVector<u8, deviceRequestFactory::requestBufferSize>& result) {
+void exositeRequestFactory::parseReadResult(pbuf* buf, std::string& result) {
 	int http_status = getHTTPStatus(buf);
 	if (200 == http_status) {
+		result.clear();
 		u8 crlf = 0;
 		u32 index = 0;
 
@@ -123,8 +124,11 @@ void exositeRequestFactory::parseReadResult(pbuf* buf, basicVector<u8, deviceReq
 		// The body is "<key>=<value>"
 		if (4 == crlf) {
 			// read in the rest of the body as the value
-			result.len = buf->len - index;
-			strncpy((s8*)result.container, static_cast<s8*>(buf->payload) + index, result.len);
+//			result.len = buf->len - index;
+//			strncpy((s8*)result.container, static_cast<s8*>(buf->payload) + index, result.len);
+//			UARTwrite(static_cast<s8*>(buf->payload) + index, buf->len - index);
+//			UARTprintf("\n");
+			result.append(static_cast<s8*>(buf->payload) + index, buf->len - index);
 		}
 
 		_statusCode = EXO_STATUS_OK;
@@ -290,8 +294,7 @@ void exositeRequestFactory::sendLine(std::string& buf, unsigned char LINE, const
 	case LENGTH_LINE: // Content-Length: NN
 		buf.append(_requestPartContentLength);
 		buf.append(payload);
-		buf.append(_requestPartCRLF);
-		buf.append(_requestPartCRLF);
+		buf.append("\r\n\r\n");
 		break;
 	case GETDATA_LINE:
 		buf.append(_requestPartGetURL);
