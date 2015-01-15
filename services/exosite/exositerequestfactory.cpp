@@ -26,16 +26,10 @@ const s8 exositeRequestFactory::_requestPartCRLF[]			= "\r\n";
 
 s8 exositeRequestFactory::_exositeProvisionInfo[_length];
 ExositeStatusCodes exositeRequestFactory::_statusCode;
-int exositeRequestFactory::exosite_initialized;
 
 bool exositeRequestFactory::write(const std::string& request, std::string& buf) {
 	char bufCIK[41];
 	char strBuf[10];
-
-	if (!exosite_initialized) {
-		_statusCode = EXO_STATUS_INIT;
-		return false;
-	}
 
 	if (!getCIK(bufCIK)) {
 		return false;
@@ -78,11 +72,6 @@ int exositeRequestFactory::read(const std::string& request, std::string& buf) {
 	// created by CAJ changes below.
 	//
 	char bufCIK[41];
-
-	if (!exosite_initialized) {
-		_statusCode = EXO_STATUS_INIT;
-		return false;
-	}
 
 	if (!getCIK(bufCIK)) {
 		return false;
@@ -170,18 +159,12 @@ int exositeRequestFactory::init(const s8* vendor, const s8* model, const u8 if_n
 	// read UUID into 'sn'
 	info_assemble(vendor, model, struuid);
 
-	exosite_initialized = 1;
-
 	_statusCode = EXO_STATUS_OK;
 
 	return 1;
 }
 
 void exositeRequestFactory::setCIK(char* pCIK) {
-	if (!exosite_initialized) {
-		_statusCode = EXO_STATUS_INIT;
-		return;
-	}
 	metaData::write((unsigned char *)pCIK, _CIKSize, META_CIK);
 	_statusCode = EXO_STATUS_OK;
 	return;

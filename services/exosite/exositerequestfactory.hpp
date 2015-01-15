@@ -58,7 +58,6 @@ private: static int getHTTPStatus(pbuf* buf);
 private: static void sendLine(std::string& buf, unsigned char LINE, const char* payload);
 
 private: static ExositeStatusCodes _statusCode;
-private: static int exosite_initialized;
 
 private: static const u8	_vendorNameSize = 20;
 private: static const u8	_modelNameSize = 20;
