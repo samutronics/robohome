@@ -9,7 +9,6 @@
 #define _EXOSITEMANAGER_H_
 
 #include "iservice.hpp"
-#include "basicvector.hpp"
 #include "../../projectconfiguration.hpp"
 
 struct netconn;

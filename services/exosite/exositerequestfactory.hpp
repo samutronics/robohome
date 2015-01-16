@@ -9,7 +9,6 @@
 #define _EXOSITE_H_
 
 #include "lwip/tcp.h"
-#include "basicvector.hpp"
 #include "devicerequestFactory.hpp"
 #include "../../projectconfiguration.hpp"
 

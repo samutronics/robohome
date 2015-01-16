@@ -8,7 +8,6 @@
 #ifndef __REQUESTS_HPP__
 #define __REQUESTS_HPP__
 
-#include "basicvector.hpp"
 #include "statisticentry.hpp"
 #include "../../projectconfiguration.hpp"
 
