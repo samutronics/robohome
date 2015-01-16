@@ -8,7 +8,6 @@
 #ifndef _EXOSITE_H_
 #define _EXOSITE_H_
 
-#include "lwip/tcp.h"
 #include "devicerequestFactory.hpp"
 #include "../../projectconfiguration.hpp"
 
@@ -63,9 +62,7 @@ private: static const u8	_modelNameSize = 20;
 private: static const u8	_serialNumberSize = 25;
 private: static const u8	_CIKSize = 40;
 
-private: static const u8	_length = _serialNumberSize + _modelNameSize + _vendorNameSize;
-
-private: static s8			_exositeProvisionInfo[_length];
+private: static s8			_exositeProvisionInfo[_serialNumberSize + _modelNameSize + _vendorNameSize];
 
 private: static const s8	_requestPartCIKHeader[];
 private: static const s8	_requestPartContentLength[];
@@ -89,11 +86,9 @@ private: enum lineTypes {
   POSTDATA_LINE,
   EMPTY_LINE
 };
-
 };
 
 } // exositeTask
-
 } // manager
 
 #endif // _EXOSITE_H_

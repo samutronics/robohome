@@ -24,7 +24,7 @@ const s8 exositeRequestFactory::_requestPartModel[]			= "model=";
 const s8 exositeRequestFactory::_requestPartSerialNumber[]	= "sn=";
 const s8 exositeRequestFactory::_requestPartCRLF[]			= "\r\n";
 
-s8 exositeRequestFactory::_exositeProvisionInfo[_length];
+s8 exositeRequestFactory::_exositeProvisionInfo[_serialNumberSize + _modelNameSize + _vendorNameSize];
 ExositeStatusCodes exositeRequestFactory::_statusCode;
 
 bool exositeRequestFactory::write(const std::string& request, std::string& buf) {
