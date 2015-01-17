@@ -45,6 +45,7 @@ bool exositeRequestFactory::write(const std::string& request, std::string& buf) 
 
 	sprintf(strBuf, "%d", request.length());
 
+	buf.clear();
 	sendLine(buf, POSTDATA_LINE, "/onep:v1/stack/alias");
 	sendLine(buf, HOST_LINE, 0);
 	sendLine(buf, CIK_LINE, bufCIK);
@@ -73,9 +74,7 @@ int exositeRequestFactory::read(const std::string& request, std::string& buf) {
 	//
 	char bufCIK[41];
 
-	if (!getCIK(bufCIK)) {
-		return false;
-	}
+	if (!getCIK(bufCIK)) {return false;}
 
 	// This is an example read GET
 	//  s.send('GET /onep:v1/stack/alias?temp HTTP/1.1\r\n')

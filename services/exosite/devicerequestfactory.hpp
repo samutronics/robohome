@@ -15,15 +15,16 @@ namespace service {
 namespace exosite {
 
 class deviceRequestFactory {
-public: static bool makeDeviceSyncRequest();
-public: static bool makeSyncRequest(const statisticEntry& entry);
+public: static const std::string& readRequest();
+public: static const std::string& writeRequest();
 public: static bool updateEntryByResponse(statisticEntry& entry);
 
-private: static bool addRequest(const std::string& pcNewRequest, std::string& buf);
-
-public: static std::string writeRequestOutbound;
-public: static std::string readRequestOutbound;
 public: static std::string response;
+
+private: static bool addRequest(const std::string& newRequest, std::string& buf);
+
+private: static std::string writeRequestOutbound;
+private: static std::string readRequestOutbound;
 };
 
 } // exositeTask

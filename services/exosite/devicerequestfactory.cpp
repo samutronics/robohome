@@ -16,33 +16,6 @@ string deviceRequestFactory::writeRequestOutbound;
 string deviceRequestFactory::readRequestOutbound;
 string deviceRequestFactory::response;
 
-bool deviceRequestFactory::makeDeviceSyncRequest() {
-    //
-    // Clear the request buffers
-    //
-    readRequestOutbound.clear();
-    writeRequestOutbound.clear();
-
-    //
-    // Loop over all statistics in the list, and add them to the request
-    // buffer.
-    //
-
-    deviceStatistic::reset();
-    while(deviceStatistic::next()) {
-        //
-        // Record the read/write behavior of each stat before sending the
-        // request. If a particular stat is set to "READ_WRITE", we need to
-        // know that now.
-        //
-        if(!makeSyncRequest(*deviceStatistic::current())) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
 bool deviceRequestFactory::updateEntryByResponse(statisticEntry& entry) {
 	//
 	// Find the desired alias in the buffer.
@@ -81,45 +54,35 @@ bool deviceRequestFactory::updateEntryByResponse(statisticEntry& entry) {
 	return true;
 }
 
-bool deviceRequestFactory::makeSyncRequest(const statisticEntry& entry) {
-	//
-	// Only interact with the server if the entry has an alias
-	//
-	if(entry.entryAliasInCloud == 0) {return true;}
+const std::string& deviceRequestFactory::readRequest() {
+	readRequestOutbound.clear();
+    deviceStatistic::reset();
+    while(deviceStatistic::next()) {
+    	if(!deviceStatistic::current()->entryAliasInCloud) {continue;}
 
-	//
-	// Check to see if we write this stat to the server.
-	//
-	if((entry.access == WRITE_ONLY) || (entry.access == READ_WRITE)) {
-		//
-		// Format a request to write the current value of this stat.
-		//
-		string str;
-		str.reserve(100);
-		entry.requestFormat(str);
+    	if((deviceStatistic::current()->access == READ_ONLY) || (deviceStatistic::current()->access == READ_WRITE)) {
+    		addRequest(deviceStatistic::current()->entryAliasInCloud, readRequestOutbound);
+    	}
+    }
 
-		//
-		// If the request didn't fit, report failure.
-		//
-		if(!addRequest(str, writeRequestOutbound)) {
-			return false;
-		}
+    return readRequestOutbound;
+}
 
-	}
+const std::string& deviceRequestFactory::writeRequest() {
+	writeRequestOutbound.clear();
+    deviceStatistic::reset();
+    while(deviceStatistic::next()) {
+    	if(!deviceStatistic::current()->entryAliasInCloud) {continue;}
 
-	if((entry.access == READ_ONLY) || (entry.access == READ_WRITE)) {
-		//
-		// If the request didn't fit, report failure.
-		//
-		if(!addRequest(entry.entryAliasInCloud, readRequestOutbound)) {
-			return false;
-		}
-	}
+    	if((deviceStatistic::current()->access == WRITE_ONLY) || (deviceStatistic::current()->access == READ_WRITE)) {
+    		string str;
+    		str.reserve(100);
+    		deviceStatistic::current()->requestFormat(str);
+    		addRequest(str, readRequestOutbound);
+    	}
+    }
 
-	//
-	// Shouldn't get here...
-	//
-	return true;
+    return writeRequestOutbound;
 }
 
 bool deviceRequestFactory::addRequest(const std::string& pcNewRequest, std::string& buf) {

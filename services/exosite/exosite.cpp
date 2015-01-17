@@ -7,7 +7,6 @@
 // =============================================================================
 #include "lwip/api.h"
 #include "exosite.hpp"
-#include "requestFactory.hpp"
 #include "devicestatistic.hpp"
 #include "exositerequestfactory.hpp"
 #include "../projectconfiguration.hpp"
@@ -58,53 +57,47 @@ void exosite::retryContext(netconn*& connection, s32& error) {
 	if (ERR_OK != error) {return;}
 
 	while(1) {
-		deviceRequestFactory::makeDeviceSyncRequest();
-		if(!deviceRequestFactory::writeRequestOutbound.empty()) {
-			exositeRequestFactory::write(deviceRequestFactory::writeRequestOutbound, _rxTxBuf);
-			error = netconn_write(connection, _rxTxBuf.data(), _rxTxBuf.length(), NETCONN_COPY);
-			if (ERR_OK != error) {return;}
+		exositeRequestFactory::write(deviceRequestFactory::writeRequest(), _rxTxBuf);
+		error = netconn_write(connection, _rxTxBuf.data(), _rxTxBuf.length(), NETCONN_COPY);
+		if (ERR_OK != error) {return;}
 
-			_rxTxBuf.clear();
-			netbuf* buf = NULL;
-			error = netconn_recv(connection, &buf);
-			if (ERR_OK != error) {netbuf_delete(buf); return;}
-			exositeRequestFactory::parseWriteResult(buf->p);
-			netbuf_delete(buf);
-		}
+		netbuf* writeReplyBuffer = NULL;
+		error = netconn_recv(connection, &writeReplyBuffer);
+		if (ERR_OK != error) {netbuf_delete(writeReplyBuffer); return;}
+		exositeRequestFactory::parseWriteResult(writeReplyBuffer->p);
+		netbuf_delete(writeReplyBuffer);
 
 		vTaskDelay(updatePeriode);
 
-		if(!deviceRequestFactory::readRequestOutbound.empty()) {
-			exositeRequestFactory::read(deviceRequestFactory::readRequestOutbound, _rxTxBuf);
-			error = netconn_write(connection, _rxTxBuf.data(), _rxTxBuf.length(), NETCONN_COPY);
-			if (ERR_OK != error) {return;}
+		exositeRequestFactory::read(deviceRequestFactory::readRequest(), _rxTxBuf);
+		error = netconn_write(connection, _rxTxBuf.data(), _rxTxBuf.length(), NETCONN_COPY);
+		if (ERR_OK != error) {return;}
 
-			_rxTxBuf.clear();
-			netbuf* buf = NULL;
-			error = netconn_recv(connection, &buf);
-			if (ERR_OK != error) {netbuf_delete(buf); return;}
-			exositeRequestFactory::parseReadResult(buf->p, deviceRequestFactory::response);
-			netbuf_delete(buf);
+		netbuf* readReplyBuffer = NULL;
+		error = netconn_recv(connection, &readReplyBuffer);
+		if (ERR_OK != error) {netbuf_delete(readReplyBuffer); return;}
+		exositeRequestFactory::parseReadResult(readReplyBuffer->p, deviceRequestFactory::response);
+		netbuf_delete(readReplyBuffer);
 
-		    deviceStatistic::reset();
-		    while(deviceStatistic::next()) {
-				taskENTER_CRITICAL();
-		    	deviceRequestFactory::updateEntryByResponse(*deviceStatistic::current());
+		deviceStatistic::reset();
+		while(deviceStatistic::next()) {
+			taskENTER_CRITICAL();
+			deviceRequestFactory::updateEntryByResponse(*deviceStatistic::current());
 
-				//Guard the message printing.
-				taskENTER_CRITICAL();
-		    	if(deviceStatistic::current()->entryName) {
-		    		UARTprintf("%s=%s\n", deviceStatistic::current()->entryName, deviceStatistic::current()->getValue().c_str());
-		    	}
-		    	taskEXIT_CRITICAL(); //this is only for the systematic usage of print guarding
+			//Guard the message printing.
+			taskENTER_CRITICAL();
+			if(deviceStatistic::current()->entryName) {
+				UARTprintf("%s=%s\n", deviceStatistic::current()->entryName, deviceStatistic::current()->getValue().c_str());
+			}
+			taskEXIT_CRITICAL(); //this is only for the systematic usage of print guarding
 
-		    	taskEXIT_CRITICAL();
-		    }
+			taskEXIT_CRITICAL();
 		}
 
 		vTaskDelay(updatePeriode);
 	}
 }
+
 // =============================================================================
 //! \file
 //! \copyright
