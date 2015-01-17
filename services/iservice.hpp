@@ -33,8 +33,9 @@ class IService {
 // =============================================================================
 #define TO_BE_RUNABLE(derived)									\
 	public: static inline void start(void *pvParameters) {		\
-		static derived d;										\
-		d.task(pvParameters);									\
+		static derived* d;										\
+		if(!d) {d = new derived();}								\
+		d->task(pvParameters);									\
 		while(1);												\
 	};															\
 
