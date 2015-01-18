@@ -29,13 +29,6 @@ public: requestType type;
 class weatherRequestFactory {
 
 public: static void request(weatherRequest& request, const char* location, bool forecast, u32 days);
-
-private: static const char g_cWeatherRequest[];
-private: static const char g_cWeatherRequestForecast[];
-private: static const char g_cMode[];
-private: static const char g_cAPPIDOpenWeather[];
-private: static const char g_cHTTP11[];
-private: static const char pcCount[];
 };
 
 } // weatherTask

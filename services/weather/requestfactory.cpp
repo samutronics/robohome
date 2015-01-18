@@ -9,12 +9,12 @@
 
 using namespace service::weather;
 
-const char weatherRequestFactory::g_cWeatherRequest[] = "GET http://api.openweathermap.org/data/2.5/weather?q=";
-const char weatherRequestFactory::g_cWeatherRequestForecast[] = "GET http://api.openweathermap.org/data/2.5/forecast/daily?q=";
-const char weatherRequestFactory::g_cMode[] = "&mode=json&units=metric";
-const char weatherRequestFactory::g_cAPPIDOpenWeather[] = "&APIID=afc5370fef1dfec1666a5676346b163b";
-const char weatherRequestFactory::g_cHTTP11[] = " HTTP/1.0\r\n\r\n";
-const char weatherRequestFactory::pcCount[] = "&cnt=1";
+const s8 weatherRequestTemplate[]			= "GET http://api.openweathermap.org/data/2.5/weather?q=";
+const s8 weatherRequestForecastTempalte[]	= "GET http://api.openweathermap.org/data/2.5/forecast/daily?q=";
+const s8 modeTemplate[]						= "&mode=json&units=metric";
+const s8 APPIDOpenWeatherTemplate[]			= "&APIID=afc5370fef1dfec1666a5676346b163b";
+const s8 HTTP11Template[]					= " HTTP/1.0\r\n\r\n";
+const s8 pcCountTemplate[]					= "&cnt=1";
 
 void weatherRequestFactory::request(weatherRequest& request, const char* location, bool forecast, u32 days) {
 	memset(request.request, 0, sizeof(request.request));
@@ -23,13 +23,13 @@ void weatherRequestFactory::request(weatherRequest& request, const char* locatio
 	if(strstr(location, " ")) {return;}
 
 	if(forecast) {
-		strncpy(request.request + request.len, g_cWeatherRequestForecast, sizeof(g_cWeatherRequestForecast));
-		request.len += sizeof(g_cWeatherRequestForecast) - 1;
+		strncpy(request.request + request.len, weatherRequestForecastTempalte, sizeof(weatherRequestForecastTempalte));
+		request.len += sizeof(weatherRequestForecastTempalte) - 1;
 		request.type = forecastRequest;
 	}
 	else {
-		strncpy(request.request + request.len, g_cWeatherRequest, sizeof(g_cWeatherRequest));
-		request.len += sizeof(g_cWeatherRequest) - 1;
+		strncpy(request.request + request.len, weatherRequestTemplate, sizeof(weatherRequestTemplate));
+		request.len += sizeof(weatherRequestTemplate) - 1;
 		request.type = currentRequest;
 	}
 
@@ -37,19 +37,19 @@ void weatherRequestFactory::request(weatherRequest& request, const char* locatio
 	strncpy(request.request + request.len, location, lcoationSize);
 	request.len += lcoationSize;
 
-	strncpy(request.request + request.len, g_cMode, sizeof(g_cMode));
-	request.len += sizeof(g_cMode) - 1;
+	strncpy(request.request + request.len, modeTemplate, sizeof(modeTemplate));
+	request.len += sizeof(modeTemplate) - 1;
 
 	if(forecast) {
-		strncpy(request.request + request.len, pcCount, sizeof(pcCount));
-		request.len += sizeof(pcCount) - 1;
+		strncpy(request.request + request.len, pcCountTemplate, sizeof(pcCountTemplate));
+		request.len += sizeof(pcCountTemplate) - 1;
 	}
 
-	strncpy(request.request + request.len, g_cAPPIDOpenWeather, sizeof(g_cAPPIDOpenWeather));
-	request.len += sizeof(g_cAPPIDOpenWeather) - 1;
+	strncpy(request.request + request.len, APPIDOpenWeatherTemplate, sizeof(APPIDOpenWeatherTemplate));
+	request.len += sizeof(APPIDOpenWeatherTemplate) - 1;
 
-	strncpy(request.request + request.len, g_cHTTP11, sizeof(g_cHTTP11));
-	request.len += sizeof(g_cHTTP11) - 1;
+	strncpy(request.request + request.len, HTTP11Template, sizeof(HTTP11Template));
+	request.len += sizeof(HTTP11Template) - 1;
 }
 
 // =============================================================================
