@@ -12,11 +12,7 @@
 using namespace std;
 using namespace service::exosite;
 
-string deviceRequestFactory::writeRequestOutbound;
-string deviceRequestFactory::readRequestOutbound;
-string deviceRequestFactory::response;
-
-bool deviceRequestFactory::updateEntryByResponse(statisticEntry& entry) {
+bool deviceRequestFactory::updateEntryByResponse(statisticEntry& entry, const std::string& response) {
 	//
 	// Find the desired alias in the buffer.
 	//
@@ -85,8 +81,8 @@ const std::string& deviceRequestFactory::writeRequest() {
     return writeRequestOutbound;
 }
 
-bool deviceRequestFactory::addRequest(const std::string& pcNewRequest, std::string& buf) {
-	if(buf.length() != 0) {
+bool deviceRequestFactory::addRequest(const std::string& newRequest, std::string& buf) {
+	if(!buf.empty()) {
 		//
 		// If the buffer has any data in it, add an ampersand to separate
 		// this request from any previous requests.
@@ -98,7 +94,7 @@ bool deviceRequestFactory::addRequest(const std::string& pcNewRequest, std::stri
 	// Append the data from the new request to the request buffer, and make
 	// sure to put a terminator after it.
 	//
-	buf.append(pcNewRequest);
+	buf.append(newRequest);
 	return true;
 }
 

@@ -9,6 +9,8 @@
 #define _EXOSITEMANAGER_H_
 
 #include "iservice.hpp"
+#include "devicerequestfactory.hpp"
+#include "exositerequestfactory.hpp"
 #include "../../projectconfiguration.hpp"
 
 struct netconn;
@@ -25,9 +27,10 @@ TO_BE_RUNABLE(exosite)
 // =============================================================================
 // Member declarations
 // =============================================================================
-
-private: std::string	_rxTxBuf;
-private: ip_addr		_serverIP;
+private: deviceRequestFactory	_deviceRequestFactory;
+private: exositeRequestFactory	_exositeRequestFactory;
+private: std::string			_workerBuffer;
+private: ip_addr				_serverIP;
 };
 
 } // exosite

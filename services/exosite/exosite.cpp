@@ -16,6 +16,7 @@ using namespace service::exosite;
 using namespace service::exosite::configuration;
 
 exosite::exosite() {
+	_workerBuffer.reserve(1024);
 }
 
 void exosite::task(void *pvParameters) {
@@ -25,7 +26,7 @@ void exosite::task(void *pvParameters) {
 
 	u8 pucMACAddr[6];
 	EMACAddrGet(EMAC0_BASE, 0, pucMACAddr);
-	exositeRequestFactory::init("texasinstruments", "ek-tm4c1294xl", IF_ENET, pucMACAddr, 0);
+	_exositeRequestFactory.init("texasinstruments", "ek-tm4c1294xl", IF_ENET, pucMACAddr, 0);
 
 	netconn* connection = NULL;
 	s32 error = ERR_OK;
@@ -57,32 +58,32 @@ void exosite::retryContext(netconn*& connection, s32& error) {
 	if (ERR_OK != error) {return;}
 
 	while(1) {
-		exositeRequestFactory::write(deviceRequestFactory::writeRequest(), _rxTxBuf);
-		error = netconn_write(connection, _rxTxBuf.data(), _rxTxBuf.length(), NETCONN_COPY);
+		_exositeRequestFactory.writeRequest(_deviceRequestFactory.writeRequest(), _workerBuffer);
+		error = netconn_write(connection, _workerBuffer.data(), _workerBuffer.length(), NETCONN_NOCOPY);
 		if (ERR_OK != error) {return;}
 
 		netbuf* writeReplyBuffer = NULL;
 		error = netconn_recv(connection, &writeReplyBuffer);
 		if (ERR_OK != error) {netbuf_delete(writeReplyBuffer); return;}
-		exositeRequestFactory::parseWriteResult(writeReplyBuffer->p);
+		_exositeRequestFactory.parseWriteResult(writeReplyBuffer->p);
 		netbuf_delete(writeReplyBuffer);
 
 		vTaskDelay(updatePeriode);
 
-		exositeRequestFactory::read(deviceRequestFactory::readRequest(), _rxTxBuf);
-		error = netconn_write(connection, _rxTxBuf.data(), _rxTxBuf.length(), NETCONN_COPY);
+		_exositeRequestFactory.readRequest(_deviceRequestFactory.readRequest(), _workerBuffer);
+		error = netconn_write(connection, _workerBuffer.data(), _workerBuffer.length(), NETCONN_NOCOPY);
 		if (ERR_OK != error) {return;}
 
 		netbuf* readReplyBuffer = NULL;
 		error = netconn_recv(connection, &readReplyBuffer);
 		if (ERR_OK != error) {netbuf_delete(readReplyBuffer); return;}
-		exositeRequestFactory::parseReadResult(readReplyBuffer->p, deviceRequestFactory::response);
+		_exositeRequestFactory.parseReadResult(readReplyBuffer->p, _workerBuffer);
 		netbuf_delete(readReplyBuffer);
 
 		deviceStatistic::reset();
 		while(deviceStatistic::next()) {
 			taskENTER_CRITICAL();
-			deviceRequestFactory::updateEntryByResponse(*deviceStatistic::current());
+			_deviceRequestFactory.updateEntryByResponse(*deviceStatistic::current(), _workerBuffer);
 
 			//Guard the message printing.
 			taskENTER_CRITICAL();

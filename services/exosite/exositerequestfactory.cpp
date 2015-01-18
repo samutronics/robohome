@@ -10,24 +10,25 @@
 #include "metadataentry.hpp"
 #include "exositerequestfactory.hpp"
 
+using namespace std;
 using namespace service::exosite;
 
-const s8 exositeRequestFactory::_requestPartCIKHeader[]		= "X-Exosite-CIK: ";
-const s8 exositeRequestFactory::_requestPartContentLength[]	= "Content-Length: ";
-const s8 exositeRequestFactory::_requestPartGetURL[]		= "GET /onep:v1/stack/alias?";
-const s8 exositeRequestFactory::_requestPartHTTP[]			= "  HTTP/1.1\r\n";
-const s8 exositeRequestFactory::_requestPartHost[]			= "Host: m2.exosite.com\r\n";
-const s8 exositeRequestFactory::_requestPartAccept[]		= "Accept: application/x-www-form-urlencoded; charset=utf-8\r\n";
-const s8 exositeRequestFactory::_requestPartContent[]		= "Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n";
-const s8 exositeRequestFactory::_requestPartVendor[]		= "vendor=";
-const s8 exositeRequestFactory::_requestPartModel[]			= "model=";
-const s8 exositeRequestFactory::_requestPartSerialNumber[]	= "sn=";
-const s8 exositeRequestFactory::_requestPartCRLF[]			= "\r\n";
+const s8 _requestPartCIKHeader[]		= "X-Exosite-CIK: ";
+const s8 _requestPartContentLength[]	= "Content-Length: ";
+const s8 _requestPartGetURL[]			= "GET /onep:v1/stack/alias?";
+const s8 _requestPartHTTP[]				= "  HTTP/1.1\r\n";
+const s8 _requestPartHost[]				= "Host: m2.exosite.com\r\n";
+const s8 _requestPartAccept[]			= "Accept: application/x-www-form-urlencoded; charset=utf-8\r\n";
+const s8 _requestPartContent[]			= "Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n";
+const s8 _requestPartVendor[]			= "vendor=";
+const s8 _requestPartModel[]			= "model=";
+const s8 _requestPartSerialNumber[]		= "sn=";
+const s8 _requestPartCRLF[]				= "\r\n";
 
 s8 exositeRequestFactory::_exositeProvisionInfo[_serialNumberSize + _modelNameSize + _vendorNameSize];
 ExositeStatusCodes exositeRequestFactory::_statusCode;
 
-bool exositeRequestFactory::write(const std::string& request, std::string& buf) {
+bool exositeRequestFactory::writeRequest(const std::string& request, std::string& buf) {
 	char bufCIK[41];
 	char strBuf[10];
 
@@ -66,7 +67,7 @@ void exositeRequestFactory::parseWriteResult(pbuf* buf) {
 	}
 }
 
-int exositeRequestFactory::read(const std::string& request, std::string& buf) {
+int exositeRequestFactory::readRequest(const std::string& request, std::string& buf) {
 	//
 	// Modified by Texas Instruments, DGT, changed buflen from unsigned char to
 	// unsigned int. comment out declaration of *pcheck to prevent warnings
@@ -91,28 +92,12 @@ int exositeRequestFactory::read(const std::string& request, std::string& buf) {
 }
 
 void exositeRequestFactory::parseReadResult(pbuf* buf, std::string& result) {
+	result.clear();
 	int http_status = getHTTPStatus(buf);
 	if (200 == http_status) {
-		result.clear();
-		u8 crlf = 0;
-		u32 index = 0;
-
-		// Find 4 consecutive \r or \n - should be: \r\n\r\n
-		while (index < buf->len && 4 > crlf) {
-			if ('\r' == static_cast<s8*>(buf->payload)[index] || '\n' == static_cast<s8*>(buf->payload)[index]) {
-				++crlf;
-			}
-			else {
-				crlf = 0;
-			}
-
-			index++;
-		}
-
-		// The body is "<key>=<value>"
-		if (4 == crlf) {
-			// read in the rest of the body as the value
-			result.append(static_cast<s8*>(buf->payload) + index, buf->len - index);
+		result.append(static_cast<s8*>(buf->payload), buf->len);
+		if(string::npos == result.find("\r\n\r\n")) {
+			result.clear();
 		}
 
 		_statusCode = EXO_STATUS_OK;
