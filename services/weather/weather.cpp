@@ -88,7 +88,7 @@ void weather::retryContext(netconn*& connection, s32& error) {
 			taskEXIT_CRITICAL();
 		}
 		else {
-			UARTprintf("Failed to parse request");
+			UARTprintf("Failed to parse request\n");
 		}
 
 		netconn_close(connection);
