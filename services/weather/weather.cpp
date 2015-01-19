@@ -94,6 +94,11 @@ void weather::retryContext(netconn*& connection, s32& error) {
 		netconn_close(connection);
 		netconn_delete(connection);
 
+		if(0 == itemCount) {
+			connection = NULL;
+			return;
+		}
+
 		// =============================================================================
 		//! * Wait until the time of the next request
 		// =============================================================================
