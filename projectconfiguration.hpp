@@ -144,7 +144,6 @@ namespace configuration {
 
 const char url[] = "api.openweathermap.org";
 const u32 port = 80;
-const u32 requestSize = 256;
 const u32 updatePeriode = 1800000; //0.5 h with the current scheduler setting: 1000 Hz task preemtion.
 const u32 timeOut = 10000; //10 s with the current scheduler setting: 1000 Hz task preemtion.
 

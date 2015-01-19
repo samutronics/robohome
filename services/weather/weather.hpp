@@ -34,9 +34,9 @@ TO_BE_RUNABLE(weather)
 // =============================================================================
 // Member declarations
 // =============================================================================
-private: report			_report;
-private: ip_addr		_serverIP;
-private: weatherRequest	_request;
+private: report					_report;
+private: ip_addr				_serverIP;
+private: weatherRequestFactory	_requestFactory;
 };
 
 } // weather

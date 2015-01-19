@@ -10,6 +10,7 @@
 #include "weather.hpp"
 #include "requestfactory.hpp"
 
+using namespace std;
 using namespace service::weather;
 using namespace service::weather::configuration;
 
@@ -53,7 +54,7 @@ void weather::retryContext(netconn*& connection, s32& error) {
 	//! to be done only once.
 	//! \warning Whitespaces are not allowed in the the request.
 	// =============================================================================
-	weatherRequestFactory::request(_request, "Budapest,HU", false, 0);
+	const string& request = _requestFactory.request("Budapest,HU", false, 0);
 
 	while(1) {
 		// =============================================================================
@@ -68,7 +69,7 @@ void weather::retryContext(netconn*& connection, s32& error) {
 		error = netconn_connect(connection, &_serverIP, port);
 		if (ERR_OK != error) {return;}
 
-		error = netconn_write(connection, _request.request, _request.len, NETCONN_COPY);
+		error = netconn_write(connection, request.data(), request.length(), NETCONN_NOCOPY);
 		if (ERR_OK != error) {return;}
 
 		netbuf* buf = NULL;

@@ -15,24 +15,19 @@
 namespace service {
 namespace weather {
 
-enum requestType {
-	currentRequest,
-	forecastRequest
-};
-
-class weatherRequest {
-public: s8 request[configuration::requestSize];
-public: u16 len;
-public: requestType type;
-};
-
 class weatherRequestFactory {
+public: inline weatherRequestFactory();
 
-public: static void request(weatherRequest& request, const char* location, bool forecast, u32 days);
+public: const std::string& request(const char* location, bool forecast, u32 days);
+
+private: std::string _request;
 };
+
+weatherRequestFactory::weatherRequestFactory() {
+	_request.reserve(255);
+}
 
 } // weatherTask
-
 } // service
 
 #endif // _REQUESTFACTORY_HPP_
