@@ -11,20 +11,19 @@
 #include "lwip/api.h"
 #include "ipcQueue.hpp"
 
-
 PACK_STRUCT_BEGIN
 struct sntp_msg {
-	PACK_STRUCT_FIELD(u8_t           li_vn_mode[1]);
-	PACK_STRUCT_FIELD(u8_t           stratum[1]);
-	PACK_STRUCT_FIELD(u8_t           poll[1]);
-	PACK_STRUCT_FIELD(u8_t           precision[1]);
-	PACK_STRUCT_FIELD(u32_t          root_delay[1]);
-	PACK_STRUCT_FIELD(u32_t          root_dispersion[1]);
-	PACK_STRUCT_FIELD(u32_t          reference_identifier[1]);
-	PACK_STRUCT_FIELD(u32_t          reference_timestamp[2]);
-	PACK_STRUCT_FIELD(u32_t          originate_timestamp[2]);
-	PACK_STRUCT_FIELD(u32_t          receive_timestamp[2]);
-	PACK_STRUCT_FIELD(u32_t          transmit_timestamp[2]);
+	PACK_STRUCT_FIELD(u8_t           li_vn_mode				[1]);
+	PACK_STRUCT_FIELD(u8_t           stratum				[1]);
+	PACK_STRUCT_FIELD(u8_t           poll					[1]);
+	PACK_STRUCT_FIELD(u8_t           precision				[1]);
+	PACK_STRUCT_FIELD(u32_t          root_delay				[1]);
+	PACK_STRUCT_FIELD(u32_t          root_dispersion		[1]);
+	PACK_STRUCT_FIELD(u32_t          reference_identifier	[1]);
+	PACK_STRUCT_FIELD(u32_t          reference_timestamp	[2]);
+	PACK_STRUCT_FIELD(u32_t          originate_timestamp	[2]);
+	PACK_STRUCT_FIELD(u32_t          receive_timestamp		[2]);
+	PACK_STRUCT_FIELD(u32_t          transmit_timestamp		[2]);
 } PACK_STRUCT_STRUCT;
 PACK_STRUCT_END
 
