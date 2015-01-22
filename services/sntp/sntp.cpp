@@ -162,10 +162,6 @@ void sntp::task(void *pvParameters) {
 	}
 }
 
-void sntp::delegateProcessSNTPTime(u32 time) {
-	xQueueSendToBack(ipcQueue::singleton().queue(rtcQueue), &time, NULL);
-}
-
 void sntp::handlerTH() {
 	HibernateIntClear(HIBERNATE_INT_RTC_MATCH_0);
 }

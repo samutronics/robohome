@@ -17,7 +17,6 @@ namespace sntp {
 class sntp: public IService {
 private: sntp();
 private: virtual void task(void *pvParameters);
-private: static void delegateProcessSNTPTime(u32 time);
 TO_BE_RUNABLE(sntp)
 DEFINE_TH
 
@@ -25,7 +24,6 @@ private: ip_addr				_serverIP;
 };
 
 } // sntp
-
 } // service
 
 #endif // _SNTP_HPP_
