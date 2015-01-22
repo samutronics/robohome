@@ -67,8 +67,6 @@ sntp::sntp() {
 	HibernateIntEnable(HIBERNATE_INT_RTC_MATCH_0);
 	HibernateIntRegister(&sntp::handlerTH);
 	HibernateRTCEnable();
-
-	sntp_init(&delegateProcessSNTPTime);
 }
 
 void sntp::task(void *pvParameters) {
