@@ -14,17 +14,17 @@
 
 PACK_STRUCT_BEGIN
 struct sntp_msg {
- PACK_STRUCT_FIELD(u8_t           li_vn_mode);
- PACK_STRUCT_FIELD(u8_t           stratum);
- PACK_STRUCT_FIELD(u8_t           poll);
- PACK_STRUCT_FIELD(u8_t           precision);
- PACK_STRUCT_FIELD(u32_t          root_delay);
- PACK_STRUCT_FIELD(u32_t          root_dispersion);
- PACK_STRUCT_FIELD(u32_t          reference_identifier);
- PACK_STRUCT_FIELD(u32_t          reference_timestamp[2]);
- PACK_STRUCT_FIELD(u32_t          originate_timestamp[2]);
- PACK_STRUCT_FIELD(u32_t          receive_timestamp[2]);
- PACK_STRUCT_FIELD(u32_t          transmit_timestamp[2]);
+	PACK_STRUCT_FIELD(u8_t           li_vn_mode[1]);
+	PACK_STRUCT_FIELD(u8_t           stratum[1]);
+	PACK_STRUCT_FIELD(u8_t           poll[1]);
+	PACK_STRUCT_FIELD(u8_t           precision[1]);
+	PACK_STRUCT_FIELD(u32_t          root_delay[1]);
+	PACK_STRUCT_FIELD(u32_t          root_dispersion[1]);
+	PACK_STRUCT_FIELD(u32_t          reference_identifier[1]);
+	PACK_STRUCT_FIELD(u32_t          reference_timestamp[2]);
+	PACK_STRUCT_FIELD(u32_t          originate_timestamp[2]);
+	PACK_STRUCT_FIELD(u32_t          receive_timestamp[2]);
+	PACK_STRUCT_FIELD(u32_t          transmit_timestamp[2]);
 } PACK_STRUCT_STRUCT;
 PACK_STRUCT_END
 
@@ -81,58 +81,44 @@ void sntp::task(void *pvParameters) {
 	error = netconn_connect(connection, &_serverIP, 123);
 	if (ERR_OK != error) {return;}
 
-	netbuf* buffer = netbuf_new();
-	void* message = netbuf_alloc(buffer, 48);
+	while(true) {
+		netbuf* buffer = netbuf_new();
+		void* message = netbuf_alloc(buffer, 48);
 
-	static_cast<sntp_msg*>(message)->li_vn_mode = (SNTP_LI_NO_WARNING | SNTP_VERSION | SNTP_MODE_CLIENT);
+		static_cast<sntp_msg*>(message)->li_vn_mode[0] = (SNTP_LI_NO_WARNING | SNTP_VERSION | SNTP_MODE_CLIENT);
 
-	error = netconn_send(connection, buffer);
-	if (ERR_OK != error) {UARTprintf("error, stop sntp\n"); while(true);}
+		error = netconn_send(connection, buffer);
+		if (ERR_OK != error) {UARTprintf("error, stop sntp\n"); while(true);}
 
-	netbuf_delete(buffer);
-	buffer = NULL;
-	error = netconn_recv(connection, &buffer);
-	if (ERR_OK != error) {UARTprintf("error, stop sntp\n"); while(true);}
-	UARTprintf("total length: %d\n", buffer->p->tot_len);
-	UARTwrite((s8*)buffer->p->payload, buffer->p->len);
+		netbuf_delete(buffer);
+		buffer = NULL;
+		error = netconn_recv(connection, &buffer);
+		if (ERR_OK != error) {UARTprintf("error, stop sntp\n"); while(true);}
 
-	u32 receive_timestamp = 0;
-	pbuf_copy_partial(buffer->p, &receive_timestamp, 4, SNTP_OFFSET_RECEIVE_TIME);
+		u8 mode;
+		sntp_msg* reference = NULL;
+		if (buffer->p->tot_len == 48) {
+			netbuf_copy_partial(buffer, &mode, sizeof(mode), reinterpret_cast<u32>(reference->li_vn_mode));
+			mode &= SNTP_MODE_MASK;
+			/* if this is a SNTP response... */
+			if ((mode == SNTP_MODE_SERVER) || (mode == SNTP_MODE_BROADCAST)) {
+				u8 stratum;
+				netbuf_copy_partial(buffer, &stratum, sizeof(stratum), reinterpret_cast<u32>(reference->stratum));
+				if (stratum == SNTP_STRATUM_KOD) {
+					// Kiss-of-death packet. Use another server or increase UPDATE_DELAY.
+					UARTprintf("Kiss-of-death packet\n");
+					while(true);
+				}
+			}
+		}
 
-	UARTprintf("received timestamp: %d\n", receive_timestamp);
-	receive_timestamp = (ntohl(receive_timestamp) - DIFF_SEC_1900_1970);
-	tm* t = std::localtime(&receive_timestamp);
+		u32 receive_timestamp = 0;
+		netbuf_copy_partial(buffer, &receive_timestamp, sizeof(receive_timestamp), reinterpret_cast<u32>(reference->receive_timestamp));
 
+		netbuf_delete(buffer);
 
-	UARTprintf("Date and time is set to: %d.%d.%d %d:%d:%d\n",
-			t->tm_mday,
-			t->tm_mon + 1, // increment the month due to human readable format
-			t->tm_year + 1970, // add the date offset: 1970, and subtract the library "compensation"
-			t->tm_hour,
-			t->tm_min,
-			t->tm_sec);
-
-
-
-
-
-
-
-
-	while(true);
-
-	while(1) {
-		// Query the queue handler due to performance reason.
-		xQueueHandle queueHandle = ipcQueue::singleton().queue(rtcQueue);
-
-		// The thread gives up its time-slice, if the TH queue is empty: there was no interrupt
-		while(0 == uxQueueMessagesWaiting(queueHandle)) {taskYIELD();}
-
-		// If item received, read it from the TH queue
-		u32 time;
-		xQueueReceive(queueHandle, &time, 0);
-
-		tm* t = std::localtime(&time);
+		receive_timestamp = (ntohl(receive_timestamp) - DIFF_SEC_1900_1970);
+		tm* t = std::localtime(&receive_timestamp);
 
 		// The hour has to be incremented, because the Budapest
 		//	time zone is shifted by one related to the GMT.
@@ -154,9 +140,6 @@ void sntp::task(void *pvParameters) {
 				t->tm_min,
 				t->tm_sec);
 		taskEXIT_CRITICAL();
-
-		// The task gives up its remained time-slice
-		taskYIELD();
 	}
 }
 
