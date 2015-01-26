@@ -6,7 +6,6 @@
 //! \note
 // =============================================================================
 #include "time.h"
-#include "sntpd.h"
 #include "sntp.hpp"
 #include "lwip/api.h"
 #include "ipcQueue.hpp"
@@ -27,14 +26,8 @@ struct sntp_msg {
 } PACK_STRUCT_STRUCT;
 PACK_STRUCT_END
 
-#define SNTP_OFFSET_LI_VN_MODE      0
-#define SNTP_LI_MASK                0xC0
 #define SNTP_LI_NO_WARNING          0x00
-#define SNTP_LI_LAST_MINUTE_61_SEC  0x01
-#define SNTP_LI_LAST_MINUTE_59_SEC  0x02
-#define SNTP_LI_ALARM_CONDITION     0x03 /* (clock not synchronized) */
 
-#define SNTP_VERSION_MASK           0x38
 #define SNTP_VERSION                (4/* NTP Version 4*/<<3)
 
 #define SNTP_MODE_MASK              0x07
@@ -42,17 +35,12 @@ PACK_STRUCT_END
 #define SNTP_MODE_SERVER            0x04
 #define SNTP_MODE_BROADCAST         0x05
 
-#define SNTP_OFFSET_STRATUM         1
 #define SNTP_STRATUM_KOD            0x00
-
-#define SNTP_OFFSET_ORIGINATE_TIME  24
-#define SNTP_OFFSET_RECEIVE_TIME    32
-#define SNTP_OFFSET_TRANSMIT_TIME   40
 
 #define DIFF_SEC_1900_1970         (2208988800UL)
 
-using namespace communication::ipc;
 using namespace service::sntp;
+using namespace service::sntp::configuration;
 
 sntp::sntp() {
 	HibernateEnableExpClk(systemGlobal::currentSystemClockFrequency);
@@ -70,29 +58,48 @@ sntp::sntp() {
 
 void sntp::task(void *pvParameters) {
 	while(0x0 == lwIPLocalIPAddrGet() || 0xFFFFFFFF == lwIPLocalIPAddrGet()) {taskYIELD();}
+	netconn* connection = NULL;
+	s32 error = ERR_OK;
+	while(true) {
+		retryContext(connection, error);
+		if(!connection) {
+			UARTprintf("Out of memory, retry later\n");
+		}
 
-	s32 error = netconn_gethostbyname("pool.ntp.org", &_serverIP);
-	if(ERR_OK != error) {UARTprintf("error, stop sntp\n"); while(true);}
+		if(error != ERR_OK) {
+			UARTprintf("Error occured: %d\n", error);
+			netconn_close(connection);
+			netconn_delete(connection);
+			connection = NULL;
+		}
 
-	netconn* connection = netconn_new(NETCONN_UDP);
-	if (connection == NULL) {UARTprintf("error, stop sntp\n"); while(true);}
+		vTaskDelay(5000);
+	}
+}
 
-	error = netconn_connect(connection, &_serverIP, 123);
-	if (ERR_OK != error) {return;}
+void sntp::retryContext(netconn*& connection, s32& error) {
+	error = netconn_gethostbyname(url, &_serverIP);
+	if(ERR_OK != error) {return;}
 
 	while(true) {
+		connection = netconn_new(NETCONN_UDP);
+		if (connection == NULL) {return;}
+
+		error = netconn_connect(connection, &_serverIP, port);
+		if (ERR_OK != error) {return;}
+
 		netbuf* buffer = netbuf_new();
 		void* message = netbuf_alloc(buffer, 48);
 
 		static_cast<sntp_msg*>(message)->li_vn_mode[0] = (SNTP_LI_NO_WARNING | SNTP_VERSION | SNTP_MODE_CLIENT);
 
 		error = netconn_send(connection, buffer);
-		if (ERR_OK != error) {UARTprintf("error, stop sntp\n"); while(true);}
+		if (ERR_OK != error) {return;}
 
 		netbuf_delete(buffer);
 		buffer = NULL;
 		error = netconn_recv(connection, &buffer);
-		if (ERR_OK != error) {UARTprintf("error, stop sntp\n"); while(true);}
+		if (ERR_OK != error) {netbuf_delete(buffer); return;}
 
 		u8 mode;
 		sntp_msg* reference = NULL;
@@ -106,7 +113,8 @@ void sntp::task(void *pvParameters) {
 				if (stratum == SNTP_STRATUM_KOD) {
 					// Kiss-of-death packet. Use another server or increase UPDATE_DELAY.
 					UARTprintf("Kiss-of-death packet\n");
-					while(true);
+					connection = NULL;
+					return;
 				}
 			}
 		}
@@ -139,6 +147,14 @@ void sntp::task(void *pvParameters) {
 				t->tm_min,
 				t->tm_sec);
 		taskEXIT_CRITICAL();
+
+		netconn_close(connection);
+		netconn_delete(connection);
+
+		// =============================================================================
+		//! * Wait until the time of the next request
+		// =============================================================================
+		vTaskDelay(updatePeriode);
 	}
 }
 

@@ -133,8 +133,9 @@ const u32 IPGatheringStrategie = IPADDR_USE_DHCP;
 namespace sntp {
 namespace configuration {
 
-const u32 rtcQueueLength = 1;
-const u32 rtcQueueWidth = sizeof(u32);
+const char url[] = "pool.ntp.org";
+const u32 port = 123;
+const u32 updatePeriode = 3600000;
 
 }  // configuration
 }  // sntp
