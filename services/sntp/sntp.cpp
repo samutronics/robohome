@@ -8,7 +8,6 @@
 #include "time.h"
 #include "sntp.hpp"
 #include "lwip/api.h"
-#include "ipcQueue.hpp"
 
 PACK_STRUCT_BEGIN
 struct sntp_msg {
