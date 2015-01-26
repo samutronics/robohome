@@ -15,7 +15,6 @@ ipcQueue ipcQueue::_singleton;
 
 ipcQueue::ipcQueue() {
 	_q[outboundQueue]	= xQueueCreate(outboundQueueLength, outboundQueueWidth);
-	_q[rtcQueue]		= xQueueCreate(rtcQueueLength, rtcQueueWidth);
 }
 
 // =============================================================================

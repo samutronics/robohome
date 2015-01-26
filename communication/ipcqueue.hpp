@@ -20,7 +20,6 @@ namespace ipc {
 
 enum queueID {
 	outboundQueue	= 0,
-	rtcQueue		= 1,
 	DECLARE_LAST_ENUM(queueID)
 };
 
