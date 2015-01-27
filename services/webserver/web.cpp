@@ -9,8 +9,8 @@
 #include "httpd.h"
 #include "sntp.hpp"
 
+using namespace systemGlobal;
 using namespace service::web;
-using namespace service::web::configuration;
 
 web::web() {
 	// =============================================================================
@@ -45,7 +45,7 @@ web::web() {
 	//! * Initialize the LwIP stack and block the thread until a valid
     //!		IP adress will be there.
 	// =============================================================================
-    lwIPInit(systemGlobal::currentSystemClockFrequency, mac, 0, 0, 0, IPGatheringStrategie);
+    lwIPInit(currentSystemClockFrequency, mac, 0, 0, 0, IPGatheringStrategie);
     while((0xFFFFFFFF == lwIPLocalIPAddrGet()) || (0x0 == lwIPLocalIPAddrGet())) {taskYIELD();}
 
 	// =============================================================================

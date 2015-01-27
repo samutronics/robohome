@@ -99,6 +99,7 @@ namespace systemGlobal {
 
 const u32 requestedSystemClockFrequency = 120000000;
 static u32 currentSystemClockFrequency = 0;
+const u32 IPGatheringStrategie = IPADDR_USE_DHCP;
 
 }  // system
 
@@ -124,8 +125,6 @@ const u32 THQueueWidth = 1;
 
 namespace web {
 namespace configuration {
-
-const u32 IPGatheringStrategie = IPADDR_USE_DHCP;
 
 }  // configuration
 }  // web
