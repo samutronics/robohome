@@ -19,12 +19,17 @@ class weatherRequestFactory {
 public: inline weatherRequestFactory();
 
 public: const std::string& request(const char* location, bool forecast, u32 days);
+public: inline void reset();
 
 private: std::string _request;
 };
 
 weatherRequestFactory::weatherRequestFactory() {
 	_request.reserve(255);
+}
+
+inline void weatherRequestFactory::reset() {
+	_request.clear();
 }
 
 } // weatherTask

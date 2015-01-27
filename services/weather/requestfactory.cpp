@@ -18,7 +18,10 @@ const s8 HTTP11[]					= " HTTP/1.0\r\n\r\n";
 const s8 countOfDays[]				= "&cnt=1";
 
 const std::string& weatherRequestFactory::request(const char* location, bool forecast, u32 days) {
-	_request.clear();
+	if(!_request.empty()) {
+		return _request;
+	}
+
 	if(!location) {return _request;}
 
 	if(forecast) {_request.append(weatherRequestForecast);}
