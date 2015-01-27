@@ -20,7 +20,8 @@ void asbtractServiceRequestTransmitter::retryContext(netconn*& connection, s32& 
 	//!	\note Refactoring of each of LwIP services would be nice to became queriable
 	//! about its state, or the service send any kind of event.
 	// =============================================================================
-	error = netconn_gethostbyname(_url, &_serverIP);
+	ip_addr serverIP;
+	error = netconn_gethostbyname(_url, &serverIP);
 	if(ERR_OK != error) {return;}
 
 	while(1) {
@@ -40,7 +41,7 @@ void asbtractServiceRequestTransmitter::retryContext(netconn*& connection, s32& 
 		connection = netconn_new(_connectionType);
 		if (connection == NULL) {return;}
 
-		error = netconn_connect(connection, &_serverIP, _port);
+		error = netconn_connect(connection, &serverIP, _port);
 		if (ERR_OK != error) {return;}
 
 		_connectionType == NETCONN_TCP ?

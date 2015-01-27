@@ -25,7 +25,6 @@ protected: virtual netbuf* generateRequest() = 0;
 
 private: const char*		_url;
 private: const u16			_port;
-private: ip_addr			_serverIP;
 private: const u32			_updatePeriode;
 private: const netconn_type	_connectionType;
 };
