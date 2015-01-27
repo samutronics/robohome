@@ -5,7 +5,7 @@
 //! \date			26.01.2015.
 //! \note
 // =============================================================================
-#include "asbtractservicerequesttransmitter.hpp"
+#include "abstractservicerequesttransmitter.hpp"
 
 using namespace communication;
 using namespace systemGlobal;
