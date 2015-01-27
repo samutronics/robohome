@@ -7,6 +7,7 @@
 // =============================================================================
 #ifndef _ASBTRACTSERVICEREQUESTTRANSMITTER_H_
 #define _ASBTRACTSERVICEREQUESTTRANSMITTER_H_
+
 #include "../projectconfiguration.hpp"
 
 class netbuf;
