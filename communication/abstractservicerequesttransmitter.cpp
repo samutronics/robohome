@@ -24,7 +24,7 @@ void asbtractServiceRequestTransmitter::retryContext(netconn*& connection, s32& 
 	error = netconn_gethostbyname(_url, &serverIP);
 	if(ERR_OK != error) {return;}
 
-	while(1) {
+	while(true) {
 		// =============================================================================
 		//! * Create HTTP get request to query the actual weather informations. It has
 		//! to be done only once.
@@ -49,13 +49,11 @@ void asbtractServiceRequestTransmitter::retryContext(netconn*& connection, s32& 
 				error = netconn_send(connection, request);
 		if (ERR_OK != error) {return;}
 
-		netbuf* buf = NULL;
-		error = netconn_recv(connection, &buf);
-		if (ERR_OK != error) {netbuf_delete(buf); return;}
+		netbuf* reply = NULL;
+		error = netconn_recv(connection, &reply);
+		if (ERR_OK != error) {netbuf_delete(reply); return;}
 
-		if(!processingReply(buf)) {
-			return;
-		}
+		if(!processingReply(reply)) {return;}
 
 		netconn_close(connection);
 		netconn_delete(connection);
