@@ -9,7 +9,6 @@
 #define _WEATHER_H_
 
 #include "report.hpp"
-#include "iservice.hpp"
 #include "requestfactory.hpp"
 #include "abstractclientservice.hpp"
 #include "../projectconfiguration.hpp"
@@ -17,7 +16,7 @@
 namespace service {
 namespace weather {
 
-class weather: public IService, public abstractclientservice {
+class weather: public abstractclientservice {
 	TO_BE_RUNABLE(weather)
 
 protected: virtual bool processingReply(netbuf* reply);
@@ -28,12 +27,6 @@ protected: virtual netbuf* generateRequest();
 //! declared as private.
 // =============================================================================
 private: weather();
-// =============================================================================
-//! \brief Manage network connection
-//!
-//! The task manages the client - server HTTP communication.
-// =============================================================================
-private: virtual void task(void *pvParameters);
 
 // =============================================================================
 // Member declarations

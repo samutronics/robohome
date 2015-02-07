@@ -10,6 +10,29 @@
 using namespace service;
 using namespace systemGlobal;
 
+void abstractclientservice::task(void* pvParameters) {
+	while(0x0 == lwIPLocalIPAddrGet() || 0xFFFFFFFF == lwIPLocalIPAddrGet()) {taskYIELD();}
+	netconn* connection = NULL;
+	s32 error = ERR_OK;
+	while(true) {
+		retryContext(connection, error);
+		if(!connection) {
+			UARTprintf("%s: Out of memory, retry later\n", _url);
+		}
+		else if(error != ERR_OK) {
+			UARTprintf("%s: Error occured: %d\n", _url, error);
+			netconn_close(connection);
+			netconn_delete(connection);
+			connection = NULL;
+		}
+		else {
+			UARTprintf("%s: Undefined error occured\n", _url);
+		}
+
+		vTaskDelay(5000);
+	}
+}
+
 void abstractclientservice::retryContext(netconn*& connection, s32& error) {
 	while(IPGatheringStrategie == IPADDR_USE_DHCP && 0x0 == lwIPLocalIPAddrGet() || 0xFFFFFFFF == lwIPLocalIPAddrGet()) {taskYIELD();}
 

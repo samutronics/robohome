@@ -17,29 +17,7 @@ using namespace service::weather::configuration;
 weather::weather(): abstractclientservice(url, port, NETCONN_TCP, updatePeriode) {
 }
 
-void weather::task(void *pvParameters) {
-	netconn* connection = NULL;
-	s32 error = ERR_OK;
-	while(true) {
-		retryContext(connection, error);
-		if(!connection) {
-			UARTprintf("%s: Out of memory, retry later\n", url);
-		}
-		else if(error != ERR_OK) {
-			UARTprintf("%s: Error occured: %d\n", url, error);
-			netconn_close(connection);
-			netconn_delete(connection);
-			connection = NULL;
-		}
-		else {
-			UARTprintf("%s: Undefined error occured\n", url);
-		}
-
-		vTaskDelay(5000);
-	}
-}
-
-bool service::weather::weather::processingReply(netbuf* reply) {
+bool weather::processingReply(netbuf* reply) {
 	report r;
 	u32 itemCount = JSONParseCurrent(0, r, reply->p);
 	netbuf_delete(reply);

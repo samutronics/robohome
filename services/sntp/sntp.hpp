@@ -8,21 +8,19 @@
 #ifndef _SNTP_HPP_
 #define _SNTP_HPP_
 
-#include "iservice.hpp"
 #include "abstractclientservice.hpp"
 #include "../projectconfiguration.hpp"
 
 namespace service {
 namespace sntp {
 
-class sntp: public IService, public abstractclientservice {
+class sntp: public abstractclientservice {
 	TO_BE_RUNABLE(sntp)
 
 protected: virtual bool processingReply(netbuf* reply);
 protected: virtual netbuf* generateRequest();
 
 private: sntp();
-private: virtual void task(void *pvParameters);
 DEFINE_TH
 };
 

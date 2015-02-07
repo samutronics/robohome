@@ -8,6 +8,7 @@
 #ifndef _ASBTRACTCLIENTSERVICE_H_
 #define _ASBTRACTCLIENTSERVICE_H_
 
+#include "iservice.hpp"
 #include "../projectconfiguration.hpp"
 
 class netbuf;
@@ -15,13 +16,15 @@ class netconn;
 
 namespace service {
 
-class abstractclientservice {
+class abstractclientservice: public IService {
 protected: inline abstractclientservice(const char* url, u16 port, netconn_type type, u32 updatePeriode);
-
-protected: void retryContext(netconn*& connection, s32& error);
 
 protected: virtual bool processingReply(netbuf* reply) = 0;
 protected: virtual netbuf* generateRequest() = 0;
+
+protected: void task(void *pvParameters);
+
+private: void retryContext(netconn*& connection, s32& error);
 
 private: const char*		_url;
 private: const u16			_port;

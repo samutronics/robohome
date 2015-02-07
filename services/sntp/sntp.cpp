@@ -55,29 +55,6 @@ sntp::sntp(): abstractclientservice(url, port, NETCONN_UDP, updatePeriode) {
 	HibernateRTCEnable();
 }
 
-void sntp::task(void *pvParameters) {
-	while(0x0 == lwIPLocalIPAddrGet() || 0xFFFFFFFF == lwIPLocalIPAddrGet()) {taskYIELD();}
-	netconn* connection = NULL;
-	s32 error = ERR_OK;
-	while(true) {
-		retryContext(connection, error);
-		if(!connection) {
-			UARTprintf("%s: Out of memory, retry later\n", url);
-		}
-		else if(error != ERR_OK) {
-			UARTprintf("%s: Error occured: %d\n", url, error);
-			netconn_close(connection);
-			netconn_delete(connection);
-			connection = NULL;
-		}
-		else {
-			UARTprintf("%s: Undefined error occured\n", url);
-		}
-
-		vTaskDelay(5000);
-	}
-}
-
 bool sntp::processingReply(netbuf* reply) {
 	u8 mode;
 	sntp_msg* reference = NULL;
