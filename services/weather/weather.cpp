@@ -37,12 +37,9 @@ bool weather::processingReply(netbuf* reply) {
 }
 
 netbuf* weather::generateRequest() {
-	static netbuf* buf = NULL;
-	if(!buf) {
-		buf = netbuf_new();
-		const string& request = _requestFactory.request("Budapest,HU", false, 0);
-		netbuf_ref(buf, request.data(), request.length());
-	}
+	netbuf* buf = buf = netbuf_new();
+	const string& request = _requestFactory.request("Budapest,HU", false, 0);
+	netbuf_ref(buf, request.data(), request.length());
 
 	return buf;
 }

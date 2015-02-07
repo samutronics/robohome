@@ -70,6 +70,7 @@ void abstractclientservice::retryContext(netconn*& connection, s32& error) {
 		_connectionType == NETCONN_TCP ?
 				error = netconn_write(connection, request->p->payload, request->p->tot_len, NETCONN_NOCOPY) :
 				error = netconn_send(connection, request);
+		netbuf_delete(request);
 		if (ERR_OK != error) {return;}
 
 		netbuf* reply = NULL;

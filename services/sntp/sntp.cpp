@@ -107,13 +107,10 @@ bool sntp::processingReply(netbuf* reply) {
 }
 
 netbuf* sntp::generateRequest() {
-	static netbuf* request = NULL;
-	if(!request) {
-		request = netbuf_new();
-		static sntp_msg msg;
-		msg.li_vn_mode[0] = (SNTP_LI_NO_WARNING | SNTP_VERSION | SNTP_MODE_CLIENT);
-		netbuf_ref(request, &msg, sizeof(msg));
-	}
+	netbuf* request = netbuf_new();
+	static sntp_msg msg;
+	msg.li_vn_mode[0] = (SNTP_LI_NO_WARNING | SNTP_VERSION | SNTP_MODE_CLIENT);
+	netbuf_ref(request, &msg, sizeof(msg));
 
 	return request;
 }
