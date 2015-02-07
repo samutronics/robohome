@@ -9,13 +9,13 @@
 #define _SNTP_HPP_
 
 #include "iservice.hpp"
+#include "abstractclientservice.hpp"
 #include "../projectconfiguration.hpp"
-#include "abstractservicerequesttransmitter.hpp"
 
 namespace service {
 namespace sntp {
 
-class sntp: public IService, public communication::asbtractServiceRequestTransmitter {
+class sntp: public IService, public abstractclientservice {
 	TO_BE_RUNABLE(sntp)
 
 protected: virtual bool processingReply(netbuf* reply);

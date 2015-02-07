@@ -11,13 +11,13 @@
 #include "report.hpp"
 #include "iservice.hpp"
 #include "requestfactory.hpp"
+#include "abstractclientservice.hpp"
 #include "../projectconfiguration.hpp"
-#include "abstractservicerequesttransmitter.hpp"
 
 namespace service {
 namespace weather {
 
-class weather: public IService, public communication::asbtractServiceRequestTransmitter {
+class weather: public IService, public abstractclientservice {
 	TO_BE_RUNABLE(weather)
 
 protected: virtual bool processingReply(netbuf* reply);

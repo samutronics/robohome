@@ -38,11 +38,10 @@ PACK_STRUCT_END
 
 #define DIFF_SEC_1900_1970         (2208988800UL)
 
-using namespace communication;
 using namespace service::sntp;
 using namespace service::sntp::configuration;
 
-sntp::sntp(): asbtractServiceRequestTransmitter(url, port, NETCONN_UDP, updatePeriode) {
+sntp::sntp(): abstractclientservice(url, port, NETCONN_UDP, updatePeriode) {
 	HibernateEnableExpClk(systemGlobal::currentSystemClockFrequency);
 	HibernateCounterMode(HIBERNATE_COUNTER_24HR);
 

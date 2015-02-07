@@ -5,12 +5,12 @@
 //! \date			26.01.2015.
 //! \note
 // =============================================================================
-#include "abstractservicerequesttransmitter.hpp"
+#include "abstractclientservice.hpp"
 
-using namespace communication;
+using namespace service;
 using namespace systemGlobal;
 
-void asbtractServiceRequestTransmitter::retryContext(netconn*& connection, s32& error) {
+void abstractclientservice::retryContext(netconn*& connection, s32& error) {
 	while(IPGatheringStrategie == IPADDR_USE_DHCP && 0x0 == lwIPLocalIPAddrGet() || 0xFFFFFFFF == lwIPLocalIPAddrGet()) {taskYIELD();}
 
 	// =============================================================================
@@ -67,4 +67,4 @@ void asbtractServiceRequestTransmitter::retryContext(netconn*& connection, s32& 
 // =============================================================================
 //! \file
 //! \copyright
-// ============ end of file: asbtractservicerequesttransmitter.cpp =============
+// ================= end of file: abstractclientservice.cpp ====================

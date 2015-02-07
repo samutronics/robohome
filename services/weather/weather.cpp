@@ -14,7 +14,7 @@ using namespace std;
 using namespace service::weather;
 using namespace service::weather::configuration;
 
-weather::weather(): asbtractServiceRequestTransmitter(url, port, NETCONN_TCP, updatePeriode) {
+weather::weather(): abstractclientservice(url, port, NETCONN_TCP, updatePeriode) {
 }
 
 void weather::task(void *pvParameters) {
