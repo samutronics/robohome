@@ -15,6 +15,10 @@ namespace service {
 namespace sntp {
 
 class sntp: public IService {
+
+protected: virtual bool processingReply(netbuf* reply);
+protected: virtual netbuf* generateRequest();
+
 private: sntp();
 private: virtual void task(void *pvParameters);
 private: void retryContext(netconn*& connection, s32& error);
