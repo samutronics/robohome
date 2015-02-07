@@ -23,16 +23,16 @@ void weather::task(void *pvParameters) {
 	while(true) {
 		retryContext(connection, error);
 		if(!connection) {
-			UARTprintf("Out of memory, retry later\n");
+			UARTprintf("%s: Out of memory, retry later\n", url);
 		}
 		else if(error != ERR_OK) {
-			UARTprintf("Error occured: %d\n", error);
+			UARTprintf("%s: Error occured: %d\n", url, error);
 			netconn_close(connection);
 			netconn_delete(connection);
 			connection = NULL;
 		}
 		else {
-			UARTprintf("Undefined error occured\n");
+			UARTprintf("%s: Undefined error occured\n", url);
 		}
 
 		vTaskDelay(5000);
