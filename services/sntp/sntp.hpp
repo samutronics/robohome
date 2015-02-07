@@ -10,22 +10,20 @@
 
 #include "iservice.hpp"
 #include "../projectconfiguration.hpp"
+#include "abstractservicerequesttransmitter.hpp"
 
 namespace service {
 namespace sntp {
 
-class sntp: public IService {
+class sntp: public IService, public communication::asbtractServiceRequestTransmitter {
+	TO_BE_RUNABLE(sntp)
 
 protected: virtual bool processingReply(netbuf* reply);
 protected: virtual netbuf* generateRequest();
 
 private: sntp();
 private: virtual void task(void *pvParameters);
-private: void retryContext(netconn*& connection, s32& error);
-TO_BE_RUNABLE(sntp)
 DEFINE_TH
-
-private: ip_addr				_serverIP;
 };
 
 } // sntp

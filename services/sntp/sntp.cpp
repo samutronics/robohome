@@ -38,10 +38,11 @@ PACK_STRUCT_END
 
 #define DIFF_SEC_1900_1970         (2208988800UL)
 
+using namespace communication;
 using namespace service::sntp;
 using namespace service::sntp::configuration;
 
-sntp::sntp() {
+sntp::sntp(): asbtractServiceRequestTransmitter(url, port, NETCONN_UDP, updatePeriode) {
 	HibernateEnableExpClk(systemGlobal::currentSystemClockFrequency);
 	HibernateCounterMode(HIBERNATE_COUNTER_24HR);
 
@@ -64,47 +65,18 @@ void sntp::task(void *pvParameters) {
 		if(!connection) {
 			UARTprintf("Out of memory, retry later\n");
 		}
-
-		if(error != ERR_OK) {
+		else if(error != ERR_OK) {
 			UARTprintf("Error occured: %d\n", error);
 			netconn_close(connection);
 			netconn_delete(connection);
 			connection = NULL;
 		}
+		else {
+			UARTprintf("Undefined error occured\n");
+		}
+
 
 		vTaskDelay(5000);
-	}
-}
-
-void sntp::retryContext(netconn*& connection, s32& error) {
-	error = netconn_gethostbyname(url, &_serverIP);
-	if(ERR_OK != error) {return;}
-
-	while(true) {
-		connection = netconn_new(NETCONN_UDP);
-		if (connection == NULL) {return;}
-
-		error = netconn_connect(connection, &_serverIP, port);
-		if (ERR_OK != error) {return;}
-
-		netbuf* request = generateRequest();
-		error = netconn_send(connection, request);
-		if (ERR_OK != error) {return;}
-//		netbuf_delete(request);
-
-		netbuf* buffer = NULL;
-		error = netconn_recv(connection, &buffer);
-		if (ERR_OK != error) {netbuf_delete(buffer); return;}
-
-		processingReply(buffer);
-
-		netconn_close(connection);
-		netconn_delete(connection);
-
-		// =============================================================================
-		//! * Wait until the time of the next request
-		// =============================================================================
-		vTaskDelay(updatePeriode);
 	}
 }
 
