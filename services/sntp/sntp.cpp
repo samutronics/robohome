@@ -68,6 +68,7 @@ bool sntp::processingReply(netbuf* reply) {
 			if (stratum == SNTP_STRATUM_KOD) {
 				// Kiss-of-death packet. Use another server or increase UPDATE_DELAY.
 				UARTprintf("Kiss-of-death packet\n");
+				netbuf_delete(reply);
 				return false;
 			}
 		}
