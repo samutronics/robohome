@@ -8,8 +8,8 @@
 #ifndef _EXOSITEMANAGER_H_
 #define _EXOSITEMANAGER_H_
 
-#include "iservice.hpp"
 #include "devicerequestfactory.hpp"
+#include "abstractclientservice.hpp"
 #include "exositerequestfactory.hpp"
 #include "../../projectconfiguration.hpp"
 
@@ -18,11 +18,13 @@ struct netconn;
 namespace service {
 namespace exosite {
 
-class exosite: public IService {
-private: exosite();
-private: virtual void task(void *pvParameters);
-private: void retryContext(netconn*& connection, s32& error);
-TO_BE_RUNABLE(exosite)
+class exosite: public abstractclientservice {
+	TO_BE_RUNABLE(exosite)
+
+protected: virtual bool processingReply(netbuf* reply);
+protected: virtual netbuf* generateRequest();
+
+private: inline exosite();
 
 // =============================================================================
 // Member declarations
@@ -30,8 +32,15 @@ TO_BE_RUNABLE(exosite)
 private: deviceRequestFactory	_deviceRequestFactory;
 private: exositeRequestFactory	_exositeRequestFactory;
 private: std::string			_workerBuffer;
-private: ip_addr				_serverIP;
+private: bool					_requestPost;
 };
+
+inline exosite::exosite(): abstractclientservice(configuration::url, configuration::port, NETCONN_TCP, configuration::updatePeriode), _requestPost(true) {
+	_workerBuffer.reserve(1024);
+	u8 pucMACAddr[6];
+	EMACAddrGet(EMAC0_BASE, 0, pucMACAddr);
+	_exositeRequestFactory.init("texasinstruments", "ek-tm4c1294xl", IF_ENET, pucMACAddr, 0);
+}
 
 } // exosite
 } // manager

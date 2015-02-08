@@ -5,7 +5,6 @@
 //! \date			30.12.2014.
 //! \note
 // =============================================================================
-#include "lwip/api.h"
 #include "exosite.hpp"
 #include "devicestatistic.hpp"
 #include "exositerequestfactory.hpp"
@@ -13,73 +12,13 @@
 
 using namespace std;
 using namespace service::exosite;
-using namespace service::exosite::configuration;
 
-exosite::exosite() {
-	_workerBuffer.reserve(1024);
-}
-
-void exosite::task(void *pvParameters) {
-	while(0x0 == lwIPLocalIPAddrGet() || 0xFFFFFFFF == lwIPLocalIPAddrGet()) {taskYIELD();}
-	// very stupid solution: wait until the LwIP stack is initialized
-	// it would be better, that the LwIP initialize can send some signal, like events, or semaphore.
-
-	u8 pucMACAddr[6];
-	EMACAddrGet(EMAC0_BASE, 0, pucMACAddr);
-	_exositeRequestFactory.init("texasinstruments", "ek-tm4c1294xl", IF_ENET, pucMACAddr, 0);
-
-	netconn* connection = NULL;
-	s32 error = ERR_OK;
-	while(true) {
-		retryContext(connection, error);
-		if(!connection) {
-			UARTprintf("Out of memory, retry later\n");
-		}
-
-		if(error != ERR_OK) {
-			UARTprintf("Error occured: %d\n", error);
-			netconn_close(connection);
-			netconn_delete(connection);
-			connection = NULL;
-		}
-
-		vTaskDelay(5000);
+bool exosite::processingReply(netbuf* reply) {
+	if(_requestPost) {
+		_exositeRequestFactory.parseWriteResult(reply->p);
 	}
-}
-
-void exosite::retryContext(netconn*& connection, s32& error) {
-	error = netconn_gethostbyname(url, &_serverIP);
-	if(ERR_OK != error) {return;}
-
-	connection = netconn_new(NETCONN_TCP);
-	if (connection == NULL) {return;}
-
-	error = netconn_connect(connection, &_serverIP, port);
-	if (ERR_OK != error) {return;}
-
-	while(1) {
-		_exositeRequestFactory.writeRequest(_deviceRequestFactory.writeRequest(), _workerBuffer);
-		error = netconn_write(connection, _workerBuffer.data(), _workerBuffer.length(), NETCONN_NOCOPY);
-		if (ERR_OK != error) {return;}
-
-		netbuf* writeReplyBuffer = NULL;
-		error = netconn_recv(connection, &writeReplyBuffer);
-		if (ERR_OK != error) {netbuf_delete(writeReplyBuffer); return;}
-		_exositeRequestFactory.parseWriteResult(writeReplyBuffer->p);
-		netbuf_delete(writeReplyBuffer);
-
-		vTaskDelay(updatePeriode);
-
-		_exositeRequestFactory.readRequest(_deviceRequestFactory.readRequest(), _workerBuffer);
-		error = netconn_write(connection, _workerBuffer.data(), _workerBuffer.length(), NETCONN_NOCOPY);
-		if (ERR_OK != error) {return;}
-
-		netbuf* readReplyBuffer = NULL;
-		error = netconn_recv(connection, &readReplyBuffer);
-		if (ERR_OK != error) {netbuf_delete(readReplyBuffer); return;}
-		_exositeRequestFactory.parseReadResult(readReplyBuffer->p, _workerBuffer);
-		netbuf_delete(readReplyBuffer);
-
+	else {
+		_exositeRequestFactory.parseReadResult(reply->p, _workerBuffer);
 		deviceStatistic::reset();
 		while(deviceStatistic::next()) {
 			taskENTER_CRITICAL();
@@ -90,13 +29,25 @@ void exosite::retryContext(netconn*& connection, s32& error) {
 			if(deviceStatistic::current()->entryName) {
 				UARTprintf("%s=%s\n", deviceStatistic::current()->entryName, deviceStatistic::current()->getValue().c_str());
 			}
-			taskEXIT_CRITICAL(); //this is only for the systematic usage of print guarding
+			taskEXIT_CRITICAL(); //this is only for the systematic use of print guarding
 
 			taskEXIT_CRITICAL();
 		}
-
-		vTaskDelay(updatePeriode);
 	}
+
+	netbuf_delete(reply);
+	_requestPost = !_requestPost;
+	return true;
+}
+
+netbuf* exosite::generateRequest() {
+	_requestPost ?
+			_exositeRequestFactory.writeRequest(_deviceRequestFactory.writeRequest(), _workerBuffer):
+			_exositeRequestFactory.readRequest(_deviceRequestFactory.readRequest(), _workerBuffer);
+
+	netbuf* buf = netbuf_new();
+	netbuf_ref(buf, _workerBuffer.data(), _workerBuffer.length());
+	return buf;
 }
 
 // =============================================================================
