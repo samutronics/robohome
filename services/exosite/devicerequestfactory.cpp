@@ -74,7 +74,7 @@ const std::string& deviceRequestFactory::writeRequest() {
     		string str;
     		str.reserve(100);
     		deviceStatistic::current()->requestFormat(str);
-    		addRequest(str, readRequestOutbound);
+    		addRequest(str, writeRequestOutbound);
     	}
     }
 
