@@ -11,7 +11,6 @@ using namespace service;
 using namespace systemGlobal;
 
 void abstractclientservice::task(void* pvParameters) {
-	while(0x0 == lwIPLocalIPAddrGet() || 0xFFFFFFFF == lwIPLocalIPAddrGet()) {taskYIELD();}
 	netconn* connection = NULL;
 	s32 error = ERR_OK;
 	while(true) {
@@ -34,8 +33,6 @@ void abstractclientservice::task(void* pvParameters) {
 }
 
 void abstractclientservice::retryContext(netconn*& connection, s32& error) {
-	while(IPGatheringStrategie == IPADDR_USE_DHCP && 0x0 == lwIPLocalIPAddrGet() || 0xFFFFFFFF == lwIPLocalIPAddrGet()) {taskYIELD();}
-
 	// =============================================================================
 	//! * At this point, the excecution has to wait for the end of the
 	//!		inicialization of the dns module. Until that, argument error will be

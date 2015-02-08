@@ -36,7 +36,9 @@ inline abstractclientservice::abstractclientservice(const char* url, u16 port, n
 		_url(url),
 		_port(port),
 		_updatePeriode(updatePeriode),
-		_connectionType(type) {}
+		_connectionType(type) {
+	while(systemGlobal::IPGatheringStrategie == IPADDR_USE_DHCP && 0x0 == lwIPLocalIPAddrGet() || 0xFFFFFFFF == lwIPLocalIPAddrGet()) {taskYIELD();}
+}
 
 } // service
 
