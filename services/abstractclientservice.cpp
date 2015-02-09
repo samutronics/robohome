@@ -34,11 +34,7 @@ void abstractclientservice::task(void* pvParameters) {
 
 void abstractclientservice::retryContext(netconn*& connection, s32& error) {
 	// =============================================================================
-	//! * At this point, the excecution has to wait for the end of the
-	//!		inicialization of the dns module. Until that, argument error will be
-	//!		returned from the dns lookup.
-	//!	\note Refactoring of each of LwIP services would be nice to became queriable
-	//! about its state, or the service send any kind of event.
+	//! * Try to resolve the URL. If the lookup failed, return with the LWIP's error code.
 	// =============================================================================
 	ip_addr serverIP;
 	error = netconn_gethostbyname(_url, &serverIP);
@@ -46,41 +42,59 @@ void abstractclientservice::retryContext(netconn*& connection, s32& error) {
 
 	while(true) {
 		// =============================================================================
-		//! * Create HTTP get request to query the actual weather informations. It has
-		//! to be done only once.
-		//! \warning Whitespaces are not allowed in the the request.
+		//! .
+		//! The further steps are excecuted periodically.
+		//! * Get the request to be sent from the concrete implementation.
 		// =============================================================================
 		netbuf* request = generateRequest();
 
 		// =============================================================================
-		//! .
-		//! The further steps are excecuted periodically.
-		//! * Connect to the server, and block the execution until the connection will
-		//! be established.
+		//! * Create a new connection with the service specified type. The netconn API's
+		//!		method only fails in case of out of memory. It's signed with empty pointer
 		// =============================================================================
 		connection = netconn_new(_connectionType);
 		if (connection == NULL) {return;}
 
+		// =============================================================================
+		//! * Establish a connection to the server. If it fails, return with the LwIP's error code.
+		// =============================================================================
 		error = netconn_connect(connection, &serverIP, _port);
 		if (ERR_OK != error) {return;}
 
+		// =============================================================================
+		//! * Send the request via the appropriate interface and delete the request.
+		//!		If the send fails, return with the LwIP's error code.
+		// =============================================================================
 		_connectionType == NETCONN_TCP ?
 				error = netconn_write(connection, request->p->payload, request->p->tot_len, NETCONN_NOCOPY) :
 				error = netconn_send(connection, request);
 		netbuf_delete(request);
 		if (ERR_OK != error) {return;}
 
+		// =============================================================================
+		//! * Wait for receive data. If it fails, return with the LwIP's error code.
+		//!	\warning Timeout isn't support yet, so the threan can blocked forever,
+		//!		it depends on the LwIP's internal.
+		// =============================================================================
 		netbuf* reply = NULL;
 		error = netconn_recv(connection, &reply);
 		if (ERR_OK != error) {netbuf_delete(reply); return;}
 
+		// =============================================================================
+		//! * Send the received data to the concrate implementation for processing.
+		//!		If the implementation was unable to process the reply, return from the
+		//!		method. It will be the undefined errors.
+		// =============================================================================
 		if(!processingReply(reply)) {return;}
 
+		// =============================================================================
+		//! * Clean up the resources.
+		// =============================================================================
 		netconn_close(connection);
 		netconn_delete(connection);
 
 		// =============================================================================
-		//! * Wait until the time of the next request
+		//! * Block the thread until the timout is expired.
 		// =============================================================================
 		vTaskDelay(_updatePeriode);
 	}

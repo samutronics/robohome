@@ -16,6 +16,9 @@
 namespace service {
 namespace weather {
 
+// =============================================================================
+//! \brief Service implementation to gather weather informations for the system.
+// =============================================================================
 class weather: public abstractclientservice {
 	TO_BE_RUNABLE(weather)
 

@@ -18,6 +18,10 @@ struct netconn;
 namespace service {
 namespace exosite {
 
+// =============================================================================
+//! \brief Service implementation to handle connection between the embedded
+//!		device and the ti.exosite.com.
+// =============================================================================
 class exosite: public abstractclientservice {
 	TO_BE_RUNABLE(exosite)
 

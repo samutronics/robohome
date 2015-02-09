@@ -14,6 +14,9 @@
 namespace service {
 namespace sntp {
 
+// =============================================================================
+//! \brief Service implementation to ensure the system time to be up-to-date.
+// =============================================================================
 class sntp: public abstractclientservice {
 	TO_BE_RUNABLE(sntp)
 
