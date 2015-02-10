@@ -97,11 +97,28 @@ web::web() {
 	// =============================================================================
 	//! * Initialize HTTP daemon, that is responsible for the webpage.
     // =============================================================================
-    httpd_init();
+//    httpd_init();
 }
 
 void web::task(void *pvParameters) {
-    while(1) {
+	while(1) {
+
+		netconn* connection = netconn_new (NETCONN_TCP);
+		netconn_bind(connection, IPADDR_ANY, 80);
+		netconn_listen(connection);
+
+		// task routine, loop forever
+		while(true)
+		{
+			netconn* incomingConnection = NULL;
+			s32 error = netconn_accept(connection, &incomingConnection);
+			if (error != ERR_OK) {continue;}
+
+			error = netconn_write(incomingConnection, (void*)page, sizeof(page), NETCONN_NOCOPY);
+
+			netconn_delete(incomingConnection);
+		}
+
 		taskYIELD();
 	}
 }

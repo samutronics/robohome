@@ -288,7 +288,7 @@
 #define DEFAULT_RAW_RECVMBOX_SIZE       1
 #define DEFAULT_UDP_RECVMBOX_SIZE       1
 #define DEFAULT_TCP_RECVMBOX_SIZE       1
-//#define DEFAULT_ACCEPTMBOX_SIZE         0
+#define DEFAULT_ACCEPTMBOX_SIZE         1
 
 //*****************************************************************************
 //
