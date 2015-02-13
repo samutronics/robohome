@@ -7,7 +7,6 @@
 // =============================================================================
 #include "web.hpp"
 #include "httpd.h"
-#include "sntp.hpp"
 
 const u8 page[] = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\
 <html xmlns=\"http://www.w3.org/1999/xhtml\">\
@@ -22,11 +21,17 @@ const u8 page[] = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//E
             }\
 \
             if (req) {\
-                req.open(\"GET\", \"/processing?\", true);\
+                req.open(\"GET\", \"192.168.1.122/processing?\", true);\
                 req.onreadystatechange = updateStateReply;\
                 req.send(null);\
             }\
         }\
+        function LED1_onclick() {\
+            var req = new XmlHttpRequest();\
+            req.open(\"GET\", \"request.htm\", false);\
+            req.send();\
+        }\
+\
     </script>\
 </head>\
 <body>\
@@ -35,16 +40,24 @@ const u8 page[] = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//E
     <p style=\"font-weight: 700; text-decoration: underline; text-align: center; font-size: xx-large\">\
         <input id=\"LED0\" name=\"R1\" type=\"radio\" value=\"LED0\" /></p>\
     <p style=\"font-weight: 700; text-decoration: underline; text-align: center; font-size: xx-large\">\
-        <input id=\"LED1\" name=\"R2\" type=\"radio\" value=\"LED1\" /></p>\
+        <input id=\"LED1\" name=\"R2\" type=\"radio\" value=\"LED1\" onclick=\"return LED1_onclick()\" /></p>\
     <p style=\"font-weight: 700; text-decoration: underline; text-align: center; font-size: xx-large\">\
         <textarea id=\"RTC\" cols=\"20\" name=\"S1\" rows=\"2\" title=\"RTC of Samutronics\"></textarea></p>\
 </body>\
 </html>\
 ";
 
+const sp8 httpMethods[] = {
+		"GET ",
+		"POST ",
+		"HEAD ",
+		""
+};
 
+using namespace std;
 using namespace systemGlobal;
 using namespace service::web;
+using namespace service::web::configuration;
 
 web::web() {
 	// =============================================================================
@@ -97,30 +110,93 @@ web::web() {
 	// =============================================================================
 	//! * Initialize HTTP daemon, that is responsible for the webpage.
     // =============================================================================
-//    httpd_init();
 }
 
 void web::task(void *pvParameters) {
-	while(1) {
-
+	while(true) {
 		netconn* connection = netconn_new (NETCONN_TCP);
-		netconn_bind(connection, IPADDR_ANY, 80);
+		netconn_bind(connection, IPADDR_ANY, port);
 		netconn_listen(connection);
-
-		// task routine, loop forever
 		while(true)
 		{
-			netconn* incomingConnection = NULL;
-			s32 error = netconn_accept(connection, &incomingConnection);
-			if (error != ERR_OK) {continue;}
+			// wait for an incomming connection from the remote client
+			_connectionFromClient = NULL;
+			if (ERR_OK != netconn_accept(connection, &_connectionFromClient)) {continue;}
 
-			error = netconn_write(incomingConnection, (void*)page, sizeof(page), NETCONN_NOCOPY);
+			// get data from the connection request
+			netbuf* reply = NULL;
+			if (ERR_OK != netconn_recv(_connectionFromClient, &reply)) {
+				UARTprintf("Failed to receive data\n");
+				netconn_close(_connectionFromClient);
+				netconn_delete(_connectionFromClient);
+				continue;
+			}
 
-			netconn_delete(incomingConnection);
+			// put the data into an std::string object to the parse becamores easier
+			string httpRequest(static_cast<s8*>(reply->p->payload), reply->p->len);
+			// the std::string object took over the data. Delete the netbuf to avoid the memory leaks
+			netbuf_delete(reply);
+
+			// serve the request by the method type
+			switch(getHTTPMethodType(httpRequest)) {
+			case get: {
+				parseURI(httpRequest);
+				break;
+			}
+			default: {
+				UARTprintf("unsupported method\n");
+				while(true);
+			}
+			}
+
+			// freeing the
+			netconn_close(_connectionFromClient);
+			netconn_delete(_connectionFromClient);
+		}
+	}
+}
+
+bool web::parseURI(const std::string& request) const {
+	u32 startOfURI = request.find("/");
+	if(string::npos == startOfURI) {return false;}
+
+	if(parseDefaultResource(request, startOfURI)) {return true;}
+
+	u32 startOfArguments = request.find("?");
+	if(parseResource(request, startOfURI, startOfArguments)) {return true;}
+
+	return false;
+}
+
+bool web::parseResource(const std::string& request, const u32 startOfURI, const u32 startOfArguments) const {
+	u32 endOfURI = request.find(" ", startOfURI);
+	string URI(request.substr(startOfURI, string::npos == startOfArguments ? endOfURI : startOfArguments));
+	if (ERR_OK != netconn_write(_connectionFromClient, (void*)page, sizeof(page), NETCONN_NOCOPY)) {
+		UARTprintf("Failed to reply to URI: %s\n", URI.c_str());
+		return true;
+	}
+
+	return false;
+}
+
+bool web::parseDefaultResource(const std::string& request, const u32 startOfURI) const {
+	if('/' == request[startOfURI] && ' ' == request[startOfURI + 1]) {
+		if (ERR_OK != netconn_write(_connectionFromClient, (void*)page, sizeof(page), NETCONN_NOCOPY)) {
+			UARTprintf("Failed to send default page\n");
 		}
 
-		taskYIELD();
+		return true;
 	}
+
+	return false;
+}
+
+web::httpMethod web::getHTTPMethodType(const std::string& request) const {
+	for(u32 method = get; method <= last_httpVersion_element; method++) {
+		if(0 == request.find(httpMethods[method])) {return static_cast<httpMethod>(method);}
+	}
+
+	return last_httpMethod_element;
 }
 
 // =============================================================================

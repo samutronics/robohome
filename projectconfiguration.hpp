@@ -126,6 +126,9 @@ const u32 THQueueWidth = 1;
 namespace web {
 namespace configuration {
 
+const s8 defaultPage[] = "/index.htm";
+const u16 port = 80;
+
 }  // configuration
 }  // web
 
@@ -133,7 +136,7 @@ namespace sntp {
 namespace configuration {
 
 const char url[] = "pool.ntp.org";
-const u32 port = 123;
+const u16 port = 123;
 const u32 updatePeriode = 3600000;
 
 }  // configuration
@@ -143,7 +146,7 @@ namespace weather {
 namespace configuration {
 
 const char url[] = "api.openweathermap.org";
-const u32 port = 80;
+const u16 port = 80;
 const u32 updatePeriode = 1800000; //0.5 h with the current scheduler setting: 1000 Hz task preemtion.
 
 }  // configuration
@@ -153,7 +156,7 @@ namespace exosite {
 namespace configuration {
 
 const char url[] = "m2.exosite.com";
-const u32 port = 80;
+const u16 port = 80;
 const u32 updatePeriode = 4000;
 
 }  // configuration

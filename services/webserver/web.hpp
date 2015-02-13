@@ -15,6 +15,20 @@ namespace service {
 namespace web {
 
 class web: public IService {
+private: enum httpVersion {
+		version10 = 0,
+		version11 = 1,
+		DECLARE_LAST_ENUM(httpVersion)
+	};
+
+private: enum httpMethod {
+		get = 0,
+		post = 1,
+		head = 2,
+		DECLARE_LAST_ENUM(httpMethod)
+	};
+
+	TO_BE_RUNABLE(web)
 // =============================================================================
 //! \brief Initialize the hardware and necessary objects
 //!
@@ -23,13 +37,19 @@ class web: public IService {
 // =============================================================================
 private: web();
 
+private: httpMethod getHTTPMethodType(const std::string& request) const;
+private: bool parseURI(const std::string& request) const;
+private: bool parseResource(const std::string& request, const u32 startOfURI, const u32 startOfArguments) const;
+private: bool parseDefaultResource(const std::string& request, const u32 startOfURI) const;
+
 // =============================================================================
 //! \brief Empty implementation of the task.
 //!
 //!	This basic implementation is required due to the architecture convenience.
 // =============================================================================
 private: virtual void task(void *pvParameters);
-TO_BE_RUNABLE(web)
+
+private: netconn* _connectionFromClient;
 };
 
 } // web
