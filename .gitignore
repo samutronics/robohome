@@ -20,3 +20,5 @@ Debug/*
 /Release__opt_for_speed__3
 /Release__opt_for_speed__4
 /Release__opt_for_speed__5
+doc/*.ldb
+doc/SW Specification 11.pdf
