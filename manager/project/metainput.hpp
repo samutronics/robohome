@@ -45,7 +45,7 @@ inline u16 metaInput::totalCount() const {
 inline TriggerType metaInput::trigger() const {
 	u32 value;
 	EEPROMRead(&value, _itemAddress / sizeof(u32), 1);
-	return static_cast<TriggerType>(((value >> _sectionAddress % sizeof(u32) * 8) & 0xFF));
+	return static_cast<TriggerType>(((value >> _itemAddress % sizeof(u32) * 8) & 0xFF));
 }
 
 inline metaInput metaInput::next() const {
