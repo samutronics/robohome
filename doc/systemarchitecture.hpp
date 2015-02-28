@@ -12,6 +12,7 @@
 //!	\section designconstraints Design constraints
 //! -# There is no separeted input for the services. Services act as an write request from the input side.
 //! -# The number of inputs and outputs are must be identical as the IO points in the hardware configuration
+//! -# The project represented in binray form that will be processed by the system is valid and consistent.
 //!
 //!	\section projectmanagement Project management
 //! The project is the human readable, text represented form that determines the run-time behavioral of the system related to its inputs and outputs.
@@ -139,7 +140,62 @@
 //!
 //!
 //! \subsection configuration Configuration management
+//! By the CM the commissioner is able to change the behavioral of the system. The CM allows the change of parameters, that
+//! aren't lead directly to a system crash. These parameters could be e.g. the URL of ntp server, the number inputs, connections
+//! between in and outputs.
 //!
+//! \subsubsection datastructure Data Structure
+//! A project represented in binary form is splitted up into the following main sections. That means that the sections also can
+//! contains furthere subsections, but the interpretation of that belongs to the appropriate subsystem. The main sections are:
+//! * system configuration
+//! * input properties
+//! * output properties
+//! * irrigation description
+//! .
+//! The project structure highly inspired by partitioning table of the HDD's. So at the start of the project there will be the
+//! offsets of sections listed above. That composed of the following internal structures:
+//! * <b>System Configuration:</b> provides the following fields:
+//!		* IP address gathering strategie, in case of static IP, the IP address, subnet mask and default gateway. The input section
+//!		consist of the following fields:
+//!			* IP address on 4 byte, is it's zero, the system assume a DHCP strategie
+//!			* subnet mask on 4 byte, considered only in case of static IP
+//!			* default gateway on 4 byte, considered only in case of static IP
+//!			.
+//!		.
+//! * <b>Input properties:</b> section contains the properties of inputs. The list of inputs have to be mapped to the physical
+//! address, e.g.: first item assign to the input bit 0, tenth item assign to the input bit 11. There isn't allowed tobe gap between
+//! the inputs. The input section consist of the following fields:
+//! 	* total number of inputs represented represented on unsigned short
+//!		* list of trigger types: no more fields need to create an Input object
+//!		.
+//! * <b>Output properties:</b> in the current implementation splitted up to two more subsections: first for the simple output and
+//! the second describes the tri-state outputs. The input section consist of the following fields:
+//!		* start address of simple outputs represented on unsigned short
+//!		* start address of tri-state outputs represented on unsigned short
+//!		* simple output section:
+//!			* number of simple outputs represented on unsigned short
+//!			* lists of simple outputs:
+//!				* address represented on unsigned short
+//!				* time out represented on unsigned short
+//!				* number of connected inputs represented on unsigned short
+//!				* lists of address of inputs represented on unsigned short
+//!				.
+//!			.
+//!		* tri-state output section:
+//!			* number of tri-state outputs represented on unsigned short
+//!			* lists of tri-state outputs:
+//!				* address represented on unsigned short
+//!				* time out represented on unsigned short
+//!				* number of connected Up/Down inputs represented on unsigned short
+//!				* lists of address of Up/Down inputs represented on unsigned short
+//!				* extended address represented on unsigned short
+//!				* number of connected Down inputs represented on unsigned short
+//!				* lists of address of Down inputs represented on unsigned short
+//!				* number of connected Up inputs represented on unsigned short
+//!				* lists of address of Up inputs represented on unsigned short
+//!				.
+//!			.
+//! * <b>Irrigation description:</b>
 //!
 //!
 //!
