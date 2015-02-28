@@ -32,6 +32,8 @@
 #include <stdbool.h>
 
 #include <string>
+#include <vector>
+#include <limits>
 
 // =============================================================================
 // FreeRTOS related includes -- porting for the given hardware
