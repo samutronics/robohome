@@ -13,8 +13,8 @@
 namespace manager {
 namespace project {
 
-class mataOutput {
-public: inline mataOutput(const u16 sectionAddress);
+class metaOutput {
+public: inline metaOutput(const u16 sectionAddress);
 public: inline u16 address() const;
 public: inline u16 timeout() const;
 public: inline u16 totalCount() const;
@@ -29,9 +29,9 @@ protected: u16 _itemAddress;
 protected: const u16 _sectionAddress;
 };
 
-inline mataOutput::mataOutput(const u16 sectionAddress): _itemAddress(sectionAddress + sizeof(u16)), _sectionAddress(sectionAddress) {}
+inline metaOutput::metaOutput(const u16 sectionAddress): _itemAddress(sectionAddress + sizeof(u16)), _sectionAddress(sectionAddress) {}
 
-inline u16 mataOutput::totalCount() const {
+inline u16 metaOutput::totalCount() const {
 	static u32 count = std::numeric_limits<u32>::max();
 	if(std::numeric_limits<u32>::max() == count) {
 		EEPROMRead(&count, _sectionAddress / sizeof(u32), 1);
@@ -41,14 +41,14 @@ inline u16 mataOutput::totalCount() const {
 	return static_cast<u16>(count);
 }
 
-inline u16 mataOutput::address() const {
+inline u16 metaOutput::address() const {
 	u32 value;
 	// The address of address property in the EEPROM is directly at _itemAddress member.
 	EEPROMRead(&value, _itemAddress / sizeof(u32), 1);
 	return static_cast<u16>(((value >> _itemAddress % sizeof(u32) * 8) & 0xFFFF));
 }
 
-inline u16 mataOutput::timeout() const {
+inline u16 metaOutput::timeout() const {
 	u32 value;
 	// The address of timeout property in the EEPROM is composed of:
 	const u32 address =
@@ -61,7 +61,7 @@ inline u16 mataOutput::timeout() const {
 	return static_cast<u16>(((value >> (address) % sizeof(u32) * 8) & 0xFFFF));
 }
 
-inline void mataOutput::inputs(std::vector<u16>& input) const {
+inline void metaOutput::inputs(std::vector<u16>& input) const {
 	// The start address of inputs in the EEPROM is composed of:
 	const u32 address =
 			// the _itemAddress
@@ -76,7 +76,7 @@ inline void mataOutput::inputs(std::vector<u16>& input) const {
 	inputReader(input, address, inputCount());
 }
 
-inline void mataOutput::next() {
+inline void metaOutput::next() {
 	// the total item size in the EEPROM composed of:
 	_itemAddress +=
 			// the size of the address property
@@ -89,7 +89,7 @@ inline void mataOutput::next() {
 			inputCount() * sizeof(u16);
 }
 
-inline u16 mataOutput::inputCount() const {
+inline u16 metaOutput::inputCount() const {
 	u32 value;
 	// The address of input count property in the EEPROM is composed of:
 	const u32 address =
@@ -104,7 +104,7 @@ inline u16 mataOutput::inputCount() const {
 	return static_cast<u16>(((value >> ((address % sizeof(u32)) * 8)) & 0xFFFF));
 }
 
-inline void mataOutput::inputReader(std::vector<u16>& input, const u16 baseAddress, const u16 count) {
+inline void metaOutput::inputReader(std::vector<u16>& input, const u16 baseAddress, const u16 count) {
 	input.reserve(count);
 	for(u32 item = 0; item < count; item++) {
 		u32 value;

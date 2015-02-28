@@ -21,16 +21,16 @@ enum TriggerType {
 };
 
 class metaInput {
-public: inline metaInput(const u16 sectionAddress, const u16 itemAddress);
+public: inline metaInput(const u16 sectionAddress);
 public: inline u16 totalCount() const;
-public: inline metaInput next() const;
+public: inline void next();
 public: inline TriggerType trigger() const;
 
-private: const u16 _itemAddress;
+private: u16 _itemAddress;
 private: const u16 _sectionAddress;
 };
 
-inline metaInput::metaInput(const u16 sectionAddress, const u16 itemAddress): _itemAddress(itemAddress), _sectionAddress(sectionAddress) {}
+inline metaInput::metaInput(const u16 sectionAddress): _itemAddress(sectionAddress + sizeof(u16)), _sectionAddress(sectionAddress) {}
 
 inline u16 metaInput::totalCount() const {
 	static u32 count = std::numeric_limits<u32>::max();
@@ -48,8 +48,8 @@ inline TriggerType metaInput::trigger() const {
 	return static_cast<TriggerType>(((value >> _itemAddress % sizeof(u32) * 8) & 0xFF));
 }
 
-inline metaInput metaInput::next() const {
-	return metaInput(_sectionAddress, _itemAddress + 1);
+inline void metaInput::next() {
+	_itemAddress += sizeof(u8);
 }
 
 } // project
