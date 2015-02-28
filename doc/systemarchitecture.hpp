@@ -166,7 +166,7 @@
 //! address, e.g.: first item assign to the input bit 0, tenth item assign to the input bit 11. There isn't allowed tobe gap between
 //! the inputs. The input section consist of the following fields:
 //! 	* total number of inputs represented represented on unsigned short
-//!		* list of trigger types: no more fields need to create an Input object
+//!		* list of trigger types represented on unsigned char: no more fields need to create an Input object
 //!		.
 //! * <b>Output properties:</b> in the current implementation splitted up to two more subsections: first for the simple output and
 //! the second describes the tri-state outputs. The input section consist of the following fields:
