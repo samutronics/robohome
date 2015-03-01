@@ -53,14 +53,17 @@ inline InputManager* InputManager::getInstance() {
 }
 
 inline InputManager::InputManager() {
-	const project::metaInput data = project::ProjectManager::getInstance()->input();
+	project::metaInput data = project::ProjectManager::getInstance()->input();
 	const u32 size = data.totalCount() / sizeof(_inputs[0]) + (data.totalCount() % sizeof(_inputs[0])) ? 1 : 0;
 	_dataChanged.reserve(size);
 	_dataCurrent.reserve(size);
 	_dataPrevious.reserve(size);
 
 	_inputs.reserve(data.totalCount());
-	for(u32 index = 0; index < data.totalCount(); index++) {_inputs.push_back(Input(data.trigger(), index, _dataChanged, _dataCurrent, _dataPrevious));}
+	for(u32 index = 0; index < data.totalCount(); index++) {
+		_inputs.push_back(Input(data.trigger(), index, _dataChanged, _dataCurrent, _dataPrevious));
+		data.next();
+	}
 
 	_lock.reserve(data.totalCount());
 	for(u32 index = 0; index < data.totalCount(); index++) {_lock[index] = xSemaphoreCreateMutex();}
