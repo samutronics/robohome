@@ -19,7 +19,7 @@ namespace manager {
 namespace project {
 
 class ProjectManager {
-private: static inline ProjectManager* getInstance();
+public: static inline ProjectManager* getInstance();
 
 public: void read(std::vector<u32>& project) const;
 public: bool write(const std::vector<u32>& project) const;

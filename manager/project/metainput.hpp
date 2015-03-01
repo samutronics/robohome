@@ -16,7 +16,6 @@ namespace project {
 enum TriggerType {
 	triggerBothEdges,
 	triggerRisingEdge,
-	triggerFallingEdge,
 	triggerUnknown
 };
 
