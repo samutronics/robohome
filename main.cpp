@@ -13,10 +13,10 @@
 // =============================================================================
 #include "web.hpp"
 #include "sntp.hpp"
-#include "input.hpp"
 #include "output.hpp"
 #include "weather.hpp"
 #include "exosite.hpp"
+#include "services/input/input.hpp"
 #include "projectconfiguration.hpp"
 
 using namespace service::sntp;
