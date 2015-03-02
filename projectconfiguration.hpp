@@ -82,12 +82,19 @@
 // =============================================================================
 // Define types
 // =============================================================================
-typedef unsigned int	u32;
-typedef int				s32;
-typedef unsigned short	u16;
-typedef short			s16;
-typedef unsigned char	u8;
-typedef char			s8;
+typedef unsigned int			u32;
+typedef int						s32;
+typedef unsigned short			u16;
+typedef short					s16;
+typedef unsigned char			u8;
+typedef char					s8;
+
+typedef const unsigned int		cu32;
+typedef const int				cs32;
+typedef const unsigned short	cu16;
+typedef const short				cs16;
+typedef const unsigned char		cu8;
+typedef const char				cs8;
 
 typedef unsigned char*	up8;
 typedef char*			sp8;
