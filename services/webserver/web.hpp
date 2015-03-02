@@ -39,8 +39,8 @@ private: web();
 
 private: httpMethod getHTTPMethodType(const std::string& request) const;
 private: bool parseURI(const std::string& request) const;
-private: bool parseResource(const std::string& request, const u32 startOfURI, const u32 startOfArguments) const;
-private: bool parseDefaultResource(const std::string& request, const u32 startOfURI) const;
+private: bool parseResource(const std::string& request, cu32 startOfURI, cu32 startOfArguments) const;
+private: bool parseDefaultResource(const std::string& request, cu32 startOfURI) const;
 
 // =============================================================================
 //! \brief Empty implementation of the task.

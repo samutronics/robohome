@@ -21,19 +21,19 @@ enum StateChange {
 };
 
 class Input {
-public: inline Input(const project::TriggerType type, const u16 hwAddress, const std::vector<u32>& dataChanged, const std::vector<u32>& dataCurrent, const std::vector<u32>& dataPrevious);
+public: inline Input(const project::TriggerType type, cu16 hwAddress, const std::vector<u32>& dataChanged, const std::vector<u32>& dataCurrent, const std::vector<u32>& dataPrevious);
 public: inline Input& operator=(const Input& other);
 
 public: inline StateChange changed(u16& deferTime) const;
 
 private: const project::TriggerType	_type;
-private: const u16					_hwAddress;
+private: cu16						_hwAddress;
 private: const std::vector<u32>&	_dataChanged;
 private: const std::vector<u32>&	_dataCurrent;
 private: const std::vector<u32>&	_dataPrevious;
 };
 
-inline Input::Input(const project::TriggerType type, const u16 hwAddress, const std::vector<u32>& dataChanged, const std::vector<u32>& dataCurrent, const std::vector<u32>& dataPrevious):
+inline Input::Input(const project::TriggerType type, cu16 hwAddress, const std::vector<u32>& dataChanged, const std::vector<u32>& dataCurrent, const std::vector<u32>& dataPrevious):
 		_type(type),
 		_hwAddress(hwAddress),
 		_dataChanged(dataChanged),

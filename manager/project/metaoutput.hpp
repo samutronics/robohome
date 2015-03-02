@@ -23,13 +23,13 @@ public: inline void inputs(std::vector<u16>& input) const;
 public: inline virtual void next();
 
 protected: inline u16 inputCount() const;
-protected: static inline void inputReader(std::vector<u16>& input, const u16 baseAddress, const u16 count);
+protected: static inline void inputReader(std::vector<u16>& input, cu16 baseAddress, cu16 count);
 
 protected: u16 _itemAddress;
-protected: const u16 _sectionAddress;
+protected: cu16 _sectionAddress;
 };
 
-inline metaOutput::metaOutput(const u16 sectionAddress): _itemAddress(sectionAddress + sizeof(u16)), _sectionAddress(sectionAddress) {}
+inline metaOutput::metaOutput(cu16 sectionAddress): _itemAddress(sectionAddress + sizeof(u16)), _sectionAddress(sectionAddress) {}
 
 inline u16 metaOutput::totalCount() const {
 	static u32 count = std::numeric_limits<u32>::max();
@@ -51,7 +51,7 @@ inline u16 metaOutput::address() const {
 inline u16 metaOutput::timeout() const {
 	u32 value;
 	// The address of timeout property in the EEPROM is composed of:
-	const u32 address =
+	cu32 address =
 			// the _itemAddress
 			_itemAddress +
 			// the size of the address property
@@ -63,7 +63,7 @@ inline u16 metaOutput::timeout() const {
 
 inline void metaOutput::inputs(std::vector<u16>& input) const {
 	// The start address of inputs in the EEPROM is composed of:
-	const u32 address =
+	cu32 address =
 			// the _itemAddress
 			_itemAddress +
 			// the size of the address property
@@ -92,7 +92,7 @@ inline void metaOutput::next() {
 inline u16 metaOutput::inputCount() const {
 	u32 value;
 	// The address of input count property in the EEPROM is composed of:
-	const u32 address =
+	cu32 address =
 			// the _itemAddress
 			_itemAddress +
 			// the size of the address property
@@ -104,11 +104,11 @@ inline u16 metaOutput::inputCount() const {
 	return static_cast<u16>(((value >> ((address % sizeof(u32)) * 8)) & 0xFFFF));
 }
 
-inline void metaOutput::inputReader(std::vector<u16>& input, const u16 baseAddress, const u16 count) {
+inline void metaOutput::inputReader(std::vector<u16>& input, cu16 baseAddress, cu16 count) {
 	input.reserve(count);
 	for(u32 item = 0; item < count; item++) {
 		u32 value;
-		const u32 address = baseAddress + item * sizeof(u16);
+		cu32 address = baseAddress + item * sizeof(u16);
 		EEPROMRead(&value, address / sizeof(u32), 1);
 		input.push_back(static_cast<u16>((value >> ((address % sizeof(u32)) * 8)) & 0xFFFF));
 	}

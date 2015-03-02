@@ -22,7 +22,7 @@ class abstractclientservice: public IService {
 //! \note Keep in mind, that the constructor blocks the task execution until the
 //! IP address isn't present in case of DHCP IP address gathering startegie.
 // =============================================================================
-protected: inline abstractclientservice(const char* url, u16 port, netconn_type type, u32 updatePeriode);
+protected: inline abstractclientservice(cs8* url, u16 port, netconn_type type, u32 updatePeriode);
 
 // =============================================================================
 //! \brief Forward the received data to the client for processing.
@@ -62,13 +62,13 @@ protected: void task(void *pvParameters);
 // =============================================================================
 private: void retryContext(netconn*& connection, s32& error);
 
-private: const char*		_url;
-private: const u16			_port;
-private: const u32			_updatePeriode;
+private: cs8*				_url;
+private: cu16				_port;
+private: cu32				_updatePeriode;
 private: const netconn_type	_connectionType;
 };
 
-inline abstractclientservice::abstractclientservice(const char* url, u16 port, netconn_type type, u32 updatePeriode):
+inline abstractclientservice::abstractclientservice(cs8* url, u16 port, netconn_type type, u32 updatePeriode):
 		_url(url),
 		_port(port),
 		_updatePeriode(updatePeriode),

@@ -13,17 +13,17 @@
 using namespace std;
 using namespace service::exosite;
 
-const s8 _requestPartCIKHeader[]		= "X-Exosite-CIK: ";
-const s8 _requestPartContentLength[]	= "Content-Length: ";
-const s8 _requestPartGetURL[]			= "GET /onep:v1/stack/alias?";
-const s8 _requestPartHTTP[]				= "  HTTP/1.1\r\n";
-const s8 _requestPartHost[]				= "Host: m2.exosite.com\r\n";
-const s8 _requestPartAccept[]			= "Accept: application/x-www-form-urlencoded; charset=utf-8\r\n";
-const s8 _requestPartContent[]			= "Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n";
-const s8 _requestPartVendor[]			= "vendor=";
-const s8 _requestPartModel[]			= "model=";
-const s8 _requestPartSerialNumber[]		= "sn=";
-const s8 _requestPartCRLF[]				= "\r\n";
+cs8 _requestPartCIKHeader[]		= "X-Exosite-CIK: ";
+cs8 _requestPartContentLength[]	= "Content-Length: ";
+cs8 _requestPartGetURL[]		= "GET /onep:v1/stack/alias?";
+cs8 _requestPartHTTP[]			= "  HTTP/1.1\r\n";
+cs8 _requestPartHost[]			= "Host: m2.exosite.com\r\n";
+cs8 _requestPartAccept[]		= "Accept: application/x-www-form-urlencoded; charset=utf-8\r\n";
+cs8 _requestPartContent[]		= "Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n";
+cs8 _requestPartVendor[]		= "vendor=";
+cs8 _requestPartModel[]			= "model=";
+cs8 _requestPartSerialNumber[]	= "sn=";
+cs8 _requestPartCRLF[]			= "\r\n";
 
 s8 exositeRequestFactory::_exositeProvisionInfo[_serialNumberSize + _modelNameSize + _vendorNameSize];
 ExositeStatusCodes exositeRequestFactory::_statusCode;
@@ -110,7 +110,7 @@ void exositeRequestFactory::parseReadResult(pbuf* buf, std::string& result) {
 	}
 }
 
-int exositeRequestFactory::init(const s8* vendor, const s8* model, const u8 if_nbr, u8* pui8MACAddr, s32 reset) {
+int exositeRequestFactory::init(cs8* vendor, cs8* model, cu8 if_nbr, u8* pui8MACAddr, s32 reset) {
 	char struuid[_serialNumberSize];
 
 	metaData::init(reset);          //always initialize Exosite meta structure
@@ -148,7 +148,7 @@ int exositeRequestFactory::init(const s8* vendor, const s8* model, const u8 if_n
 	return 1;
 }
 
-void exositeRequestFactory::setCIK(char* pCIK) {
+void exositeRequestFactory::setCIK(s8* pCIK) {
 	metaData::write((unsigned char *)pCIK, _CIKSize, META_CIK);
 	_statusCode = EXO_STATUS_OK;
 	return;
@@ -176,7 +176,7 @@ int exositeRequestFactory::getCIK(char* pCIK) {
 	return 1;
 }
 
-int exositeRequestFactory::info_assemble(const char* vendor, const char* model, const char* sn) {
+int exositeRequestFactory::info_assemble(cs8* vendor, cs8* model, cs8* sn) {
 	int info_len = 0;
 	int assemble_len = 0;
 	char * vendor_info = _exositeProvisionInfo;
@@ -237,7 +237,7 @@ int exositeRequestFactory::getHTTPStatus(pbuf* buf) {
 	return code;
 }
 
-void exositeRequestFactory::sendLine(std::string& buf, unsigned char LINE, const char* payload) {
+void exositeRequestFactory::sendLine(std::string& buf, unsigned char LINE, cs8* payload) {
 	switch(LINE) {
 	case CIK_LINE:
 		buf.append(_requestPartCIKHeader);

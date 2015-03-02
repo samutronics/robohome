@@ -106,9 +106,9 @@ typedef char*			sp8;
 // =============================================================================
 namespace systemGlobal {
 
-const u32 requestedSystemClockFrequency = 120000000;
+cu32 requestedSystemClockFrequency = 120000000;
 static u32 currentSystemClockFrequency = 0;
-const u32 IPGatheringStrategie = IPADDR_USE_DHCP;
+cu32 IPGatheringStrategie = IPADDR_USE_DHCP;
 
 }  // system
 
@@ -117,8 +117,8 @@ namespace service {
 namespace outbound {
 namespace configuration {
 
-const u32 outboundQueueLength = 4;
-const u32 outboundQueueWidth = 1;
+cu32 outboundQueueLength = 4;
+cu32 outboundQueueWidth = 1;
 
 }  // configuration
 }  // outbound
@@ -126,8 +126,8 @@ const u32 outboundQueueWidth = 1;
 namespace inbound {
 namespace configuration {
 
-const u32 THQueueLength = 2;
-const u32 THQueueWidth = 1;
+cu32 THQueueLength = 2;
+cu32 THQueueWidth = 1;
 
 }  // configuration
 }  // inbound
@@ -135,8 +135,8 @@ const u32 THQueueWidth = 1;
 namespace web {
 namespace configuration {
 
-const s8 defaultPage[] = "/index.htm";
-const u16 port = 80;
+cs8 defaultPage[] = "/index.htm";
+cu16 port = 80;
 
 }  // configuration
 }  // web
@@ -144,9 +144,9 @@ const u16 port = 80;
 namespace sntp {
 namespace configuration {
 
-const char url[] = "pool.ntp.org";
-const u16 port = 123;
-const u32 updatePeriode = 3600000;
+cs8 url[] = "pool.ntp.org";
+cu16 port = 123;
+cu32 updatePeriode = 3600000;
 
 }  // configuration
 }  // sntp
@@ -154,9 +154,9 @@ const u32 updatePeriode = 3600000;
 namespace weather {
 namespace configuration {
 
-const char url[] = "api.openweathermap.org";
-const u16 port = 80;
-const u32 updatePeriode = 1800000; //0.5 h with the current scheduler setting: 1000 Hz task preemtion.
+cs8 url[] = "api.openweathermap.org";
+cu16 port = 80;
+cu32 updatePeriode = 1800000; //0.5 h with the current scheduler setting: 1000 Hz task preemtion.
 
 }  // configuration
 }  // weather
@@ -164,9 +164,9 @@ const u32 updatePeriode = 1800000; //0.5 h with the current scheduler setting: 1
 namespace exosite {
 namespace configuration {
 
-const char url[] = "m2.exosite.com";
-const u16 port = 80;
-const u32 updatePeriode = 4000;
+cs8 url[] = "m2.exosite.com";
+cu16 port = 80;
+cu32 updatePeriode = 4000;
 
 }  // configuration
 }  // exosite

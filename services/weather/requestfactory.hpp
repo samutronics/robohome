@@ -18,7 +18,7 @@ namespace weather {
 class weatherRequestFactory {
 public: inline weatherRequestFactory();
 
-public: const std::string& request(const char* location, bool forecast, u32 days);
+public: const std::string& request(cs8* location, bool forecast, u32 days);
 public: inline void reset();
 
 private: std::string _request;

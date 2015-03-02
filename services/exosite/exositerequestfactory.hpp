@@ -50,16 +50,16 @@ public: static void setCIK(char* pCIK);
 public: static int getCIK(char* pCIK);
 public: inline ExositeStatusCodes statusCode() {return _statusCode;}
 
-private: static int info_assemble(const char* vendor, const char* model, const char* sn);
+private: static int info_assemble(cs8* vendor, cs8* model, cs8* sn);
 private: static int getHTTPStatus(pbuf* buf);
-private: void sendLine(std::string& buf, unsigned char LINE, const char* payload);
+private: void sendLine(std::string& buf, u8 LINE, cs8* payload);
 
 private: static ExositeStatusCodes _statusCode;
 
-private: static const u8	_vendorNameSize = 20;
-private: static const u8	_modelNameSize = 20;
-private: static const u8	_serialNumberSize = 25;
-private: static const u8	_CIKSize = 40;
+private: static cu8	_vendorNameSize = 20;
+private: static cu8	_modelNameSize = 20;
+private: static cu8	_serialNumberSize = 25;
+private: static cu8	_CIKSize = 40;
 
 private: static s8			_exositeProvisionInfo[_serialNumberSize + _modelNameSize + _vendorNameSize];
 

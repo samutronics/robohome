@@ -31,7 +31,7 @@ public: static void read(u8* read_buffer, u16 destBytes, u8 element);
 private: static void readMetaItem(u8* pucBuffer, s32 iLength, s32 iOffset);
 private: static void writeMetaItem(u8* pucBuffer, s32 iLength, s32 iOffset);
 
-private: static const char _exomark[];
+private: static cs8 _exomark[];
 };
 
 } // exositeTask

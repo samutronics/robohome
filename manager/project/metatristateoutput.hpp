@@ -15,7 +15,7 @@ namespace manager {
 namespace project {
 
 class metaTriStateOutput: public metaOutput {
-public: inline metaTriStateOutput(const u16 sectionAddress);
+public: inline metaTriStateOutput(cu16 sectionAddress);
 
 public: inline virtual void next();
 
@@ -27,7 +27,7 @@ private: inline u16 inputDownCount() const;
 private: inline u16 inputUpCount() const;
 };
 
-inline metaTriStateOutput::metaTriStateOutput(const u16 sectionAddress): metaOutput(sectionAddress) {}
+inline metaTriStateOutput::metaTriStateOutput(cu16 sectionAddress): metaOutput(sectionAddress) {}
 
 inline void metaTriStateOutput::next() {
 	// the total item size in the EEPROM composed of:
@@ -55,7 +55,7 @@ inline void metaTriStateOutput::next() {
 inline u16 metaTriStateOutput::extendedAddress() const {
 	u32 value;
 	// The start address of extendedAddress in the EEPROM is composed of:
-	const u32 address =
+	cu32 address =
 			// the _itemAddress
 			_itemAddress +
 			// the size of the address property
@@ -73,7 +73,7 @@ inline u16 metaTriStateOutput::extendedAddress() const {
 
 inline void metaTriStateOutput::inputsDown(std::vector<u16>& down) const {
 	// The start address of inputsDown in the EEPROM is composed of:
-	const u32 address =
+	cu32 address =
 			// the _itemAddress
 			_itemAddress +
 			// the size of the address property
@@ -94,7 +94,7 @@ inline void metaTriStateOutput::inputsDown(std::vector<u16>& down) const {
 
 inline void metaTriStateOutput::inputsUp(std::vector<u16>& up) const {
 	// The start address of inputsUp in the EEPROM is composed of:
-	const u32 address =
+	cu32 address =
 			// the _itemAddress
 			_itemAddress +
 			// the size of the address property
@@ -120,7 +120,7 @@ inline void metaTriStateOutput::inputsUp(std::vector<u16>& up) const {
 inline u16 metaTriStateOutput::inputDownCount() const {
 	u32 value;
 	// The start address of inputDownCount in the EEPROM is composed of:
-	const u32 address =
+	cu32 address =
 			// the _itemAddress
 			_itemAddress +
 			// the size of the address property
@@ -141,7 +141,7 @@ inline u16 metaTriStateOutput::inputDownCount() const {
 inline u16 metaTriStateOutput::inputUpCount() const {
 	u32 value;
 	// The start address of inputUpCount in the EEPROM is composed of:
-	const u32 address =
+	cu32 address =
 			// the _itemAddress
 			_itemAddress +
 			// the size of the address property

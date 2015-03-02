@@ -19,7 +19,7 @@ public: inline TriStateOutput(cu16 hwAddress, cu16 timeout, const std::vector<u1
 public: inline TriStateOutput& operator=(const TriStateOutput& other);
 public: inline virtual void evaluate();
 
-private: const u16					_extendedAddress;
+private: cu16						_extendedAddress;
 private: const std::vector<u16>&	_inputsUp;
 private: const std::vector<u16>&	_inputsDown;
 };

@@ -27,7 +27,7 @@ enum valueType {
 };
 
 class statisticEntry {
-public: inline statisticEntry(const char* name, const char* alias, valueType t, accessMode a):
+public: inline statisticEntry(cs8* name, cs8* alias, valueType t, accessMode a):
 				entryName(name), entryAliasInCloud(alias), type(t), access(a) {
 	_value.clear();
 	_value.reserve(32);
@@ -38,8 +38,8 @@ public: inline void requestFormat(std::string& str) const;
 public: inline void setValue(const std::string& value);
 public: inline const std::string& getValue() const;
 
-public: const char* entryName;
-public: const char* entryAliasInCloud;
+public: cs8* entryName;
+public: cs8* entryAliasInCloud;
 public: accessMode access;
 
 private: std::string _value;

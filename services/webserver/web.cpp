@@ -7,7 +7,7 @@
 // =============================================================================
 #include "web.hpp"
 
-const u8 page[] = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\
+cu8 page[] = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\
 <html xmlns=\"http://www.w3.org/1999/xhtml\">\
 <head>\
     <title></title>\
@@ -167,7 +167,7 @@ bool web::parseURI(const std::string& request) const {
 	return false;
 }
 
-bool web::parseResource(const std::string& request, const u32 startOfURI, const u32 startOfArguments) const {
+bool web::parseResource(const std::string& request, cu32 startOfURI, cu32 startOfArguments) const {
 	u32 endOfURI = request.find(" ", startOfURI);
 	string URI(request.substr(startOfURI, string::npos == startOfArguments ? endOfURI : startOfArguments));
 	if (ERR_OK != netconn_write(_connectionFromClient, (void*)page, sizeof(page), NETCONN_NOCOPY)) {
@@ -178,7 +178,7 @@ bool web::parseResource(const std::string& request, const u32 startOfURI, const 
 	return false;
 }
 
-bool web::parseDefaultResource(const std::string& request, const u32 startOfURI) const {
+bool web::parseDefaultResource(const std::string& request, cu32 startOfURI) const {
 	if('/' == request[startOfURI] && ' ' == request[startOfURI + 1]) {
 		if (ERR_OK != netconn_write(_connectionFromClient, (void*)page, sizeof(page), NETCONN_NOCOPY)) {
 			UARTprintf("Failed to send default page\n");

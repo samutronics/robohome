@@ -14,8 +14,8 @@ namespace manager {
 namespace project {
 
 class metaSysConfig {
-public: metaSysConfig(const u16 sectionAddress): _sectionAddress(sectionAddress) {}
-private: const u16 _sectionAddress;
+public: metaSysConfig(cu16 sectionAddress): _sectionAddress(sectionAddress) {}
+private: cu16 _sectionAddress;
 };
 
 } // project

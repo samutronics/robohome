@@ -14,8 +14,8 @@ namespace manager {
 namespace project {
 
 class metaIrrigation {
-public: metaIrrigation(const u16 sectionAddress): _sectionAddress(sectionAddress) {}
-protected: const u16 _sectionAddress;
+public: metaIrrigation(cu16 sectionAddress): _sectionAddress(sectionAddress) {}
+protected: cu16 _sectionAddress;
 };
 
 } // project

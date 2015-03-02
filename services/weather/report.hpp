@@ -17,7 +17,7 @@ class report {
     //
     // The brief weather description, this is caller provided.
     //
-	public: const s8* Description;
+	public: cs8* Description;
 
     //
     // The current temperature(units determined by caller).
@@ -62,7 +62,7 @@ class report {
     //
     // Icon image.
     //
-    const u8 *pui8Image;
+    cu8 *pui8Image;
 };
 
 } // weatherTask

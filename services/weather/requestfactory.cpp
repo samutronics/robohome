@@ -10,17 +10,15 @@
 using namespace std;
 using namespace service::weather;
 
-const s8 weatherRequest[]			= "GET http://api.openweathermap.org/data/2.5/weather?q=";
-const s8 weatherRequestForecast[]	= "GET http://api.openweathermap.org/data/2.5/forecast/daily?q=";
-const s8 mode[]						= "&mode=json&units=metric";
-const s8 APPIDOpenWeather[]			= "&APIID=afc5370fef1dfec1666a5676346b163b";
-const s8 HTTP11[]					= " HTTP/1.0\r\n\r\n";
-const s8 countOfDays[]				= "&cnt=1";
+cs8 weatherRequest[]			= "GET http://api.openweathermap.org/data/2.5/weather?q=";
+cs8 weatherRequestForecast[]	= "GET http://api.openweathermap.org/data/2.5/forecast/daily?q=";
+cs8 mode[]						= "&mode=json&units=metric";
+cs8 APPIDOpenWeather[]			= "&APIID=afc5370fef1dfec1666a5676346b163b";
+cs8 HTTP11[]					= " HTTP/1.0\r\n\r\n";
+cs8 countOfDays[]				= "&cnt=1";
 
-const std::string& weatherRequestFactory::request(const char* location, bool forecast, u32 days) {
-	if(!_request.empty()) {
-		return _request;
-	}
+const std::string& weatherRequestFactory::request(cs8* location, bool forecast, u32 days) {
+	if(!_request.empty()) {return _request;}
 
 	if(!location) {return _request;}
 

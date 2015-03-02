@@ -20,7 +20,7 @@ public: static inline InputManager* getInstance();
 
 public: inline const std::vector<Input>& inputs() const;
 public: inline void reset();
-public: inline void write(const u16 address, const u8 data);
+public: inline void write(cu16 address, cu8 data);
 public: inline void write(const std::vector<u32>& data);
 
 private: inline InputManager();
@@ -73,7 +73,7 @@ inline void InputManager::reset() {
 	for(u32 index = 0; index < _dataChanged.size(); index++) {_dataChanged[index] = 0;}
 }
 
-inline void InputManager::write(const u16 address, const u8 data) {
+inline void InputManager::write(cu16 address, cu8 data) {
 	if(address < _dataChanged.size() * sizeof(_dataChanged[0]) * 8) {return;}
 
 	xSemaphoreTake(_lock[address / sizeof(_dataChanged[0])], 0);

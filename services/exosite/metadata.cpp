@@ -10,10 +10,10 @@
 
 using namespace service::exosite;
 
-const char metaData::_exomark[] = "exosite!";
+cs8 metaData::_exomark[] = "exosite!";
 
 void metaData::defaults() {
-	const unsigned char meta_server_ip[6] = {173,255,209,28,0,80};
+	cu8 meta_server_ip[6] = {173,255,209,28,0,80};
 
 	write((unsigned char *)meta_server_ip, 6, META_SERVER);     //store server IP
 	write((unsigned char *)_exomark, sizeof(_exomark) - 1, META_MARK); //store exosite mark

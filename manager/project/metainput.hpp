@@ -26,10 +26,10 @@ public: inline void next();
 public: inline TriggerType trigger() const;
 
 private: u16 _itemAddress;
-private: const u16 _sectionAddress;
+private: cu16 _sectionAddress;
 };
 
-inline metaInput::metaInput(const u16 sectionAddress): _itemAddress(sectionAddress + sizeof(u16)), _sectionAddress(sectionAddress) {}
+inline metaInput::metaInput(cu16 sectionAddress): _itemAddress(sectionAddress + sizeof(u16)), _sectionAddress(sectionAddress) {}
 
 inline u16 metaInput::totalCount() const {
 	static u32 count = std::numeric_limits<u32>::max();
