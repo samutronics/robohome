@@ -48,13 +48,13 @@ class IService {
 // =============================================================================
 #define DEFINE_TH												\
 		private: static void handlerTH();						\
-		private: static xQueueHandle _THQueue;
+		private: static xSemaphoreHandle _THQueue;
 
 // =============================================================================
 //! \brief Declaration of the queue in the Top Halve part of THBH model
 // =============================================================================
 #define DECLARE_TH(derived)										\
-		xQueueHandle derived::_THQueue;
+		xSemaphoreHandle derived::_THQueue;
 
 #endif //_IMANAGER_H_
 // =============================================================================
