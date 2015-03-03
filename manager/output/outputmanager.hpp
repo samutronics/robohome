@@ -19,16 +19,17 @@ namespace output {
 class OutputManager {
 public: static inline OutputManager* getInstance();
 
-public: const std::vector<Output>& outputs() const;
-public: const std::vector<TriStateOutput>& tristateoutputs() const;
+public: const std::vector<Output*>& outputs() const;
+public: const std::vector<TriStateOutput*>& tristateoutputs() const;
 
 public: bool read(cu16 address) const;
 public: const std::vector<u32>& read() const;
 
+public: virtual ~OutputManager();
 private: inline OutputManager();
 
-private: std::vector<Output>			_output;
-private: std::vector<TriStateOutput>	_tristateoutput;
+private: std::vector<Output*>			_output;
+private: std::vector<TriStateOutput*>	_tristateoutput;
 private: std::vector<u32>				_data;
 
 private: static OutputManager* _instance;
@@ -60,7 +61,7 @@ inline OutputManager::OutputManager():
 	project::metaOutput simpleoutput = project::ProjectManager::getInstance()->output();
 	for(u32 index = 0; index < simpleoutput.totalCount(); index++) {
 		simpleoutput.inputs(simpleTmp);
-		_output.push_back(Output(simpleoutput.address(), simpleoutput.timeout(), simpleTmp, _data));
+		_output.push_back(new Output(simpleoutput.address(), simpleoutput.timeout(), simpleTmp, _data));
 	}
 
 	std::vector<u16> tristateTmpUp(100);
@@ -70,14 +71,14 @@ inline OutputManager::OutputManager():
 		tristateutput.inputs(simpleTmp);
 		tristateutput.inputsUp(tristateTmpUp);
 		tristateutput.inputsDown(tristateTmpDown);
-		_output.push_back(TriStateOutput(tristateutput.address(), tristateutput.timeout(), simpleTmp, _data, tristateutput.extendedAddress(), tristateTmpUp, tristateTmpDown));
+		_output.push_back(new TriStateOutput(tristateutput.address(), tristateutput.timeout(), simpleTmp, _data, tristateutput.extendedAddress(), tristateTmpUp, tristateTmpDown));
 	}
 }
 
-const std::vector<Output>& OutputManager::outputs() const {
+const std::vector<Output*>& OutputManager::outputs() const {
 	return _output;
 }
-const std::vector<TriStateOutput>& OutputManager::tristateoutputs() const {
+const std::vector<TriStateOutput*>& OutputManager::tristateoutputs() const {
 	return _tristateoutput;
 }
 

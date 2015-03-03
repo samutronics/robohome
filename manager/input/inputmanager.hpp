@@ -18,14 +18,15 @@ namespace input {
 class InputManager {
 public: static inline InputManager* getInstance();
 
-public: inline const std::vector<Input>& inputs() const;
+public: virtual ~InputManager();
+public: inline const std::vector<Input*>& inputs() const;
 public: inline void reset();
 public: inline void write(cu16 address, cu8 data);
 public: inline void write(const std::vector<u32>& data);
 
 private: inline InputManager();
 
-private: std::vector<Input> _inputs;
+private: std::vector<Input*> _inputs;
 private: std::vector<u32> _dataChanged;
 private: std::vector<u32> _dataCurrent;
 private: std::vector<u32> _dataPrevious;
@@ -54,20 +55,20 @@ inline InputManager* InputManager::getInstance() {
 
 inline InputManager::InputManager():
 				_inputs(project::ProjectManager::getInstance()->input().totalCount()),
-				_dataChanged((_inputs.size() / sizeof(_inputs[0])) + ((_inputs.size() % sizeof(_inputs[0])) ? 1 : 0)),
-				_dataCurrent((_inputs.size() / sizeof(_inputs[0])) + ((_inputs.size() % sizeof(_inputs[0])) ? 1 : 0)),
-				_dataPrevious((_inputs.size() / sizeof(_inputs[0])) + ((_inputs.size() % sizeof(_inputs[0])) ? 1 : 0)),
+				_dataChanged((_inputs.size() / sizeof(_dataChanged[0])) + ((_inputs.size() % sizeof(_dataChanged[0])) ? 1 : 0)),
+				_dataCurrent((_inputs.size() / sizeof(_dataCurrent[0])) + ((_inputs.size() % sizeof(_dataCurrent[0])) ? 1 : 0)),
+				_dataPrevious((_inputs.size() / sizeof(_dataPrevious[0])) + ((_inputs.size() % sizeof(_dataPrevious[0])) ? 1 : 0)),
 				_lock(project::ProjectManager::getInstance()->input().totalCount()) {
 	project::metaInput data = project::ProjectManager::getInstance()->input();
 	for(u32 index = 0; index < data.totalCount(); index++) {
-		_inputs.push_back(Input(data.trigger(), index, _dataChanged, _dataCurrent, _dataPrevious));
+		_inputs.push_back(new Input(data.trigger(), index, _dataChanged, _dataCurrent, _dataPrevious));
 		data.next();
 	}
 
 	for(u32 index = 0; index < data.totalCount(); index++) {_lock[index] = xSemaphoreCreateMutex();}
 }
 
-inline const std::vector<Input>& InputManager::inputs() const {return _inputs;}
+inline const std::vector<Input*>& InputManager::inputs() const {return _inputs;}
 
 inline void InputManager::reset() {
 	for(u32 index = 0; index < _dataChanged.size(); index++) {_dataChanged[index] = 0;}
