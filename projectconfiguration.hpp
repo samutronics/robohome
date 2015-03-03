@@ -126,8 +126,8 @@ cu32 outboundQueueWidth = 1;
 namespace inbound {
 namespace configuration {
 
-cu32 THQueueLength = 2;
-cu32 THQueueWidth = 1;
+cu32 timer = TIMER0_BASE;
+cu32 pollingFrequency = 20;
 
 }  // configuration
 }  // inbound

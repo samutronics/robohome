@@ -6,40 +6,32 @@
 //! \note
 // =============================================================================
 #include "input.hpp"
-#include "ipcQueue.hpp"
 #include "../projectconfiguration.hpp"
 
-using namespace communication::ipc;
 using namespace service::inbound;
 using namespace service::inbound::configuration;
 
 DECLARE_TH(input)
 
 input::input() {
-	_THQueue = xQueueCreate(THQueueLength, THQueueWidth);
+	_THQueue = xSemaphoreCreateBinary();
 
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOJ);
-    GPIOPinTypeGPIOInput(GPIO_PORTJ_BASE, GPIO_PIN_0);
-    GPIOPadConfigSet(GPIO_PORTJ_BASE, GPIO_PIN_0, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
-
-    GPIOIntTypeSet(GPIO_PORTJ_BASE, GPIO_PIN_0, GPIO_RISING_EDGE);
-    GPIOIntRegister(GPIO_PORTJ_BASE, &input::handlerTH);
-    GPIOIntEnable(GPIO_PORTJ_BASE, GPIO_INT_PIN_0);
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
+	TimerConfigure	(timer, TIMER_CFG_PERIODIC);
+	TimerLoadSet	(timer, TIMER_A, systemGlobal::requestedSystemClockFrequency / pollingFrequency);
+	TimerIntRegister(timer, TIMER_A, &handlerTH);
+	TimerIntEnable	(timer, TIMER_TIMA_TIMEOUT);
+	TimerEnable		(timer, TIMER_A);
 }
 
 void input::task(void *pvParameters) {
-	while(1) {
+	while(true) {
 		// The thread gives up its time-slice, if the TH queue is empty: there was no interrupt
-		while(0 == uxQueueMessagesWaiting(_THQueue)) {taskYIELD();}
+		xSemaphoreTake(_THQueue, portMAX_DELAY);
 
-		// If item received, read it from the TH queue
-		u8 state;
-		xQueueReceive(_THQueue, &state, 0);
 
-		// This is the place, where the thread couly process the datas
+		UARTprintf("C\n");
 
-		// Forward the item to the targeted thread
-		xQueueSendToBack(ipcQueue::singleton().queue(outboundQueue), &state, NULL);
 
 		// The task gives up its remained time-slice
 		taskYIELD();
@@ -47,10 +39,8 @@ void input::task(void *pvParameters) {
 }
 
 void input::handlerTH() {
-	static bool loggedState = false;
-	loggedState = !loggedState;
-	xQueueSendToBackFromISR(_THQueue, &loggedState, NULL);
-	GPIOIntClear(GPIO_PORTJ_BASE, GPIO_INT_PIN_0);
+	TimerIntClear(timer, TIMER_TIMA_TIMEOUT);
+	xSemaphoreGiveFromISR(_THQueue, NULL);
 }
 
 // =============================================================================
