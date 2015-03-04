@@ -116,6 +116,15 @@ namespace service {
 namespace outbound {
 namespace configuration {
 
+cu32 timer = TIMER1_BASE;
+cu32 pollingFrequency = 5;
+cu32 timerPeriphery =
+		(timer == TIMER0_BASE) ?
+				SYSCTL_PERIPH_TIMER0 :
+				(timer == TIMER1_BASE) ?
+						SYSCTL_PERIPH_TIMER1 :
+						0;
+
 cu32 outboundQueueLength = 4;
 cu32 outboundQueueWidth = 1;
 

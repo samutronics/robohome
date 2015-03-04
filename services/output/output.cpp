@@ -13,32 +13,36 @@ using namespace communication::ipc;
 using namespace service::outbound;
 using namespace service::outbound::configuration;
 
-output::output() {
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPION);
-    GPIOPinTypeGPIOOutput(GPIO_PORTN_BASE, GPIO_PIN_1);
-    GPIODirModeSet(GPIO_PORTN_BASE, GPIO_PIN_1, GPIO_DIR_MODE_OUT);
+DECLARE_TH(output)
 
-    _queueOutbound = xQueueCreate(outboundQueueLength, outboundQueueWidth);
+output::output() {
+	_THQueue = xSemaphoreCreateBinary();
+
+	SysCtlPeripheralEnable(timerPeriphery);
+	TimerConfigure	(timer, TIMER_CFG_PERIODIC);
+	TimerLoadSet	(timer, TIMER_A, systemGlobal::requestedSystemClockFrequency / pollingFrequency);
+	TimerIntRegister(timer, TIMER_A, &handlerTH);
+	TimerIntEnable	(timer, TIMER_TIMA_TIMEOUT);
+	TimerEnable		(timer, TIMER_A);
 }
 
 void output::task(void *pvParameters) {
 	while(1) {
-		// Query the queue handler due to performance reason.
-		xQueueHandle queueHandle = ipcQueue::singleton().queue(outboundQueue);
+		// The thread gives up its time-slice, if there is no semaphire given.
+		xSemaphoreTake(_THQueue, portMAX_DELAY);
 
-		// The thread gives up its time-slice, if the TH queue is empty: there was no interrupt
-		while(0 == uxQueueMessagesWaiting(queueHandle)) {taskYIELD();}
 
-		// If item received, read it from the TH queue
-		u8 state;
-		xQueueReceive(queueHandle, &state, 0);
+		UARTprintf("D\n");
 
-		// Forward the data to the target: in this particular case to the LED
-		GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_1, (state << 1));
 
 		// The task gives up its remained time-slice
 		taskYIELD();
 	}
+}
+
+void output::handlerTH() {
+	TimerIntClear(timer, TIMER_TIMA_TIMEOUT);
+	xSemaphoreGiveFromISR(_THQueue, NULL);
 }
 
 // =============================================================================

@@ -18,8 +18,7 @@ class output: public IService{
 private: output();
 private: virtual void task(void *pvParameters);
 TO_BE_RUNABLE(output)
-
-private: xQueueHandle _queueOutbound;
+DEFINE_TH
 };
 
 } // outbound
