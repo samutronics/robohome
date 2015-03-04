@@ -16,7 +16,7 @@ DECLARE_TH(input)
 input::input() {
 	_THQueue = xSemaphoreCreateBinary();
 
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
+	SysCtlPeripheralEnable(timerPeriphery);
 	TimerConfigure	(timer, TIMER_CFG_PERIODIC);
 	TimerLoadSet	(timer, TIMER_A, systemGlobal::requestedSystemClockFrequency / pollingFrequency);
 	TimerIntRegister(timer, TIMER_A, &handlerTH);
@@ -26,7 +26,7 @@ input::input() {
 
 void input::task(void *pvParameters) {
 	while(true) {
-		// The thread gives up its time-slice, if the TH queue is empty: there was no interrupt
+		// The thread gives up its time-slice, if there is no semaphire given.
 		xSemaphoreTake(_THQueue, portMAX_DELAY);
 
 

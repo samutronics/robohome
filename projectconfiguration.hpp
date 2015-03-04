@@ -31,7 +31,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include <string>
 #include <vector>
 #include <limits>
 
@@ -128,6 +127,12 @@ namespace configuration {
 
 cu32 timer = TIMER0_BASE;
 cu32 pollingFrequency = 20;
+cu32 timerPeriphery =
+		(timer == TIMER0_BASE) ?
+				SYSCTL_PERIPH_TIMER0 :
+				(timer == TIMER1_BASE) ?
+						SYSCTL_PERIPH_TIMER1 :
+						0;
 
 }  // configuration
 }  // inbound
