@@ -16,7 +16,6 @@ namespace output {
 
 class Output {
 public: inline Output(const u16 hwAddress, const u16 timeout, const std::vector<u16>& inputs, std::vector<u32>& data);
-public: inline Output& operator=(const Output& other);
 public: inline virtual void evaluate();
 
 protected: u16 _deferredTime;
@@ -32,11 +31,6 @@ inline Output::Output(const u16 hwAddress, const u16 timeout, const std::vector<
 		_hwAddress(hwAddress),
 		_timeout(timeout),
 		_inputs(inputs) {}
-
-inline Output& Output::operator=(const Output& other) {
-	Output(other._hwAddress, other._timeout, other._inputs, other._data);
-	return *this;
-}
 
 inline void Output::evaluate() {
 

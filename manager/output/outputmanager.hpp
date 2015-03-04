@@ -20,7 +20,6 @@ class OutputManager {
 public: static inline OutputManager* getInstance();
 
 public: const std::vector<Output*>& outputs() const;
-public: const std::vector<TriStateOutput*>& tristateoutputs() const;
 
 public: bool read(cu16 address) const;
 public: const std::vector<u32>& read() const;
@@ -29,7 +28,6 @@ public: virtual ~OutputManager();
 private: inline OutputManager();
 
 private: std::vector<Output*>			_output;
-private: std::vector<TriStateOutput*>	_tristateoutput;
 private: std::vector<u32>				_data;
 
 private: static OutputManager* _instance;
@@ -54,9 +52,8 @@ inline OutputManager* OutputManager::getInstance() {
 }
 
 inline OutputManager::OutputManager():
-				_output(project::ProjectManager::getInstance()->output().totalCount()),
-				_tristateoutput(project::ProjectManager::getInstance()->triStateOutput().totalCount()),
-				_data((_output.size() + _tristateoutput.size()) / sizeof(_data[0]) + (((_output.size() + _tristateoutput.size()) % sizeof(_data[0])) ? 1 : 0)) {
+				_output(project::ProjectManager::getInstance()->output().totalCount() + project::ProjectManager::getInstance()->triStateOutput().totalCount()),
+				_data(_output.size() / sizeof(_data[0]) + (_output.size() % (sizeof(_data[0]) ? 1 : 0))) {
 	std::vector<u16> simpleTmp(100);
 	project::metaOutput simpleoutput = project::ProjectManager::getInstance()->output();
 	for(u32 index = 0; index < simpleoutput.totalCount(); index++) {
@@ -77,9 +74,6 @@ inline OutputManager::OutputManager():
 
 const std::vector<Output*>& OutputManager::outputs() const {
 	return _output;
-}
-const std::vector<TriStateOutput*>& OutputManager::tristateoutputs() const {
-	return _tristateoutput;
 }
 
 const std::vector<u32>& OutputManager::read() const {

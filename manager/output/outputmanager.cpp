@@ -13,7 +13,6 @@ OutputManager* OutputManager::_instance = NULL;
 
 OutputManager::~OutputManager() {
 	for(u32 index = 0; index < _output.size(); index++) {delete _output[index];}
-	for(u32 index = 0; index < _tristateoutput.size(); index++) {delete _tristateoutput[index];}
 }
 // =============================================================================
 //! \file

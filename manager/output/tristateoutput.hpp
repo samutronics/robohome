@@ -16,7 +16,7 @@ namespace output {
 
 class TriStateOutput: public Output {
 public: inline TriStateOutput(cu16 hwAddress, cu16 timeout, const std::vector<u16>& inputsUpDown, std::vector<u32>& data, cu16 extendedAddress, const std::vector<u16>& inputsUp, const std::vector<u16>& inputsDown);
-public: inline TriStateOutput& operator=(const TriStateOutput& other);
+
 public: inline virtual void evaluate();
 
 private: cu16						_extendedAddress;
@@ -29,11 +29,6 @@ inline TriStateOutput::TriStateOutput(cu16 hwAddress, cu16 timeout, const std::v
 				_extendedAddress(extendedAddress),
 				_inputsUp(inputsUp),
 				_inputsDown(inputsDown) {}
-
-inline TriStateOutput& TriStateOutput::operator=(const TriStateOutput& other) {
-	TriStateOutput(other._hwAddress, other._timeout, other._inputs, other._data, other._extendedAddress, other._inputsUp, other._inputsDown);
-	return *this;
-}
 
 inline void TriStateOutput::evaluate() {
 
