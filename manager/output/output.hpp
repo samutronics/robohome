@@ -26,6 +26,10 @@ protected: const u16 _timeout;
 protected: const std::vector<u16>& _inputs;
 };
 
+// =============================================================================
+// Inline method implementation
+// =============================================================================
+
 inline Output::Output(const u16 hwAddress, const u16 timeout, const std::vector<u16>& inputs, std::vector<u32>& data):
 		_data(data),
 		_hwAddress(hwAddress),

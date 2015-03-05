@@ -18,6 +18,10 @@ public: metaIrrigation(cu16 sectionAddress): _sectionAddress(sectionAddress) {}
 protected: cu16 _sectionAddress;
 };
 
+// =============================================================================
+// Inline method implementation
+// =============================================================================
+
 } // project
 } // manager
 

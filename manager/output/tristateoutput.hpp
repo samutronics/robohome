@@ -24,6 +24,10 @@ private: const std::vector<u16>&	_inputsUp;
 private: const std::vector<u16>&	_inputsDown;
 };
 
+// =============================================================================
+// Inline method implementation
+// =============================================================================
+
 inline TriStateOutput::TriStateOutput(cu16 hwAddress, cu16 timeout, const std::vector<u16>& inputsUpDown, std::vector<u32>& data, cu16 extendedAddress, const std::vector<u16>& inputsUp, const std::vector<u16>& inputsDown):
 				Output(hwAddress, timeout, inputsUpDown, data),
 				_extendedAddress(extendedAddress),

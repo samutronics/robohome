@@ -18,6 +18,10 @@ public: metaSysConfig(cu16 sectionAddress): _sectionAddress(sectionAddress) {}
 private: cu16 _sectionAddress;
 };
 
+// =============================================================================
+// Inline method implementation
+// =============================================================================
+
 } // project
 } // manager
 

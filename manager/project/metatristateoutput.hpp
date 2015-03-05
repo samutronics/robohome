@@ -27,6 +27,10 @@ private: inline u16 inputDownCount() const;
 private: inline u16 inputUpCount() const;
 };
 
+// =============================================================================
+// Inline method implementation
+// =============================================================================
+
 inline metaTriStateOutput::metaTriStateOutput(cu16 sectionAddress): metaOutput(sectionAddress) {}
 
 inline void metaTriStateOutput::next() {

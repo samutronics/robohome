@@ -35,6 +35,10 @@ private: inline ProjectManager();
 private: static ProjectManager* _instance;
 };
 
+// =============================================================================
+// Inline method implementation
+// =============================================================================
+
 inline ProjectManager* ProjectManager::getInstance() {
 	if(!_instance) {
 		xSemaphoreHandle sync = NULL;

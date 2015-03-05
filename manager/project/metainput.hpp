@@ -29,6 +29,10 @@ private: u16 _itemAddress;
 private: cu16 _sectionAddress;
 };
 
+// =============================================================================
+// Inline method implementation
+// =============================================================================
+
 inline metaInput::metaInput(cu16 sectionAddress): _itemAddress(sectionAddress + sizeof(u16)), _sectionAddress(sectionAddress) {}
 
 inline u16 metaInput::totalCount() const {

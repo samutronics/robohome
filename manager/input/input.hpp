@@ -32,6 +32,10 @@ private: const std::vector<u32>&	_dataCurrent;
 private: const std::vector<u32>&	_dataPrevious;
 };
 
+// =============================================================================
+// Inline method implementation
+// =============================================================================
+
 inline Input::Input(const project::TriggerType type, cu16 hwAddress, const std::vector<u32>& dataChanged, const std::vector<u32>& dataCurrent, const std::vector<u32>& dataPrevious):
 		_type(type),
 		_hwAddress(hwAddress),

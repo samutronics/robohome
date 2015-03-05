@@ -33,6 +33,10 @@ private: std::vector<u32>				_data;
 private: static OutputManager* _instance;
 };
 
+// =============================================================================
+// Inline method implementation
+// =============================================================================
+
 inline OutputManager* OutputManager::getInstance() {
 	if(!_instance) {
 		xSemaphoreHandle sync = NULL;

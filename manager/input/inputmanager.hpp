@@ -35,6 +35,10 @@ private: std::vector<xSemaphoreHandle> _lock;
 private: static InputManager* _instance;
 };
 
+// =============================================================================
+// Inline method implementation
+// =============================================================================
+
 inline InputManager* InputManager::getInstance() {
 	if(!_instance) {
 		xSemaphoreHandle sync = NULL;

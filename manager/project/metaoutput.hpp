@@ -29,6 +29,10 @@ protected: u16 _itemAddress;
 protected: cu16 _sectionAddress;
 };
 
+// =============================================================================
+// Inline method implementation
+// =============================================================================
+
 inline metaOutput::metaOutput(cu16 sectionAddress): _itemAddress(sectionAddress + sizeof(u16)), _sectionAddress(sectionAddress) {}
 
 inline u16 metaOutput::totalCount() const {
