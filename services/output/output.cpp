@@ -6,10 +6,8 @@
 //! \note
 // =============================================================================
 #include "output.hpp"
-#include "ipcQueue.hpp"
 #include "../projectconfiguration.hpp"
 
-using namespace communication::ipc;
 using namespace service::outbound;
 using namespace service::outbound::configuration;
 
