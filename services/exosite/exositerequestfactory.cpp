@@ -14,6 +14,7 @@ using namespace std;
 using namespace service::exosite;
 
 cs8 _requestPartCIKHeader[]		= "X-Exosite-CIK: ";
+cs8 _requestPartCIK[]			= "15e4890a88d79261608b194c8217c486c68f0007";
 cs8 _requestPartContentLength[]	= "Content-Length: ";
 cs8 _requestPartGetURL[]		= "GET /onep:v1/stack/alias?";
 cs8 _requestPartHTTP[]			= "  HTTP/1.1\r\n";
@@ -49,7 +50,7 @@ bool exositeRequestFactory::writeRequest(const std::string& request, std::string
 	buf.clear();
 	sendLine(buf, POSTDATA_LINE, "/onep:v1/stack/alias");
 	sendLine(buf, HOST_LINE, 0);
-	sendLine(buf, CIK_LINE, bufCIK);
+	sendLine(buf, CIK_LINE, 0);
 	sendLine(buf, CONTENT_LINE, 0);
 	sendLine(buf, LENGTH_LINE, strBuf);
 
@@ -237,11 +238,11 @@ int exositeRequestFactory::getHTTPStatus(pbuf* buf) {
 	return code;
 }
 
-void exositeRequestFactory::sendLine(std::string& buf, unsigned char LINE, cs8* payload) {
+void exositeRequestFactory::sendLine(std::string& buf, u8 LINE, cs8* payload) {
 	switch(LINE) {
 	case CIK_LINE:
 		buf.append(_requestPartCIKHeader);
-		buf.append(payload);
+		buf.append(_requestPartCIK);
 		buf.append(_requestPartCRLF);
 		break;
 	case HOST_LINE:
