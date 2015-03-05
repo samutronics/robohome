@@ -5,64 +5,15 @@
 //! \date			01.01.2015.
 //! \note
 // =============================================================================
-#ifndef _EXOSITE_H_
-#define _EXOSITE_H_
+#ifndef _EXOSITEREQUESTFACTORY_H_
+#define _EXOSITEREQUESTFACTORY_H_
 
-#include "devicerequestFactory.hpp"
 #include "../../projectconfiguration.hpp"
 
 namespace service {
 namespace exosite {
 
-enum UUIDInterfaceTypes {
-    IF_WIFI,
-    IF_ENET,
-    IF_FILE,
-    IF_HDD,
-    IF_I2C,
-    IF_GPRS,
-    IF_NONE
-};
-
-enum ExositeStatusCodes {
-    EXO_STATUS_OK,
-    EXO_STATUS_INIT,
-    EXO_STATUS_BAD_UUID,
-    EXO_STATUS_BAD_VENDOR,
-    EXO_STATUS_BAD_MODEL,
-    EXO_STATUS_BAD_INIT,
-    EXO_STATUS_BAD_TCP,
-    EXO_STATUS_BAD_SN,
-    EXO_STATUS_CONFLICT,
-    EXO_STATUS_BAD_CIK,
-    EXO_STATUS_NOAUTH,
-    EXO_STATUS_END
-};
-
 class exositeRequestFactory {
-public: bool writeRequest(const std::string& request, std::string& buf);
-public: void parseWriteResult(pbuf* buf);
-public: int readRequest(const std::string& request, std::string& buf);
-public: void parseReadResult(pbuf* buf, std::string& result);
-
-public: int init(const s8* vendor, const s8* model, const u8 if_nbr, u8* pui8MACAddr, s32 reset);
-public: static void setCIK(char* pCIK);
-public: static int getCIK(char* pCIK);
-public: inline ExositeStatusCodes statusCode() {return _statusCode;}
-
-private: static int info_assemble(cs8* vendor, cs8* model, cs8* sn);
-private: static int getHTTPStatus(pbuf* buf);
-private: void sendLine(std::string& buf, u8 LINE, cs8* payload);
-
-private: static ExositeStatusCodes _statusCode;
-
-private: static cu8	_vendorNameSize = 20;
-private: static cu8	_modelNameSize = 20;
-private: static cu8	_serialNumberSize = 25;
-private: static cu8	_CIKSize = 40;
-
-private: static s8			_exositeProvisionInfo[_serialNumberSize + _modelNameSize + _vendorNameSize];
-
 private: enum lineTypes {
   CIK_LINE,
   HOST_LINE,
@@ -73,12 +24,20 @@ private: enum lineTypes {
   POSTDATA_LINE,
   EMPTY_LINE
 };
+
+public: bool writeRequest(const std::string& request, std::string& buf);
+public: void parseWriteResult(pbuf* buf);
+public: int readRequest(const std::string& request, std::string& buf);
+public: void parseReadResult(pbuf* buf, std::string& result);
+
+private: int getHTTPStatus(pbuf* buf);
+private: template<lineTypes LINE> void sendLine(std::string& buf, cs8* payload);
 };
 
-} // exositeTask
-} // manager
+} // exosite
+} // service
 
-#endif // _EXOSITE_H_
+#endif // _EXOSITEREQUESTFACTORY_H_
 
 // =============================================================================
 //! \file

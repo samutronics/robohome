@@ -5,8 +5,8 @@
 //! \date			01.01.2015.
 //! \note
 // =============================================================================
-#ifndef __REQUESTS_HPP__
-#define __REQUESTS_HPP__
+#ifndef _DEVICEREQUESTFACTORY_HPP_
+#define _DEVICEREQUESTFACTORY_HPP_
 
 #include "statisticentry.hpp"
 #include "../../projectconfiguration.hpp"
@@ -27,15 +27,12 @@ private: std::string writeRequestOutbound;
 private: std::string readRequestOutbound;
 };
 
-inline deviceRequestFactory::deviceRequestFactory() {
-	writeRequestOutbound.reserve(255);
-	readRequestOutbound.reserve(255);
-}
+inline deviceRequestFactory::deviceRequestFactory(): writeRequestOutbound(255, ' '), readRequestOutbound(255, ' ') {}
 
-} // exositeTask
-} // namespace manager
+} // exosite
+} // service
 
-#endif // __REQUESTS_HPP__
+#endif // _DEVICEREQUESTFACTORY_HPP_
 // =============================================================================
 //! \file
 //! \copyright

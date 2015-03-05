@@ -5,8 +5,8 @@
 //! \date			30.12.2014.
 //! \note
 // =============================================================================
-#ifndef _EXOSITEMANAGER_H_
-#define _EXOSITEMANAGER_H_
+#ifndef _EXOSITE_H_
+#define _EXOSITE_H_
 
 #include "devicerequestfactory.hpp"
 #include "abstractclientservice.hpp"
@@ -39,17 +39,15 @@ private: std::string			_workerBuffer;
 private: bool					_requestPost;
 };
 
-inline exosite::exosite(): abstractclientservice(configuration::url, configuration::port, NETCONN_TCP, configuration::updatePeriode), _requestPost(true) {
-	_workerBuffer.reserve(1024);
-	u8 pucMACAddr[6];
-	EMACAddrGet(EMAC0_BASE, 0, pucMACAddr);
-	_exositeRequestFactory.init("texasinstruments", "ek-tm4c1294xl", IF_ENET, pucMACAddr, 0);
-}
+inline exosite::exosite():
+		abstractclientservice(configuration::url, configuration::port, NETCONN_TCP, configuration::updatePeriode),
+		_workerBuffer(1024, ' '),
+		_requestPost(true) {}
 
 } // exosite
-} // manager
+} // service
 
-#endif // _EXOSITEMANAGER_H_
+#endif // _EXOSITE_H_
 // =============================================================================
 //! \file
 //! \copyright
