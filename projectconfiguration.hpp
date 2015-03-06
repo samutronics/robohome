@@ -97,6 +97,10 @@ typedef const char				cs8;
 
 typedef unsigned char*	up8;
 typedef char*			sp8;
+typedef unsigned short*	up16;
+typedef short*			sp16;
+typedef unsigned int*	up32;
+typedef int*			sp32;
 
 #define DECLARE_LAST_ENUM(enumName) last_##enumName##_element
 
