@@ -36,24 +36,36 @@ protected: cu16 _sectionAddress;
 inline metaOutput::metaOutput(cu16 sectionAddress): _itemAddress(sectionAddress + sizeof(u16)), _sectionAddress(sectionAddress) {}
 
 inline u16 metaOutput::totalCount() const {
-	static u32 count = std::numeric_limits<u32>::max();
-	if(std::numeric_limits<u32>::max() == count) {
-		EEPROMRead(&count, _sectionAddress / sizeof(u32), 1);
-		count = ((count >> _sectionAddress % sizeof(u32) * 8) & 0xFFFF);
+	u32 count[2];
+	EEPROMRead(count, _sectionAddress - (_sectionAddress % sizeof(count[0])), sizeof(count));
+
+	u16 retVal;
+	if(2 < _sectionAddress % sizeof(count[0])) {
+		retVal = ((count[1] & 0XFF) << 8) | (count[0] >> ((_sectionAddress % sizeof(count[0])) * 8) & 0XFF);
+	}
+	else {
+		retVal = (count[0] >> ((_sectionAddress % sizeof(count[0])) * 8) & 0XFFFF);
 	}
 
-	return static_cast<u16>(count);
+	return retVal;
 }
 
 inline u16 metaOutput::address() const {
-	u32 value;
-	// The address of address property in the EEPROM is directly at _itemAddress member.
-	EEPROMRead(&value, _itemAddress / sizeof(u32), 1);
-	return static_cast<u16>(((value >> _itemAddress % sizeof(u32) * 8) & 0xFFFF));
+	u32 count[2];
+	EEPROMRead(count, _itemAddress - (_itemAddress % sizeof(count[0])), sizeof(count));
+
+	u16 retVal;
+	if(2 < _itemAddress % sizeof(count[0])) {
+		retVal = ((count[1] & 0XFF) << 8) | (count[0] >> ((_itemAddress % sizeof(count[0])) * 8) & 0XFF);
+	}
+	else {
+		retVal = (count[0] >> ((_itemAddress % sizeof(count[0])) * 8) & 0XFFFF);
+	}
+
+	return retVal;
 }
 
 inline u16 metaOutput::timeout() const {
-	u32 value;
 	// The address of timeout property in the EEPROM is composed of:
 	cu32 address =
 			// the _itemAddress
@@ -61,8 +73,18 @@ inline u16 metaOutput::timeout() const {
 			// the size of the address property
 			sizeof(u16);
 
-	EEPROMRead(&value, (address) / sizeof(u32), 1);
-	return static_cast<u16>(((value >> (address) % sizeof(u32) * 8) & 0xFFFF));
+	u32 count[2];
+	EEPROMRead(count, address - (address % sizeof(count[0])), sizeof(count));
+
+	u16 retVal;
+	if(2 < address % sizeof(count[0])) {
+		retVal = ((count[1] & 0XFF) << 8) | (count[0] >> ((address % sizeof(count[0])) * 8) & 0XFF);
+	}
+	else {
+		retVal = (count[0] >> ((address % sizeof(count[0])) * 8) & 0XFFFF);
+	}
+
+	return retVal;
 }
 
 inline void metaOutput::inputs(std::vector<u16>& input) const {
@@ -94,7 +116,6 @@ inline void metaOutput::next() {
 }
 
 inline u16 metaOutput::inputCount() const {
-	u32 value;
 	// The address of input count property in the EEPROM is composed of:
 	cu32 address =
 			// the _itemAddress
@@ -104,17 +125,36 @@ inline u16 metaOutput::inputCount() const {
 			// the size of the time-out property
 			sizeof(u16);
 
-	EEPROMRead(&value, address / sizeof(u32), 1);
-	return static_cast<u16>(((value >> ((address % sizeof(u32)) * 8)) & 0xFFFF));
+	u32 count[2];
+	EEPROMRead(count, address - (address % sizeof(count[0])), sizeof(count));
+
+	u16 retVal;
+	if(2 < address % sizeof(count[0])) {
+		retVal = ((count[1] & 0XFF) << 8) | (count[0] >> ((address % sizeof(count[0])) * 8) & 0XFF);
+	}
+	else {
+		retVal = (count[0] >> ((address % sizeof(count[0])) * 8) & 0XFFFF);
+	}
+
+	return retVal;
 }
 
 inline void metaOutput::inputReader(std::vector<u16>& input, cu16 baseAddress, cu16 count) {
 	input.reserve(count);
 	for(u32 item = 0; item < count; item++) {
-		u32 value;
+		u32 data[2];
 		cu32 address = baseAddress + item * sizeof(u16);
-		EEPROMRead(&value, address / sizeof(u32), 1);
-		input.push_back(static_cast<u16>((value >> ((address % sizeof(u32)) * 8)) & 0xFFFF));
+		EEPROMRead(data, address - (address % sizeof(data[0])), sizeof(data));
+
+		u16 in;
+		if(2 < address % sizeof(data[0])) {
+			in = ((data[1] & 0XFF) << 8) | (data[0] >> ((address % sizeof(data[0])) * 8) & 0XFF);
+		}
+		else {
+			in = (data[0] >> ((address % sizeof(data[0])) * 8) & 0XFFFF);
+		}
+
+		input.push_back(in);
 	}
 }
 
