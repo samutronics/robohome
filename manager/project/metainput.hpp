@@ -38,8 +38,16 @@ inline metaInput::metaInput(cu16 sectionAddress): _itemAddress(sectionAddress + 
 inline u16 metaInput::totalCount() const {
 	u32 count[2];
 	EEPROMRead(count, _sectionAddress - (_sectionAddress % sizeof(count[0])), sizeof(count));
-	return static_cast<u16>((((count[1] >> ((sizeof(count[1]) - _sectionAddress % sizeof(count[1]) - 1) * 8)) & 0XFF) << 8) |
-			((count[0] >> (_sectionAddress % sizeof(count[0]) * 8)) & 0XFF));
+
+	u16 retVal;
+	if(2 < _sectionAddress % sizeof(count[0])) {
+		retVal = ((count[1] & 0XFF) << 8) | (count[0] >> ((_sectionAddress % sizeof(count[0])) * 8) & 0XFF);
+	}
+	else {
+		retVal = (count[0] >> ((_sectionAddress % sizeof(count[0])) * 8) & 0XFFFF);
+	}
+
+	return retVal;
 }
 
 inline TriggerType metaInput::trigger() const {
