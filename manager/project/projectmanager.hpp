@@ -22,13 +22,15 @@ class ProjectManager {
 public: static inline ProjectManager* getInstance();
 
 public: void read(std::vector<u32>& project) const;
-public: bool write(const std::vector<u32>& project) const;
+public: bool write(std::vector<u32>& project) const;
 
-public: inline metaInput			input() const;
-public: inline metaOutput			output() const;
-public: inline metaTriStateOutput	triStateOutput() const;
-public: inline metaSysConfig		sysConfig() const;
-public: inline metaIrrigation		irrigation() const;
+public: void trace() const;
+
+public: inline metaInput			input()				const;
+public: inline metaOutput			output()			const;
+public: inline metaTriStateOutput	triStateOutput()	const;
+public: inline metaSysConfig		sysConfig()			const;
+public: inline metaIrrigation		irrigation()		const;
 
 private: inline ProjectManager();
 
