@@ -74,6 +74,28 @@ void ProjectManager::trace() const {
 	}
 }
 
+void ProjectManager::parse() const {
+	vector<u32> project;
+	read(project);
+
+	UARTprintf("Section table:\n\tSystem configuration: %d\n\tInput properties: %d\n\tOutput properties: %d\n\tIrrigation configuration: %d\n",
+			static_cast<u16>(project[0] & 0XFFFF),
+			static_cast<u16>((project[0] >> 16) & 0XFFFF),
+			static_cast<u16>(project[1] & 0XFFFF),
+			static_cast<u16>((project[1] >> 16) & 0XFFFF));
+
+	metaInput in = input();
+	UARTprintf("Total number of inputs: %d\n", in.totalCount());
+	for(u32 index = 0; index < in.totalCount(); index++) {
+		UARTprintf("\tType of input at address %d: %s\n",
+				index,
+				in.trigger() == triggerBothEdges ? "triggerBothEdges" :
+						in.trigger() == triggerRisingEdge ? "triggerRisingEdge" : "none");
+		in.next();
+	}
+
+}
+
 // =============================================================================
 //! \file
 //! \copyright

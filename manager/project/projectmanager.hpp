@@ -25,6 +25,7 @@ public: void read(std::vector<u32>& project) const;
 public: bool write(std::vector<u32>& project) const;
 
 public: void trace() const;
+public: void parse() const;
 
 public: inline metaInput			input()				const;
 public: inline metaOutput			output()			const;
@@ -72,7 +73,7 @@ inline metaSysConfig ProjectManager::sysConfig() const {
 
 inline metaInput ProjectManager::input() const {
 	u32 section;
-	EEPROMRead(&section, 0, 1);
+	EEPROMRead(&section, 0, sizeof(section));
 	return metaInput(static_cast<u16>((section >> 16) & 0xFFFF));
 }
 
