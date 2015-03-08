@@ -63,12 +63,6 @@ static cu16 inputAddress		= sizeof(cikSize) + sizeof(cik);
 static cu16 outputAddress		= inputAddress + sizeof(inputCount) + sizeof(input);
 static cu16 irrigationAddress	= outputAddress + sizeof(simpleOutputCount) + sizeof(triStateOutputCount) + sizeof(simpleO) + sizeof(triStateO);
 
-inline void writeDummyProject() {
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_EEPROM0);
-	EEPROMInit();
-
-}
-
 #endif // DUMMYWRITER_HPP_
 // =============================================================================
 //! \file
