@@ -36,19 +36,16 @@ private: cu16 _sectionAddress;
 inline metaInput::metaInput(cu16 sectionAddress): _itemAddress(sectionAddress + sizeof(u16)), _sectionAddress(sectionAddress) {}
 
 inline u16 metaInput::totalCount() const {
-	static u32 count = std::numeric_limits<u32>::max();
-	if(std::numeric_limits<u32>::max() == count) {
-		EEPROMRead(&count, _sectionAddress / sizeof(u32), 1);
-		count = ((count >> _sectionAddress % sizeof(u32) * 8) & 0xFFFF);
-	}
-
-	return static_cast<u16>(count);
+	u32 count[2];
+	EEPROMRead(count, _sectionAddress - (_sectionAddress % sizeof(count[0])), sizeof(count));
+	return static_cast<u16>((((count[1] >> ((sizeof(count[1]) - _sectionAddress % sizeof(count[1]) - 1) * 8)) & 0XFF) << 8) |
+			((count[0] >> (_sectionAddress % sizeof(count[0]) * 8)) & 0XFF));
 }
 
 inline TriggerType metaInput::trigger() const {
 	u32 value;
-	EEPROMRead(&value, _itemAddress / sizeof(u32), 1);
-	return static_cast<TriggerType>(((value >> _itemAddress % sizeof(u32) * 8) & 0xFF));
+	EEPROMRead(&value, _itemAddress - (_itemAddress % sizeof(value)), sizeof(value));
+	return static_cast<TriggerType>((value >> (_itemAddress % sizeof(value) * 8)) & 0XFF);
 }
 
 inline void metaInput::next() {
