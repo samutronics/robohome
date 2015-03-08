@@ -84,6 +84,11 @@ void ProjectManager::parse() const {
 			static_cast<u16>(project[1] & 0XFFFF),
 			static_cast<u16>((project[1] >> 16) & 0XFFFF));
 
+	metaSysConfig sys = sysConfig();
+	string str;
+	sys.cik(str);
+	UARTprintf("CIK: %s\n", str.c_str());
+
 	metaInput in = input();
 	UARTprintf("Total number of inputs: %d\n", in.totalCount());
 	for(u32 index = 0; index < in.totalCount(); index++) {

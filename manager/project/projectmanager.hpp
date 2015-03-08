@@ -67,8 +67,8 @@ inline ProjectManager::ProjectManager() {
 
 inline metaSysConfig ProjectManager::sysConfig() const {
 	u32 section;
-	EEPROMRead(&section, 0, 1);
-	return metaSysConfig(0);
+	EEPROMRead(&section, 0, sizeof(section));
+	return metaSysConfig(static_cast<u16>(section & 0xFFFF));
 }
 
 inline metaInput ProjectManager::input() const {
