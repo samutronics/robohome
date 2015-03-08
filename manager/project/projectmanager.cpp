@@ -24,6 +24,7 @@ void ProjectManager::read(vector<u32>& project) const {
 bool ProjectManager::write(vector<u32>& project) const {
 	if((EEPROMSizeGet() / sizeof(project[0])) < project.size()) {return false;}
 	for(u32 index = 0; index < project.size(); index++) {
+		UARTprintf("%d %d %d %d\n", ((project[index] >> 24) & 0XFF), ((project[index] >> 16) & 0XFF), ((project[index] >> 8) & 0XFF), (project[index] & 0XFF));
 		EEPROMProgram(&project[index], index * sizeof(project[0]), sizeof(project[0]));
 	}
 	return true;
@@ -97,6 +98,22 @@ void ProjectManager::parse() const {
 				in.trigger() == triggerBothEdges ? "triggerBothEdges" :
 						in.trigger() == triggerRisingEdge ? "triggerRisingEdge" : "none");
 		in.next();
+	}
+
+	metaOutput out = output();
+	UARTprintf("Total number of simple outputs: %d\n", out.totalCount());
+	for(u32 index = 0; index < out.totalCount(); index++) {
+		UARTprintf("\tAddress of output: %d\n", out.address());
+		UARTprintf("\tTime-out of output: %d\n", out.timeout());
+		vector<u16> inputs;
+		out.inputs(inputs);
+		UARTprintf("\tAccessed from inputs: ");
+		for(u32 item = 0; item < inputs.size(); item++) {
+			UARTprintf("%d ", inputs[item]);
+		}
+
+		UARTprintf("\n");
+		out.next();
 	}
 
 }

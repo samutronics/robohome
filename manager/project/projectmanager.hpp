@@ -79,16 +79,26 @@ inline metaInput ProjectManager::input() const {
 
 inline metaOutput ProjectManager::output() const {
 	u32 section;
-	EEPROMRead(&section, 1, 1);
-	EEPROMRead(&section, ((section & 0xFFFF) / sizeof(u32)), 1);
-	return metaOutput(static_cast<u16>(section >> (((section & 0xFFFF) % sizeof(u32)) * 8) & 0xFFFF));
+	EEPROMRead(&section, sizeof(u32), sizeof(section));
+	return metaOutput(section & 0XFFFF);
 }
 
 inline metaTriStateOutput ProjectManager::triStateOutput() const {
 	u32 section;
-	EEPROMRead(&section, 1, 1);
-	EEPROMRead(&section, (((section >> 16) & 0xFFFF) / sizeof(u32)), 1);
-	return metaTriStateOutput(static_cast<u16>(section >> (((section & 0xFFFF) % sizeof(u32)) * 8) & 0xFFFF));
+	EEPROMRead(&section, sizeof(u32), sizeof(section));
+
+	u32 count[2];
+	EEPROMRead(count, ((section >> 16) & 0xFFFF) - (((section >> 16) & 0xFFFF) % sizeof(count[0])), sizeof(count));
+
+	u16 outputSection;
+	if(2 < section % sizeof(count[0])) {
+		outputSection = ((count[1] & 0XFF) << 8) | (count[0] >> ((section % sizeof(count[0])) * 8) & 0XFF);
+	}
+	else {
+		outputSection = (count[0] >> ((section % sizeof(count[0])) * 8) & 0XFFFF);
+	}
+
+	return metaTriStateOutput(outputSection);
 }
 
 inline metaIrrigation ProjectManager::irrigation() const {
