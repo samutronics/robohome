@@ -34,9 +34,7 @@ public: inline TriggerType trigger() const;
 inline metaInput::metaInput(cu16 sectionAddress): abstractMetaIO(sectionAddress) {}
 
 inline TriggerType metaInput::trigger() const {
-	u32 value;
-	EEPROMRead(&value, _itemAddress - (_itemAddress % sizeof(value)), sizeof(value));
-	return static_cast<TriggerType>((value >> (_itemAddress % sizeof(value) * 8)) & 0XFF);
+	return static_cast<TriggerType>(read<u8>(_itemAddress));
 }
 
 } // project

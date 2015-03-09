@@ -27,16 +27,16 @@ protected: cu16 _sectionAddress;
 inline abstractMetaSection::abstractMetaSection(const u16 sectionAddress): _sectionAddress(sectionAddress) {}
 
 template<typename T> T abstractMetaSection::read(cu16 address) {
-	union buffer {
-		u32 read[2];
-		u8 parse[sizeof(read)];
-	} b;
+	union {
+		u32 read[sizeof(T) == sizeof(u8) ? sizeof(u8) : 2];
+		u8 parse[sizeof(T) == sizeof(u8) ? (sizeof(u8) * 4) : 8];
+	};
 
-	EEPROMRead(b.read, address - (address % sizeof(b.read[0])), sizeof(b.read));
+	EEPROMRead(read, address - (address % sizeof(read[0])), sizeof(read));
 
-	T retVal;
-	for(u32 index = address % sizeof(b.read); index < address % sizeof(b.read) + sizeof(T); index++) {
-		retVal |= =b.parse[index] << (index * 8));
+	T retVal = 0;
+	for(u32 index = 0; index < sizeof(T); index++) {
+		retVal |= (static_cast<T>(parse[index + (address % sizeof(read))]) << (index * 8));
 	}
 
 	return retVal;

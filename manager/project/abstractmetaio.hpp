@@ -35,18 +35,7 @@ inline void abstractMetaIO::reset() {
 }
 
 inline u16 abstractMetaIO::count() const {
-	u32 count[2];
-	EEPROMRead(count, _sectionAddress - (_sectionAddress % sizeof(count[0])), sizeof(count));
-
-	u16 retVal;
-	if(2 < _sectionAddress % sizeof(count[0])) {
-		retVal = ((count[1] & 0XFF) << 8) | (count[0] >> ((_sectionAddress % sizeof(count[0])) * 8) & 0XFF);
-	}
-	else {
-		retVal = (count[0] >> ((_sectionAddress % sizeof(count[0])) * 8) & 0XFFFF);
-	}
-
-	return retVal;
+	return read<u16>(_sectionAddress);
 }
 
 } // project
