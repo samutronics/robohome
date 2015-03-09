@@ -8,6 +8,7 @@
 #ifndef _METAINPUT_HPP_
 #define _METAINPUT_HPP_
 
+#include "abstractmetaio.hpp"
 #include "../projectconfiguration.hpp"
 
 namespace manager {
@@ -19,45 +20,23 @@ enum TriggerType {
 	triggerUnknown
 };
 
-class metaInput {
+class metaInput: public abstractMetaIO {
 public: inline metaInput(const u16 sectionAddress);
-public: inline u16 totalCount() const;
-public: inline void next();
-public: inline TriggerType trigger() const;
 
-private: u16 _itemAddress;
-private: cu16 _sectionAddress;
+public: virtual void next();
+public: inline TriggerType trigger() const;
 };
 
 // =============================================================================
 // Inline method implementation
 // =============================================================================
 
-inline metaInput::metaInput(cu16 sectionAddress): _itemAddress(sectionAddress + sizeof(u16)), _sectionAddress(sectionAddress) {}
-
-inline u16 metaInput::totalCount() const {
-	u32 count[2];
-	EEPROMRead(count, _sectionAddress - (_sectionAddress % sizeof(count[0])), sizeof(count));
-
-	u16 retVal;
-	if(2 < _sectionAddress % sizeof(count[0])) {
-		retVal = ((count[1] & 0XFF) << 8) | (count[0] >> ((_sectionAddress % sizeof(count[0])) * 8) & 0XFF);
-	}
-	else {
-		retVal = (count[0] >> ((_sectionAddress % sizeof(count[0])) * 8) & 0XFFFF);
-	}
-
-	return retVal;
-}
+inline metaInput::metaInput(cu16 sectionAddress): abstractMetaIO(sectionAddress) {}
 
 inline TriggerType metaInput::trigger() const {
 	u32 value;
 	EEPROMRead(&value, _itemAddress - (_itemAddress % sizeof(value)), sizeof(value));
 	return static_cast<TriggerType>((value >> (_itemAddress % sizeof(value) * 8)) & 0XFF);
-}
-
-inline void metaInput::next() {
-	_itemAddress += sizeof(u8);
 }
 
 } // project

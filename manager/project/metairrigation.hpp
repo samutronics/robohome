@@ -8,19 +8,21 @@
 #ifndef _METAIRRIGATION_HPP_
 #define _METAIRRIGATION_HPP_
 
+#include "abstractmetasection.hpp"
 #include "../projectconfiguration.hpp"
 
 namespace manager {
 namespace project {
 
-class metaIrrigation {
-public: metaIrrigation(cu16 sectionAddress): _sectionAddress(sectionAddress) {}
-protected: cu16 _sectionAddress;
+class metaIrrigation: public abstractMetaSection {
+public: inline metaIrrigation(cu16 sectionAddress);
 };
 
 // =============================================================================
 // Inline method implementation
 // =============================================================================
+
+inline metaIrrigation::metaIrrigation(cu16 sectionAddress): abstractMetaSection(sectionAddress) {}
 
 } // project
 } // manager

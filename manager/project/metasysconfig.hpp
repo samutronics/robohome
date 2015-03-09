@@ -8,20 +8,23 @@
 #ifndef _METASYSCONFIG_HPP_
 #define _METASYSCONFIG_HPP_
 
+#include "abstractmetasection.hpp"
 #include "../projectconfiguration.hpp"
 
 namespace manager {
 namespace project {
 
-class metaSysConfig {
-public: metaSysConfig(cu16 sectionAddress): _sectionAddress(sectionAddress) {}
+class metaSysConfig: public abstractMetaSection {
+public: inline metaSysConfig(cu16 sectionAddress);
 public: inline void cik(std::string& c) const;
-private: cu16 _sectionAddress;
+public: inline void network(u32& ipAddress, u32& netMask, u32& gateway) const;
 };
 
 // =============================================================================
 // Inline method implementation
 // =============================================================================
+
+inline metaSysConfig::metaSysConfig(cu16 sectionAddress): abstractMetaSection(sectionAddress) {}
 
 inline void metaSysConfig::cik(std::string& c) const {
 	u32 tmp[2];
