@@ -16,7 +16,7 @@ namespace project {
 class abstractMetaSection {
 protected: inline abstractMetaSection(const u16 sectionAddress);
 
-protected: template<typename T> static T read(cu16 address);
+public: template<typename T> static T read(cu16 address);
 protected: cu16 _sectionAddress;
 };
 
@@ -36,7 +36,7 @@ template<typename T> T abstractMetaSection::read(cu16 address) {
 
 	T retVal = 0;
 	for(u32 index = 0; index < sizeof(T); index++) {
-		retVal |= (static_cast<T>(parse[index + (address % sizeof(read))]) << (index * 8));
+		retVal |= (static_cast<T>(parse[index + (address % sizeof(read[0]))]) << (index * 8));
 	}
 
 	return retVal;
