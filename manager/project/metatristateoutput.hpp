@@ -17,7 +17,7 @@ namespace project {
 class metaTriStateOutput: public metaOutput {
 public: inline metaTriStateOutput(cu16 sectionAddress);
 
-public: inline virtual void next();
+public: virtual void next();
 
 public: inline u16 extendedAddress() const;
 public: inline void inputsDown(std::vector<u16>& down) const;
@@ -33,32 +33,7 @@ private: inline u16 inputUpCount() const;
 
 inline metaTriStateOutput::metaTriStateOutput(cu16 sectionAddress): metaOutput(sectionAddress) {}
 
-inline void metaTriStateOutput::next() {
-	// the total item size in the EEPROM composed of:
-	_itemAddress +=
-			// the size of the address property
-			sizeof(u16) +
-			// the size of the time-out property
-			sizeof(u16) +
-			// the size of the UpDown input count property
-			sizeof(u16) +
-			// the number of connected UpDown input count property
-			inputCount() * sizeof(u16) +
-			// the size of the extendedAddress property
-			sizeof(u16) +
-			// the size of the Down input count property
-			sizeof(u16) +
-			// the number of connected Down input count property
-			inputDownCount() * sizeof(u16) +
-			// the size of the Up input count property
-			sizeof(u16) +
-			// the number of connected Up input count property
-			inputUpCount() * sizeof(u16);
-}
-
 inline u16 metaTriStateOutput::extendedAddress() const {
-	u32 value;
-	// The start address of extendedAddress in the EEPROM is composed of:
 	cu32 address =
 			// the _itemAddress
 			_itemAddress +
@@ -71,8 +46,7 @@ inline u16 metaTriStateOutput::extendedAddress() const {
 			// the number of connected UpDown input count property
 			inputCount() * sizeof(u16);
 
-	EEPROMRead(&value, address / sizeof(u32), 1);
-	return static_cast<u16>(((value >> address % sizeof(u32) * 8) & 0xFFFF));
+	return read<u16>(address);
 }
 
 inline void metaTriStateOutput::inputsDown(std::vector<u16>& down) const {
@@ -122,7 +96,6 @@ inline void metaTriStateOutput::inputsUp(std::vector<u16>& up) const {
 }
 
 inline u16 metaTriStateOutput::inputDownCount() const {
-	u32 value;
 	// The start address of inputDownCount in the EEPROM is composed of:
 	cu32 address =
 			// the _itemAddress
@@ -138,12 +111,10 @@ inline u16 metaTriStateOutput::inputDownCount() const {
 			// the size of the extendedAddress property
 			sizeof(u16);
 
-	EEPROMRead(&value, address / sizeof(u32), 1);
-	return static_cast<u16>(((value >> address % sizeof(u32) * 8) & 0xFFFF));
+	return read<u16>(address);
 }
 
 inline u16 metaTriStateOutput::inputUpCount() const {
-	u32 value;
 	// The start address of inputUpCount in the EEPROM is composed of:
 	cu32 address =
 			// the _itemAddress
@@ -163,8 +134,7 @@ inline u16 metaTriStateOutput::inputUpCount() const {
 			// the number of connected Down input count property
 			inputDownCount() * sizeof(u16);
 
-	EEPROMRead(&value, address / sizeof(u32), 1);
-	return static_cast<u16>(((value >> address % sizeof(u32) * 8) & 0xFFFF));
+	return read<u16>(address);
 }
 
 } // project
