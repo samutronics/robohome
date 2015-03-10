@@ -92,7 +92,7 @@ inline void makeTriStateOutputCfg(std::vector<u8>& project) {
 
 inline void makeCfg(std::vector<u32>& project) {
 	std::vector<u8> data;
-	cu16 sysCfgAddress		= 8; // start directly after the sections
+	cu16 sysCfgAddress		= 8; // start directly after the main section table
 	makeSysCfg(data);
 	cu16 inputAddress		= sysCfgAddress + data.size();
 	makeInputCfg(data);
@@ -103,11 +103,6 @@ inline void makeCfg(std::vector<u32>& project) {
 	data.push_back(static_cast<u8>(((sizeof(simpleO) + sizeof(simpleOutputCount))>> 8) & 0XFF));
 	data.push_back(static_cast<u8>((sizeof(triStateO) + sizeof(triStateOutputCount)) & 0XFF));
 	data.push_back(static_cast<u8>(((sizeof(triStateO) + sizeof(triStateOutputCount)) >> 8) & 0XFF));
-
-
-	UARTprintf("output section address: %d", outputAddress);
-	UARTprintf("simple output section size: %d", (sizeof(simpleO) + sizeof(simpleOutputCount)));
-	UARTprintf("tri-state output section size: %d", (sizeof(triStateO) + sizeof(triStateOutputCount)));
 
 	makeSimpleOutputCfg(data);
 	makeTriStateOutputCfg(data);
