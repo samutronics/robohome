@@ -19,10 +19,10 @@ namespace output {
 class OutputManager {
 public: static inline OutputManager* getInstance();
 
-public: const std::vector<Output*>& outputs() const;
+public: inline const std::vector<Output*>& outputs() const;
 
-public: bool read(cu16 address) const;
-public: const std::vector<u32>& read() const;
+public: inline bool read(cu16 address) const;
+public: inline const std::vector<u32>& read() const;
 
 public: virtual ~OutputManager();
 private: inline OutputManager();
@@ -57,12 +57,14 @@ inline OutputManager* OutputManager::getInstance() {
 
 inline OutputManager::OutputManager():
 				_output(project::ProjectManager::getInstance()->output().count() + project::ProjectManager::getInstance()->triStateOutput().count()),
-				_data(_output.size() / sizeof(_data[0]) + (_output.size() % (sizeof(_data[0]) ? 1 : 0))) {
+				_data(_output.size() / sizeof(_data[0]) + (_output.size() % (sizeof(_data[0]) ? 1 : 0)), 0) {
 	std::vector<u16> simpleTmp(100);
 	project::metaOutput simpleoutput = project::ProjectManager::getInstance()->output();
 	for(u32 index = 0; index < simpleoutput.count(); index++) {
 		simpleoutput.inputs(simpleTmp);
 		_output.push_back(new Output(simpleoutput.address(), simpleoutput.timeout(), simpleTmp, _data));
+		simpleTmp.clear();
+		simpleoutput.next();
 	}
 
 	std::vector<u16> tristateTmpUp(100);
@@ -73,18 +75,22 @@ inline OutputManager::OutputManager():
 		tristateutput.inputsUp(tristateTmpUp);
 		tristateutput.inputsDown(tristateTmpDown);
 		_output.push_back(new TriStateOutput(tristateutput.address(), tristateutput.timeout(), simpleTmp, _data, tristateutput.extendedAddress(), tristateTmpUp, tristateTmpDown));
+		simpleTmp.clear();
+		tristateTmpUp.clear();
+		tristateTmpDown.clear();
+		tristateutput.next();
 	}
 }
 
-const std::vector<Output*>& OutputManager::outputs() const {
+inline const std::vector<Output*>& OutputManager::outputs() const {
 	return _output;
 }
 
-const std::vector<u32>& OutputManager::read() const {
+inline const std::vector<u32>& OutputManager::read() const {
 	return _data;
 }
 
-bool OutputManager::read(cu16 address) const {
+inline bool OutputManager::read(cu16 address) const {
 	return (_data[address / sizeof(_data[0])] & (1 << (address % sizeof(_data[0]))));
 }
 

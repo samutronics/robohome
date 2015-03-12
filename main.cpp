@@ -13,11 +13,11 @@
 // =============================================================================
 #include "web.hpp"
 #include "sntp.hpp"
-#include "output.hpp"
 #include "weather.hpp"
 #include "exosite.hpp"
 #include "services/input/input.hpp"
 #include "projectconfiguration.hpp"
+#include "services/output/output.hpp"
 
 using namespace service::sntp;
 using namespace service::inbound;

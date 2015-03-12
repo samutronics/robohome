@@ -25,7 +25,7 @@ output::output():
 }
 
 void output::task(void *pvParameters) {
-	while(1) {
+	while(true) {
 		// The thread gives up its time-slice, if there is no semaphire given.
 		xSemaphoreTake(_THQueue, portMAX_DELAY);
 
