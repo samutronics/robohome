@@ -9,6 +9,7 @@
 #define _INPUT_H_
 
 #include "iservice.hpp"
+#include "inputmanager.hpp"
 #include "../projectconfiguration.hpp"
 
 namespace service {
@@ -17,23 +18,27 @@ namespace inbound {
 class input {
 public: static inline void deploy(void* pvParameters = NULL);
 public: static void ISRHandler();
-private: input();
-private: void task(void *pvParameters);
 
+private: input();
+
+private: void task(void *pvParameters);
 private: void timerStart() const;
 private: void IOStart() const;
 private: inline void IORead();
 private: inline void LoadON() const;
 private: inline void LoadOFF() const;
 
-private: u32 _timeSliceAccumulator;
-private: cu32 _dataByteCount;
-private: std::vector<u32> _data;
-private: std::vector<u32> _dataAccumulator;
+private: cu32							_dataByteCount;
+private: std::vector<u32>				_data;
+private: manager::input::InputManager*	_iputManager;
 
 private: static input* _instance;
 private: static xSemaphoreHandle _ISRQueue;
 };
+
+// =============================================================================
+// Inline method implementation
+// =============================================================================
 
 inline void input::deploy(void* pvParameters) {
 	if(!_instance) {

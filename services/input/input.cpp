@@ -9,6 +9,7 @@
 #include "projectmanager.hpp"
 #include "../projectconfiguration.hpp"
 
+using namespace manager::input;
 using namespace manager::project;
 using namespace service::inbound;
 using namespace service::inbound::configuration;
@@ -17,10 +18,9 @@ xSemaphoreHandle input::_ISRQueue = NULL;
 input* input::_instance = NULL;
 
 input::input():
-		_timeSliceAccumulator(0),
 		_dataByteCount(ProjectManager::getInstance()->sysConfig().hwInputNumber() / 8),
 		_data(_dataByteCount / sizeof(_data[0]) + (_dataByteCount % sizeof(_data[0]) ? 1 : 0), 0),
-		_dataAccumulator(_dataByteCount / sizeof(_data[0]) + (_dataByteCount % sizeof(_data[0]) ? 1 : 0), 0) {
+		_iputManager(InputManager::getInstance()) {
 	IOStart();
 	timerStart();
 }
@@ -32,9 +32,9 @@ void input::task(void *pvParameters) {
 
 		IORead();
 
-		if(!(_timeSliceAccumulator % 5)) {
-			UARTprintf("%d\n", _data[0]);
-		}
+		_iputManager->write(_data);
+
+		for(u32 index = 0; index < _data.size(); _data[index++] = 0);
 
 		// The task gives up its remained time-slice
 		taskYIELD();
@@ -70,7 +70,6 @@ void input::IOStart() const {
 
 void input::ISRHandler() {
 	TimerIntClear(timer, TIMER_TIMA_TIMEOUT);
-	_instance->_timeSliceAccumulator++;
 	xSemaphoreGiveFromISR(_ISRQueue, NULL);
 }
 
