@@ -16,6 +16,8 @@ namespace project {
 
 class metaSysConfig: public abstractMetaSection {
 public: inline metaSysConfig(cu16 sectionAddress);
+public: inline u16 hwInputNumber() const;
+public: inline u16 hwOutputNumber() const;
 public: inline void cik(std::string& c) const;
 public: inline void network(u32& ipAddress, u32& netMask, u32& gateway) const;
 };
@@ -25,6 +27,14 @@ public: inline void network(u32& ipAddress, u32& netMask, u32& gateway) const;
 // =============================================================================
 
 inline metaSysConfig::metaSysConfig(cu16 sectionAddress): abstractMetaSection(sectionAddress) {}
+
+inline u16 metaSysConfig::hwInputNumber() const {
+	return 16; // hard-wired yet. Implementation comes later.
+}
+
+inline u16 metaSysConfig::hwOutputNumber() const {
+	return 16; // hard-wired yet. Implementation comes later.
+}
 
 inline void metaSysConfig::cik(std::string& c) const {
 	u32 tmp[2];
