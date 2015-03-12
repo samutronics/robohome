@@ -19,8 +19,8 @@ input* input::_instance = NULL;
 input::input():
 		_timeSliceAccumulator(0),
 		_dataByteCount(ProjectManager::getInstance()->sysConfig().hwInputNumber() / 8),
-		_data(_dataByteCount / sizeof(_data[0]) + (_dataByteCount % sizeof(_data[0]) ? 1 : 0)),
-		_dataAccumulator(_dataByteCount / sizeof(_data[0]) + (_dataByteCount % sizeof(_data[0]) ? 1 : 0)) {
+		_data(_dataByteCount / sizeof(_data[0]) + (_dataByteCount % sizeof(_data[0]) ? 1 : 0), 0),
+		_dataAccumulator(_dataByteCount / sizeof(_data[0]) + (_dataByteCount % sizeof(_data[0]) ? 1 : 0), 0) {
 	IOStart();
 	timerStart();
 }
@@ -30,8 +30,10 @@ void input::task(void *pvParameters) {
 		// The thread gives up its time-slice, if there is no semaphire given.
 		xSemaphoreTake(_ISRQueue, portMAX_DELAY);
 
-		if(_timeSliceAccumulator % 3) {
+		IORead();
 
+		if(!(_timeSliceAccumulator % 5)) {
+			UARTprintf("%d\n", _data[0]);
 		}
 
 		// The task gives up its remained time-slice

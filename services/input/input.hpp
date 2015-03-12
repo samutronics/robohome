@@ -23,6 +23,8 @@ private: void task(void *pvParameters);
 private: void timerStart() const;
 private: void IOStart() const;
 private: inline void IORead();
+private: inline void LoadON() const;
+private: inline void LoadOFF() const;
 
 private: u32 _timeSliceAccumulator;
 private: cu32 _dataByteCount;
@@ -50,8 +52,26 @@ inline void input::deploy(void* pvParameters) {
 	_instance->task(pvParameters);
 }
 
-inline void input::IORead() {
+inline void input::LoadON() const {
+	GPIOPinWrite(GPIO_PORTH_BASE, GPIO_PIN_0, 0x0);
+}
 
+inline void input::LoadOFF() const {
+	GPIOPinWrite(GPIO_PORTH_BASE, GPIO_PIN_0, GPIO_PIN_0);
+}
+
+inline void input::IORead() {
+	LoadOFF();
+	for(u32 index = 0; index < _dataByteCount; index++) {
+		SSIDataPut(SSI0_BASE, 0XFF);
+		while(SSIBusy(SSI0_BASE)) {taskYIELD();}
+
+		u32 tmp = 0;
+		SSIDataGet(SSI0_BASE, &tmp);
+		_data[(_dataByteCount / sizeof(_data[0])) - (index / sizeof(_data[0]))] |= (tmp & 0XFF) << ((_dataByteCount - 1 - (index % _dataByteCount)) * 8);
+	}
+
+	LoadON();
 }
 
 }  // inbound
