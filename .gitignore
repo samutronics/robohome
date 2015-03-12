@@ -2,7 +2,6 @@ Debug/*
 *~
 /Debug
 /Release
-.launches/homeAutomation.launch
 /html
 *.creator
 *.creator.user
@@ -22,3 +21,4 @@ Debug/*
 /Release__opt_for_speed__5
 doc/*.ldb
 doc/SW Specification 11.pdf
+.launches/homAutomation.launch

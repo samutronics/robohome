@@ -46,7 +46,7 @@ int main(void) {
     UARTprintf("\033[2J\033[H");
 	UARTprintf("application starts\n");
 
-	if(pdPASS != xTaskCreate(&input::start,		"TaaT_TBHB_Input",	configUSER_SPACE_STACK_SIZE, NULL, 2, NULL)) { while(true);}
+	if(pdPASS != xTaskCreate(&input::deploy,	"TaaT_TBHB_Input",	configUSER_SPACE_STACK_SIZE, NULL, 2, NULL)) { while(true);}
 	if(pdPASS != xTaskCreate(&output::start,	"TaaT_Output",		configUSER_SPACE_STACK_SIZE, NULL, 2, NULL)) { while(true);}
 	if(pdPASS != xTaskCreate(&web::start,		"TaaT_THBH_NP",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(true);}
 	if(pdPASS != xTaskCreate(&sntp::start,		"TaaT_RTC",			configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(true);}

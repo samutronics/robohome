@@ -14,15 +14,47 @@
 namespace service {
 namespace inbound {
 
-class input: public IService {
+class input {
+public: static inline void deploy(void* pvParameters = NULL);
+public: static void ISRHandler();
 private: input();
-private: virtual void task(void *pvParameters);
-TO_BE_RUNABLE(input)
-DEFINE_TH
+private: void task(void *pvParameters);
+
+private: void timerStart() const;
+private: void IOStart() const;
+private: inline void IORead();
+
+private: u32 _timeSliceAccumulator;
+private: cu32 _dataByteCount;
+private: std::vector<u32> _data;
+private: std::vector<u32> _dataAccumulator;
+
+private: static input* _instance;
+private: static xSemaphoreHandle _ISRQueue;
 };
 
-}  // inbound
+inline void input::deploy(void* pvParameters) {
+	if(!_instance) {
+		xSemaphoreHandle sync = NULL;
+		if(!sync) {sync = xSemaphoreCreateMutex();}
 
+		 xSemaphoreTake(sync, 0);
+		if(!_instance) {
+			_ISRQueue = xSemaphoreCreateBinary();
+			_instance = new input();
+		}
+
+		xSemaphoreGive(sync);
+	}
+
+	_instance->task(pvParameters);
+}
+
+inline void input::IORead() {
+
+}
+
+}  // inbound
 }  // service
 
 #endif //_INPUT_H_
