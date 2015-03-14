@@ -62,7 +62,7 @@ inline OutputManager::OutputManager():
 	project::metaOutput simpleoutput = project::ProjectManager::getInstance()->output();
 	for(u32 index = 0; index < simpleoutput.count(); index++) {
 		simpleoutput.inputs(simpleTmp);
-		_output.push_back(new Output(simpleoutput.address(), simpleoutput.timeout(), simpleTmp, _data));
+		_output[index] = new Output(simpleoutput.address(), simpleoutput.timeout(), simpleTmp, _data);
 		simpleTmp.clear();
 		simpleoutput.next();
 	}
@@ -74,7 +74,7 @@ inline OutputManager::OutputManager():
 		tristateutput.inputs(simpleTmp);
 		tristateutput.inputsUp(tristateTmpUp);
 		tristateutput.inputsDown(tristateTmpDown);
-		_output.push_back(new TriStateOutput(tristateutput.address(), tristateutput.timeout(), simpleTmp, _data, tristateutput.extendedAddress(), tristateTmpUp, tristateTmpDown));
+		_output[index + simpleoutput.count()] = new TriStateOutput(tristateutput.address(), tristateutput.timeout(), simpleTmp, _data, tristateutput.extendedAddress(), tristateTmpUp, tristateTmpDown);
 		simpleTmp.clear();
 		tristateTmpUp.clear();
 		tristateTmpDown.clear();
