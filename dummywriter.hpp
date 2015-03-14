@@ -15,6 +15,26 @@ static cs8 cik[] = "15e4890a88d79261608b194c8217c486c68f0007";
 static cu16 cikSize = (sizeof(cik) / sizeof(cik[0]));
 
 inline void makeSysCfg(std::vector<u8>& project) {
+	project.push_back(16);	// write hw input count
+	project.push_back(0);	// write hw input count
+	project.push_back(16);	// write hw output count
+	project.push_back(0);	// write hw output count
+
+	project.push_back(11);	// write IP address
+	project.push_back(1);	// write IP address
+	project.push_back(168);	// write IP address
+	project.push_back(192);	// write IP address
+
+	project.push_back(0);	// write netmask
+	project.push_back(255);	// write netmask
+	project.push_back(255);	// write netmask
+	project.push_back(255);	// write netmask
+
+	project.push_back(1);	// write default gateway
+	project.push_back(1);	// write default gateway
+	project.push_back(168);	// write default gateway
+	project.push_back(192);	// write default gateway
+
 	project.push_back(static_cast<u8>(cikSize & 0XFF));
 	project.push_back(static_cast<u8>((cikSize >> 8) & 0XFF));
 	for(u32 index = 0; index < sizeof(cik); index++) {

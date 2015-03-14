@@ -36,9 +36,6 @@ void output::task(void *pvParameters) {
 
 		IOWrite();
 
-//		UARTprintf("D\n");
-
-
 		// The task gives up its remained time-slice
 		taskYIELD();
 	}

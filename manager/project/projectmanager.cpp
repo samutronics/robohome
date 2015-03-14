@@ -85,6 +85,18 @@ void ProjectManager::parse() const {
 			static_cast<u16>((project[1] >> 16) & 0XFFFF));
 
 	metaSysConfig sys = sysConfig();
+	UARTprintf("Hardware input count: %d\n", sys.hwInputNumber());
+	UARTprintf("Hardware output count: %d\n", sys.hwOutputNumber());
+	UARTprintf("Network configuration:\n");
+
+	u32 ip;
+	u32 netmask;
+	u32 gateway;
+	sys.network(ip, netmask, gateway);
+	UARTprintf("\tIP address:\t%d.%d.%d.%d\n", ((ip >> 24) & 0XFF), ((ip >> 16) & 0XFF), ((ip >> 8) & 0XFF), (ip & 0XFF));
+	UARTprintf("\tNetwork mask:\t%d.%d.%d.%d\n", ((netmask >> 24) & 0XFF), ((netmask >> 16) & 0XFF), ((netmask >> 8) & 0XFF), (netmask & 0XFF));
+	UARTprintf("\tDefault gatewy:\t%d.%d.%d.%d\n", ((gateway >> 24) & 0XFF), ((gateway >> 16) & 0XFF), ((gateway >> 8) & 0XFF), (gateway & 0XFF));
+
 	string str;
 	sys.cik(str);
 	UARTprintf("CIK: %s\n", str.c_str());
