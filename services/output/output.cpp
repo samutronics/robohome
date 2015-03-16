@@ -6,6 +6,7 @@
 //! \note
 // =============================================================================
 #include "output.hpp"
+#include "inputmanager.hpp"
 #include "../projectconfiguration.hpp"
 
 using namespace manager::output;
@@ -34,7 +35,9 @@ void output::task(void *pvParameters) {
 			out[index]->evaluate();
 		}
 
-		IOWrite();
+		manager::input::InputManager::getInstance()->reset();
+
+//		IOWrite();
 
 		// The task gives up its remained time-slice
 		taskYIELD();

@@ -26,11 +26,11 @@ public: inline void write(const std::vector<u32>& data);
 
 private: inline InputManager();
 
-private: std::vector<Input*> _inputs;
-private: std::vector<u32> _dataChanged;
-private: std::vector<u32> _dataCurrent;
-private: std::vector<u32> _dataPrevious;
-private: std::vector<xSemaphoreHandle> _lock;
+private: std::vector<Input*>			_inputs;
+private: std::vector<u32>				_dataChanged;
+private: std::vector<u32>				_dataCurrent;
+private: std::vector<u32>				_dataPrevious;
+private: std::vector<xSemaphoreHandle>	_lock;
 
 private: static InputManager* _instance;
 };
@@ -72,7 +72,9 @@ inline InputManager::InputManager():
 	for(u32 index = 0; index < _dataChanged.size(); index++) {_lock[index] = xSemaphoreCreateMutex();}
 }
 
-inline const std::vector<Input*>& InputManager::inputs() const {return _inputs;}
+inline const std::vector<Input*>& InputManager::inputs() const {
+	return _inputs;
+}
 
 inline void InputManager::reset() {
 	for(u32 index = 0; index < _dataChanged.size(); index++) {_dataChanged[index] = 0;}

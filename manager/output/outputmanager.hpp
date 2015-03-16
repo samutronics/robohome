@@ -57,7 +57,7 @@ inline OutputManager* OutputManager::getInstance() {
 
 inline OutputManager::OutputManager():
 				_output(project::ProjectManager::getInstance()->output().count() + project::ProjectManager::getInstance()->triStateOutput().count()),
-				_data(_output.size() / sizeof(_data[0]) + (_output.size() % (sizeof(_data[0]) ? 1 : 0)), 0) {
+				_data(_output.size() / (sizeof(_data[0] * 8)) + ((_output.size() % (sizeof(_data[0]) * 8)) ? 1 : 0), 0) {
 	std::vector<u16> simpleTmp(100);
 	project::metaOutput simpleoutput = project::ProjectManager::getInstance()->output();
 	for(u32 index = 0; index < simpleoutput.count(); index++) {
