@@ -15,6 +15,7 @@
 #include "sntp.hpp"
 #include "weather.hpp"
 #include "exosite.hpp"
+#include "projectmanager.hpp"
 #include "services/input/input.hpp"
 #include "projectconfiguration.hpp"
 #include "services/output/output.hpp"
@@ -44,7 +45,9 @@ int main(void) {
 
 	UARTStdioConfig(0, 115200, systemGlobal::currentSystemClockFrequency);
     UARTprintf("\033[2J\033[H");
-	UARTprintf("application starts\n");
+	UARTprintf("Application starts\n");
+	UARTprintf("Project found\n");
+	manager::project::ProjectManager::getInstance()->parse();
 
 	if(pdPASS != xTaskCreate(&input::deploy,	"TaaT_TBHB_Input",	configUSER_SPACE_STACK_SIZE, NULL, 2, NULL)) { while(true);}
 	if(pdPASS != xTaskCreate(&output::start,	"TaaT_Output",		configUSER_SPACE_STACK_SIZE, NULL, 2, NULL)) { while(true);}

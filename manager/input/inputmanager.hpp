@@ -65,7 +65,7 @@ inline InputManager::InputManager():
 				_lock(project::ProjectManager::getInstance()->input().count()) {
 	project::metaInput data = project::ProjectManager::getInstance()->input();
 	for(u32 index = 0; index < data.count(); index++) {
-		_inputs.push_back(new Input(data.trigger(), index, _dataChanged, _dataCurrent, _dataPrevious));
+		_inputs[index] = new Input(data.trigger(), index, _dataChanged, _dataCurrent, _dataPrevious);
 		data.next();
 	}
 

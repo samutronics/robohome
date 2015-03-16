@@ -14,17 +14,18 @@
 namespace manager {
 namespace project {
 
-enum TriggerType {
-	triggerBothEdges,
-	triggerRisingEdge,
-	triggerUnknown
+enum InputType {
+	BothEdges,
+	RisingEdge,
+	DeferredBothEdges,
+	DeferredRisingEdge
 };
 
 class metaInput: public abstractMetaIO {
 public: inline metaInput(const u16 sectionAddress);
 
 public: virtual void next();
-public: inline TriggerType trigger() const;
+public: inline InputType trigger() const;
 };
 
 // =============================================================================
@@ -33,8 +34,8 @@ public: inline TriggerType trigger() const;
 
 inline metaInput::metaInput(cu16 sectionAddress): abstractMetaIO(sectionAddress) {}
 
-inline TriggerType metaInput::trigger() const {
-	return static_cast<TriggerType>(read<u8>(_itemAddress));
+inline InputType metaInput::trigger() const {
+	return static_cast<InputType>(read<u8>(_itemAddress));
 }
 
 } // project

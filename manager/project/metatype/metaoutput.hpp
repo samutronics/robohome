@@ -15,14 +15,15 @@ namespace manager {
 namespace project {
 
 class metaOutput: public abstractMetaIO {
-public: inline metaOutput(const u16 sectionAddress);
-public: inline u16 address() const;
-public: inline u16 timeout() const;
+public: inline metaOutput(cu16 sectionAddress);
+public: inline cu16 address() const;
+public: inline cu16 timeoutOFF() const;
+public: inline cu16 timeoutON() const;
 public: inline void inputs(std::vector<u16>& input) const;
 
 public: virtual void next();
 
-protected: inline u16 inputCount() const;
+protected: inline cu16 inputCount() const;
 protected: static inline void inputReader(std::vector<u16>& input, cu16 baseAddress, cu16 count);
 };
 
@@ -32,11 +33,11 @@ protected: static inline void inputReader(std::vector<u16>& input, cu16 baseAddr
 
 inline metaOutput::metaOutput(cu16 sectionAddress): abstractMetaIO(sectionAddress) {}
 
-inline u16 metaOutput::address() const {
+inline cu16 metaOutput::address() const {
 	return read<u16>(_itemAddress);
 }
 
-inline u16 metaOutput::timeout() const {
+inline cu16 metaOutput::timeoutOFF() const {
 	// The address of timeout property in the EEPROM is composed of:
 	cu32 address =
 			// the _itemAddress
@@ -45,6 +46,10 @@ inline u16 metaOutput::timeout() const {
 			sizeof(u16);
 
 	return read<u16>(address);
+}
+
+inline cu16 metaOutput::timeoutON() const {
+	return 0;
 }
 
 inline void metaOutput::inputs(std::vector<u16>& input) const {
@@ -62,7 +67,7 @@ inline void metaOutput::inputs(std::vector<u16>& input) const {
 	inputReader(input, address, inputCount());
 }
 
-inline u16 metaOutput::inputCount() const {
+inline cu16 metaOutput::inputCount() const {
 	// The address of input count property in the EEPROM is composed of:
 	cu32 address =
 			// the _itemAddress
