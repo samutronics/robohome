@@ -35,7 +35,6 @@ inline TriStateOutput::TriStateOutput(cu16 hwAddress, cu16 timeoutON, cu16 timeo
 				_inputsDown(inputsDown) {}
 
 inline void TriStateOutput::evaluate() {
-	UARTprintf("TriStateOutput::evaluate\n");
 }
 
 } // output

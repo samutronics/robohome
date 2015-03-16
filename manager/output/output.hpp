@@ -28,6 +28,11 @@ public: inline virtual void evaluate();
 
 protected: inline void writeBit(cu16 address);
 
+private: inline void evaluateBranchActive();
+private: inline void evaluateBranchPassive();
+private: inline void evaluateBranchTimeOutOn();
+private: inline void evaluateBranchTimeOutOff();
+
 protected: u16 						_timer;
 protected: OutputState 				_state;
 protected: std::vector<u32>& 		_data;
@@ -55,16 +60,118 @@ inline void Output::writeBit(cu16 address) {
 }
 
 inline void Output::evaluate() {
-	bool userInteractionOccured = false;
-	const std::vector<input::Input*>& input = input::InputManager::getInstance()->inputs();
+	switch (_state) {
+	case Active: {
+		evaluateBranchActive();
+		return;
+	}
+	case Passive: {
+		evaluateBranchPassive();
+		return;
+	}
+	case TimeOutOn: {
+		evaluateBranchTimeOutOn();
+		return;
+	}
+	case TimeOutOff: {
+		evaluateBranchTimeOutOff();
+		return;
+	}
+	default: {
+		UARTprintf("Unsupported switch case in Output::evaluate()\n");
+		break;
+	}
+	}
+}
+
+inline void Output::evaluateBranchActive() {
+	const std::vector<input::Input*>& inputs = input::InputManager::getInstance()->inputs();
 	for(u32 index = 0; index < _inputs.size(); index++) {
-		if(input[_inputs[index]]->changed()) {
+		if(input::NoChangeEvent != inputs[_inputs[index]]->changed()) {
+			if(0 != _timeoutOFF) {
+				_timer = _timeoutOFF;
+				_state = TimeOutOff;
+			}
+			else {
+				writeBit(_hwAddress);
+				_state = Passive;
+			}
+
+			return;
+		}
+	}
+}
+
+inline void Output::evaluateBranchPassive() {
+	const std::vector<input::Input*>& inputs = input::InputManager::getInstance()->inputs();
+	for(u32 index = 0; index < _inputs.size(); index++) {
+		switch (inputs[_inputs[index]]->changed()) {
+		case input::NoChangeEvent: {
+			break;
+		}
+		case input::DeferredChangeEvent: {
+			_timer = _timeoutON;
+			_state = TimeOutOn;
+			return;
+		}
+		case input::ChangeEvent: {
 			writeBit(_hwAddress);
-			userInteractionOccured = true;
+			_state = Active;
+			return;
+		}
+		default:
+			UARTprintf("Unsupported switch case in Output::evaluateBranchPassive()\n");
+			return;
+		}
+	}
+}
+
+inline void Output::evaluateBranchTimeOutOn() {
+	_timer--;
+	if(0 == _timer) {_state = Active;}
+
+	const std::vector<input::Input*>& inputs = input::InputManager::getInstance()->inputs();
+	for(u32 index = 0; index < _inputs.size(); index++) {
+		bool breakable = true;
+		switch (inputs[_inputs[index]]->changed()) {
+		case input::NoChangeEvent: {
+			breakable = false;
+			break;
+		}
+		case input::DeferredChangeEvent: {
+			_timer = _timeoutON;
+			_state = TimeOutOn;
+			break;
+		}
+		case input::ChangeEvent: {
+			_timer = 0;
+			_state = Active;
+			break;
+		}
+		default:
+			UARTprintf("Unsupported switch case in Output::evaluateBranchTimeOutOn()\n");
+			return;
+		}
+
+		if(breakable) {break;}
+	}
+
+	if(Active == _state) {writeBit(_hwAddress);}
+}
+
+inline void Output::evaluateBranchTimeOutOff() {
+	_timer--;
+	if(0 == _timer) {_state = Passive;}
+
+	const std::vector<input::Input*>& inputs = input::InputManager::getInstance()->inputs();
+	for(u32 index = 0; index < _inputs.size(); index++) {
+		if(input::NoChangeEvent != inputs[_inputs[index]]->changed()) {
+			_state = Active;
 			break;
 		}
 	}
 
+	if(_state == Passive) {writeBit(_hwAddress);}
 }
 
 } // output
