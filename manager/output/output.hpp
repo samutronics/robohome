@@ -20,7 +20,15 @@ protected: enum OutputState {
 	Active,
 	Passive,
 	TimeOutOn,
-	TimeOutOff
+	TimeOutOff,
+	ActiveUp,
+	ActiveDown,
+	PassiveUp,
+	PassiveDown,
+	TimeoutUp,
+	TimeoutDown,
+	StoppedUp,
+	StoppedDown
 };
 
 public: inline Output(const u16 hwAddress, const u16 timeoutON, const u16 timeoutOFF, const std::vector<u16>& inputs, std::vector<u32>& data);

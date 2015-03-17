@@ -19,6 +19,15 @@ public: inline TriStateOutput(cu16 hwAddress, cu16 timeoutON, cu16 timeoutOFF, c
 
 public: inline virtual void evaluate();
 
+private: inline void evaluateBranchActiveUp();
+private: inline void evaluateBranchActiveDown();
+private: inline void evaluateBranchPassiveUp();
+private: inline void evaluateBranchPassiveDown();
+private: inline void evaluateBranchTimeoutUp();
+private: inline void evaluateBranchTimeoutDown();
+private: inline void evaluateBranchStoppedUp();
+private: inline void evaluateBranchStoppedDown();
+
 private: cu16					_extendedAddress;
 private: const std::vector<u16>	_inputsUp;
 private: const std::vector<u16>	_inputsDown;
@@ -32,9 +41,81 @@ inline TriStateOutput::TriStateOutput(cu16 hwAddress, cu16 timeoutON, cu16 timeo
 				Output(hwAddress, timeoutON, timeoutOFF, inputsUpDown, data),
 				_extendedAddress(extendedAddress),
 				_inputsUp(inputsUp),
-				_inputsDown(inputsDown) {}
+				_inputsDown(inputsDown) {
+	_state = PassiveUp;
+}
 
 inline void TriStateOutput::evaluate() {
+	switch (_state) {
+	case ActiveUp: {
+		evaluateBranchActiveUp();
+		return;
+	}
+	case ActiveDown: {
+		evaluateBranchActiveDown();
+		return;
+	}
+	case PassiveUp: {
+		evaluateBranchPassiveUp();
+		return;
+	}
+	case PassiveDown: {
+		evaluateBranchPassiveDown();
+		return;
+	}
+	case TimeoutUp: {
+		evaluateBranchTimeoutUp();
+		return;
+	}
+	case TimeoutDown: {
+		evaluateBranchTimeoutDown();
+		return;
+	}
+	case StoppedUp: {
+		evaluateBranchStoppedUp();
+		return;
+	}
+	case StoppedDown: {
+		evaluateBranchStoppedDown();
+		return;
+	}
+	default: {
+		UARTprintf("Unsupported switch case in TriStateOutput::evaluate()\n");
+		break;
+	}
+	}
+}
+
+inline void TriStateOutput::evaluateBranchActiveUp() {
+
+}
+
+inline void TriStateOutput::evaluateBranchActiveDown() {
+
+}
+
+inline void TriStateOutput::evaluateBranchPassiveUp() {
+
+}
+
+inline void TriStateOutput::evaluateBranchPassiveDown() {
+
+}
+
+inline void TriStateOutput::evaluateBranchTimeoutUp() {
+
+}
+
+inline void TriStateOutput::evaluateBranchTimeoutDown() {
+
+}
+
+inline void TriStateOutput::evaluateBranchStoppedUp() {
+
+}
+
+inline void TriStateOutput::evaluateBranchStoppedDown() {
+
 }
 
 } // output
