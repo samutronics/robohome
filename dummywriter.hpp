@@ -44,22 +44,22 @@ inline void makeSysCfg(std::vector<u8>& project) {
 
 //make input properties
 static cu8 input[] = {
-		manager::project::triggerRisingEdge,
-		manager::project::triggerBothEdges,
-		manager::project::triggerBothEdges,
-		manager::project::triggerBothEdges,
-		manager::project::triggerBothEdges,
-		manager::project::triggerBothEdges,
-		manager::project::triggerBothEdges,
-		manager::project::triggerBothEdges,
-		manager::project::triggerRisingEdge,
-		manager::project::triggerRisingEdge,
-		manager::project::triggerRisingEdge,
-		manager::project::triggerRisingEdge,
-		manager::project::triggerRisingEdge,
-		manager::project::triggerRisingEdge,
-		manager::project::triggerRisingEdge,
-		manager::project::triggerRisingEdge
+		manager::project::BothEdges,
+		manager::project::BothEdges,
+		manager::project::BothEdges,
+		manager::project::BothEdges,
+		manager::project::RisingEdge,
+		manager::project::RisingEdge,
+		manager::project::RisingEdge,
+		manager::project::RisingEdge,
+		manager::project::DeferredBothEdges,
+		manager::project::DeferredBothEdges,
+		manager::project::DeferredBothEdges,
+		manager::project::DeferredBothEdges,
+		manager::project::DeferredRisingEdge,
+		manager::project::DeferredRisingEdge,
+		manager::project::DeferredRisingEdge,
+		manager::project::DeferredRisingEdge
 };
 
 inline void makeInputCfg(std::vector<u8>& project) {
@@ -73,14 +73,22 @@ inline void makeInputCfg(std::vector<u8>& project) {
 
 //make simple output properties
 static cu16 simpleO[] = {
-		// address, time-out, input-count, input list
-		0,	0,		1,		0,
-		1,	200,	2,		1, 2,
-		2,	0,		2,		4, 6,
-		3,	0,		1,		7
+		//address        timeOn        TimeOff        inputCount        inputList
+		0,                0,          0,     	       	1,                0,
+		1,                0,          0,        	    1,                4,
+		2,                0,          100,      		1,                1,
+		3,                0,          100,        		1,                5,
+		4,                100,        0,            	1,                8,
+		5,                100,        0,            	1,                12,
+		6,                100,        100,        		1,                9,
+		7,                100,        100,        		1,                13,
+		8,                100,        0,            	2,                2, 10,
+		9,                100,        0,            	2,                6, 11,
+		10,               100,        100,        		2,                3, 14,
+		11,               100,        100,        		2,                7, 15
 };
 
-static cu16 simpleOutputCount = 4;
+static cu16 simpleOutputCount = 12;
 
 inline void makeSimpleOutputCfg(std::vector<u8>& project) {
 	project.push_back(static_cast<u8>(simpleOutputCount & 0XFF));
@@ -99,7 +107,7 @@ static cu16 triStateO[] = {
 		8,	0,		0,				9,		2,		10, 11,	2,		12, 13
 };
 
-static cu16 triStateOutputCount = 3;
+static cu16 triStateOutputCount = 0; // set to 0, so there won't be deployed tri-stat outputs
 
 inline void makeTriStateOutputCfg(std::vector<u8>& project) {
 	project.push_back(static_cast<u8>(triStateOutputCount & 0XFF));

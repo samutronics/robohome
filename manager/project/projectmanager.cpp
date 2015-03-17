@@ -117,7 +117,7 @@ void ProjectManager::parse() const {
 	UARTprintf("Total number of simple outputs: %d\n", out.count());
 	for(u32 index = 0; index < out.count(); index++) {
 		UARTprintf("\tAddress of output: %d\n", out.address());
-		UARTprintf("\tON/OFF time of output: %d / %d\n", out.timeoutON(), out.timeoutOFF());
+		UARTprintf("\tON/OFF time of output: %d/%d\n", out.timeoutON(), out.timeoutOFF());
 		vector<u16> inputs;
 		out.inputs(inputs);
 		UARTprintf("\tAccessed from inputs: ");
@@ -134,7 +134,7 @@ void ProjectManager::parse() const {
 	for(u32 index = 0; index < tristate.count(); index++) {
 		UARTprintf("\tAddress of ti-state output: %d\n", tristate.address());
 		UARTprintf("\tExtended address of ti-state output: %d\n", tristate.extendedAddress());
-		UARTprintf("\tON/OFF time of output: %d / %d\n", out.timeoutON(), out.timeoutOFF());
+		UARTprintf("\tON/OFF time of output: %d/%d\n", out.timeoutON(), out.timeoutOFF());
 		vector<u16> inputs;
 		tristate.inputs(inputs);
 		UARTprintf("\tAccessed from UPDown inputs: ");
