@@ -38,7 +38,20 @@ inline cu16 metaOutput::address() const {
 }
 
 inline cu16 metaOutput::timeoutOFF() const {
-	// The address of timeout property in the EEPROM is composed of:
+	// The address of timeout ON property in the EEPROM is composed of:
+	cu32 address =
+			// the _itemAddress
+			_itemAddress +
+			// the size of the address property
+			sizeof(u16) +
+			// the size of the timeout ON
+			sizeof(u16);
+
+	return read<u16>(address);
+}
+
+inline cu16 metaOutput::timeoutON() const {
+	// The address of timeout ON property in the EEPROM is composed of:
 	cu32 address =
 			// the _itemAddress
 			_itemAddress +
@@ -48,10 +61,6 @@ inline cu16 metaOutput::timeoutOFF() const {
 	return read<u16>(address);
 }
 
-inline cu16 metaOutput::timeoutON() const {
-	return 0;
-}
-
 inline void metaOutput::inputs(std::vector<u16>& input) const {
 	// The start address of inputs in the EEPROM is composed of:
 	cu32 address =
@@ -59,7 +68,9 @@ inline void metaOutput::inputs(std::vector<u16>& input) const {
 			_itemAddress +
 			// the size of the address property
 			sizeof(u16) +
-			// the size of the time-out property
+			// the size of the timeout ON property
+			sizeof(u16) +
+			// the size of the timeout OFF property
 			sizeof(u16) +
 			// the size of the input count property
 			sizeof(u16);
@@ -74,7 +85,9 @@ inline cu16 metaOutput::inputCount() const {
 			_itemAddress +
 			// the size of the address property
 			sizeof(u16) +
-			// the size of the time-out property
+			// the size of the timeout ON property
+			sizeof(u16) +
+			// the size of the timeout OFF property
 			sizeof(u16);
 
 	return read<u16>(address);

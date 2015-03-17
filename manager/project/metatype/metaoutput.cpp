@@ -14,7 +14,9 @@ void metaOutput::next() {
 	_itemAddress +=
 			// the size of the address property
 			sizeof(u16) +
-			// the size of the time-out property
+			// the size of the timeout ON property
+			sizeof(u16) +
+			// the size of the timeout OFF property
 			sizeof(u16) +
 			// the size of the input count property
 			sizeof(u16) +
