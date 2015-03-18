@@ -122,7 +122,7 @@ namespace outbound {
 namespace configuration {
 
 cu32 timer = TIMER1_BASE;
-cu32 pollingFrequency = 5;
+cu32 pollingFrequency = 10;
 cu32 timerPeriphery =
 		(timer == TIMER0_BASE) ?
 				SYSCTL_PERIPH_TIMER0 :

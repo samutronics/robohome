@@ -37,7 +37,7 @@ void output::task(void *pvParameters) {
 
 		manager::input::InputManager::getInstance()->reset();
 
-//		IOWrite();
+		IOWrite();
 
 		// The task gives up its remained time-slice
 		taskYIELD();

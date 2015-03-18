@@ -34,8 +34,7 @@ protected: enum OutputState {
 public: inline Output(const u16 hwAddress, const u16 timeoutON, const u16 timeoutOFF, const std::vector<u16>& inputs, std::vector<u32>& data);
 public: inline virtual void evaluate();
 
-protected: inline void writeBit(cu16 address);
-
+private: inline void write();
 private: inline void evaluateBranchActive();
 private: inline void evaluateBranchPassive();
 private: inline void evaluateBranchTimeOutOn();
@@ -63,8 +62,8 @@ inline Output::Output(const u16 hwAddress, const u16 timeoutON, const u16 timeou
 		_timeoutOFF(timeoutOFF),
 		_inputs(inputs) {}
 
-inline void Output::writeBit(cu16 address) {
-	_data[address / sizeof(_data[0])] ^= (1 << (address % (sizeof(_data[0]) * 8)));
+inline void Output::write() {
+	_data[_hwAddress / sizeof(_data[0])] ^= (1 << (_hwAddress % (sizeof(_data[0]) * 8)));
 }
 
 inline void Output::evaluate() {
@@ -101,7 +100,7 @@ inline void Output::evaluateBranchActive() {
 				_state = TimeOutOff;
 			}
 			else {
-				writeBit(_hwAddress);
+				write();
 				_state = Passive;
 			}
 
@@ -123,7 +122,7 @@ inline void Output::evaluateBranchPassive() {
 			return;
 		}
 		case input::ChangeEvent: {
-			writeBit(_hwAddress);
+			write();
 			_state = Active;
 			return;
 		}
@@ -164,7 +163,7 @@ inline void Output::evaluateBranchTimeOutOn() {
 		if(breakable) {break;}
 	}
 
-	if(Active == _state) {writeBit(_hwAddress);}
+	if(Active == _state) {write();}
 }
 
 inline void Output::evaluateBranchTimeOutOff() {
@@ -179,7 +178,7 @@ inline void Output::evaluateBranchTimeOutOff() {
 		}
 	}
 
-	if(_state == Passive) {writeBit(_hwAddress);}
+	if(_state == Passive) {write();}
 }
 
 } // output
