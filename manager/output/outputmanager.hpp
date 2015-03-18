@@ -58,7 +58,7 @@ inline OutputManager* OutputManager::getInstance() {
 inline OutputManager::OutputManager():
 				_output(project::ProjectManager::getInstance()->output().count() + project::ProjectManager::getInstance()->triStateOutput().count()),
 				_data(_output.size() / (sizeof(_data[0] * 8)) + ((_output.size() % (sizeof(_data[0]) * 8)) ? 1 : 0), 0) {
-	std::vector<u16> simpleTmp(100);
+	std::vector<u16> simpleTmp;
 	project::metaOutput simpleoutput = project::ProjectManager::getInstance()->output();
 	for(u32 index = 0; index < simpleoutput.count(); index++) {
 		simpleoutput.inputs(simpleTmp);
@@ -67,8 +67,8 @@ inline OutputManager::OutputManager():
 		simpleoutput.next();
 	}
 
-	std::vector<u16> tristateTmpUp(100);
-	std::vector<u16> tristateTmpDown(100);
+	std::vector<u16> tristateTmpUp;
+	std::vector<u16> tristateTmpDown;
 	project::metaTriStateOutput tristateutput = project::ProjectManager::getInstance()->triStateOutput();
 	for(u32 index = 0; index < tristateutput.count(); index++) {
 		tristateutput.inputs(simpleTmp);
