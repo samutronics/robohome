@@ -27,7 +27,7 @@ input::input():
 
 void input::task(void *pvParameters) {
 	while(true) {
-		// The thread gives up its time-slice, if there is no semaphire given.
+		// The thread gives up its time-slice, if there is no semaphore given.
 		xSemaphoreTake(_ISRQueue, portMAX_DELAY);
 
 		IORead();

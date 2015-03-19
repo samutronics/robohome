@@ -44,27 +44,27 @@ inline Input::Input(const project::InputType type, cu16 hwAddress, const std::ve
 		_dataPrevious(dataPrevious) {}
 
 inline StateChange Input::changed() const {
-	if(!(_dataChanged[_hwAddress / sizeof(_dataChanged[0])] & (1 << (_hwAddress % sizeof(_dataChanged[0]))))) { return NoChangeEvent;}
+	cu32 bitCount = (sizeof(_dataChanged[0]) * 8);
 
-	if((_type == project::BothEdges) &&
-			((_dataCurrent[_hwAddress / sizeof(_dataCurrent[0])] & (1 << (_hwAddress % sizeof(_dataCurrent[0])))) &&
-					(!(_dataPrevious[_hwAddress / sizeof(_dataPrevious[0])] & (1 << (_hwAddress % sizeof(_dataPrevious[0]))))))) {
-		return ChangeEvent;
+	if(!(_dataChanged[_hwAddress / bitCount] & (1 << (_hwAddress % bitCount)))) { return NoChangeEvent;}
+
+	switch(_type) {
+	case project::BothEdges: {
+		return ((_dataCurrent[_hwAddress / bitCount] & (1 << (_hwAddress % bitCount))) ^
+				(_dataPrevious[_hwAddress / bitCount] & (1 << (_hwAddress % bitCount)))) ? ChangeEvent : NoChangeEvent;
 	}
-	else if((_type == project::RisingEdge) &&
-			((_dataCurrent[_hwAddress / sizeof(_dataCurrent[0])] & (1 << (_hwAddress % sizeof(_dataCurrent[0])))) &&
-					!(_dataPrevious[_hwAddress / sizeof(_dataPrevious[0])] & (1 << (_hwAddress % sizeof(_dataPrevious[0])))))) {
-		return ChangeEvent;
+	case project::RisingEdge: {
+		return ((_dataCurrent[_hwAddress / bitCount] & (1 << (_hwAddress % bitCount))) &&
+				!(_dataPrevious[_hwAddress / bitCount] & (1 << (_hwAddress % bitCount)))) ? ChangeEvent : NoChangeEvent;
 	}
-	else if((_type == project::DeferredBothEdges) &&
-			((_dataCurrent[_hwAddress / sizeof(_dataCurrent[0])] & (1 << (_hwAddress % sizeof(_dataCurrent[0])))) &&
-					(!(_dataPrevious[_hwAddress / sizeof(_dataPrevious[0])] & (1 << (_hwAddress % sizeof(_dataPrevious[0]))))))) {
-		return DeferredChangeEvent;
+	case project::DeferredBothEdges: {
+		return ((_dataCurrent[_hwAddress / bitCount] & (1 << (_hwAddress % bitCount))) ^
+				(_dataPrevious[_hwAddress / bitCount] & (1 << (_hwAddress % bitCount)))) ? DeferredChangeEvent : NoChangeEvent;
 	}
-	else if((_type == project::DeferredRisingEdge) &&
-			((_dataCurrent[_hwAddress / sizeof(_dataCurrent[0])] & (1 << (_hwAddress % sizeof(_dataCurrent[0])))) &&
-					!(_dataPrevious[_hwAddress / sizeof(_dataPrevious[0])] & (1 << (_hwAddress % sizeof(_dataPrevious[0])))))) {
-		return DeferredChangeEvent;
+	case project::DeferredRisingEdge: {
+		return ((_dataCurrent[_hwAddress / bitCount] & (1 << (_hwAddress % bitCount))) &&
+				!(_dataPrevious[_hwAddress / bitCount] & (1 << (_hwAddress % bitCount)))) ? DeferredChangeEvent : NoChangeEvent;
+	}
 	}
 
 	return NoChangeEvent;
