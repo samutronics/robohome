@@ -43,7 +43,13 @@ int main(void) {
 	GPIOPinConfigure(GPIO_PA1_U0TX);
 	GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
 
-	UARTStdioConfig(0, 115200, systemGlobal::currentSystemClockFrequency);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
+    GPIOPinConfigure(GPIO_PD4_U2RX);
+    GPIOPinConfigure(GPIO_PD5_U2TX);
+    GPIOPinTypeUART(GPIO_PORTD_BASE, GPIO_PIN_4 | GPIO_PIN_5);
+
+//	UARTStdioConfig(0, 115200, systemGlobal::currentSystemClockFrequency);
+	UARTStdioConfig(2, 115200, systemGlobal::currentSystemClockFrequency);
     UARTprintf("\033[2J\033[H");
 	UARTprintf("Application starts\n");
 	UARTprintf("Project found\n");
