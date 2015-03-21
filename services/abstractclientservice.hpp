@@ -9,6 +9,7 @@
 #define _ASBTRACTCLIENTSERVICE_H_
 
 #include "iservice.hpp"
+#include "projectmanager.hpp"
 #include "../projectconfiguration.hpp"
 
 class netbuf;
@@ -73,7 +74,12 @@ inline abstractclientservice::abstractclientservice(cs8* url, u16 port, netconn_
 		_port(port),
 		_updatePeriode(updatePeriode),
 		_connectionType(type) {
-	while(systemGlobal::IPGatheringStrategie == IPADDR_USE_DHCP && 0x0 == lwIPLocalIPAddrGet() || 0xFFFFFFFF == lwIPLocalIPAddrGet()) {taskYIELD();}
+    u32 IP = 0;
+    u32 NetMask = 0;
+    u32 GateWay = 0;
+
+    manager::project::ProjectManager::getInstance()->sysConfig().network(static_cast<u32&>(IP), static_cast<u32&>(NetMask), static_cast<u32&>(GateWay));
+    while((0 == IP) & (0xFFFFFFFF == lwIPLocalIPAddrGet()) || (0x0 == lwIPLocalIPAddrGet())) {taskYIELD();}
 }
 
 } // service

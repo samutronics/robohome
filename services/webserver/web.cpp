@@ -6,6 +6,7 @@
 //! \note
 // =============================================================================
 #include "web.hpp"
+#include "projectmanager.hpp"
 
 cu8 page[] = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\
 <html xmlns=\"http://www.w3.org/1999/xhtml\">\
@@ -56,6 +57,7 @@ const sp8 httpMethods[] = {
 using namespace std;
 using namespace systemGlobal;
 using namespace service::web;
+using namespace manager::project;
 using namespace service::web::configuration;
 
 web::web() {
@@ -87,12 +89,17 @@ web::web() {
     mac[4] = ((usr1 >>  8) & 0xff);
     mac[5] = ((usr1 >> 16) & 0xff);
 
-	// =============================================================================
-	//! * Initialize the LwIP stack and block the thread until a valid
+    u32 IP = 0;
+    u32 NetMask = 0;
+    u32 GateWay = 0;
+
+    // =============================================================================
+    //! * Initialize the LwIP stack and block the thread until a valid
     //!		IP adress will be there.
-	// =============================================================================
-    lwIPInit(currentSystemClockFrequency, mac, 0, 0, 0, IPGatheringStrategie);
-    while((0xFFFFFFFF == lwIPLocalIPAddrGet()) || (0x0 == lwIPLocalIPAddrGet())) {taskYIELD();}
+    // =============================================================================
+    ProjectManager::getInstance()->sysConfig().network(static_cast<u32&>(IP), static_cast<u32&>(NetMask), static_cast<u32&>(GateWay));
+    lwIPInit(currentSystemClockFrequency, mac, IP, NetMask, GateWay, (0 == IP) ? IPADDR_USE_DHCP : IPADDR_USE_STATIC);
+    while((0 == IP) & (0xFFFFFFFF == lwIPLocalIPAddrGet()) || (0x0 == lwIPLocalIPAddrGet())) {taskYIELD();}
 
 	// =============================================================================
 	//! * Print the gathered IP address to the terminal. Guard is required, to

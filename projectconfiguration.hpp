@@ -112,7 +112,6 @@ namespace systemGlobal {
 
 cu32 requestedSystemClockFrequency = 120000000;
 static u32 currentSystemClockFrequency = 0;
-cu32 IPGatheringStrategie = IPADDR_USE_DHCP;
 
 }  // system
 
