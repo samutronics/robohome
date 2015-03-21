@@ -37,7 +37,8 @@ public: inline virtual void evaluate();
 private: inline void write();
 private: inline void evaluateBranchActive();
 private: inline void evaluateBranchPassive();
-private: template<bool on> inline void evaluateBranchesTimeOut();
+private: inline void evaluateBranchTimeOutOn();
+private: inline void evaluateBranchTimeOutOff();
 
 protected: u16 						_timer;
 protected: OutputState 				_state;
@@ -76,11 +77,11 @@ inline void Output::evaluate() {
 		return;
 	}
 	case TimeOutOn: {
-		evaluateBranchesTimeOut<true>();
+		evaluateBranchTimeOutOn();
 		return;
 	}
 	case TimeOutOff: {
-		evaluateBranchesTimeOut<false>();
+		evaluateBranchTimeOutOff();
 		return;
 	}
 	default: {
@@ -136,11 +137,28 @@ inline void Output::evaluateBranchPassive() {
 	}
 }
 
-template<bool on> inline void Output::evaluateBranchesTimeOut() {
+inline void Output::evaluateBranchTimeOutOn() {
 	const std::vector<input::Input*>& inputs = input::InputManager::getInstance()->inputs();
 	for(u32 index = 0; index < _inputs.size(); index++) {
-		if(input::NoChangeEvent != inputs[_inputs[index]]->changed()) {
-			_state = on ? Passive : Active;
+		switch (inputs[_inputs[index]]->changed()) {
+		case input::NoChangeEvent: {
+			break;
+		}
+		case input::DeferredChangeEvent: {
+			if(0 != _timeoutON) {
+				_timer = _timeoutON;
+				return;
+			}
+
+			break;
+		}
+		case input::ChangeEvent: {
+			write();
+			_state = Active;
+			return;
+		}
+		default:
+			UARTprintf("Unsupported switch case in Output::evaluateBranchPassive()\n");
 			return;
 		}
 	}
@@ -148,7 +166,23 @@ template<bool on> inline void Output::evaluateBranchesTimeOut() {
 	_timer--;
 	if(0 == _timer) {
 		write();
-		_state = on ? Active : Passive;
+		_state = Active;
+	}
+}
+
+inline void Output::evaluateBranchTimeOutOff() {
+	const std::vector<input::Input*>& inputs = input::InputManager::getInstance()->inputs();
+	for(u32 index = 0; index < _inputs.size(); index++) {
+		if(input::NoChangeEvent != inputs[_inputs[index]]->changed()) {
+			_state = Active;
+			return;
+		}
+	}
+
+	_timer--;
+	if(0 == _timer) {
+		write();
+		_state = Passive;
 	}
 }
 
