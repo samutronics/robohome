@@ -59,14 +59,16 @@ void output::IOStart() const {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOH);
 
-    GPIOPinConfigure(GPIO_PB4_SSI1FSS); 		//CS
     GPIOPinConfigure(GPIO_PB5_SSI1CLK); 		//CLK
     GPIOPinConfigure(GPIO_PE4_SSI1XDAT0);		//MOSI
     GPIOPinConfigure(GPIO_PE5_SSI1XDAT1);		//MISO
 
-    GPIOPinTypeSSI(GPIO_PORTB_BASE, GPIO_PIN_4 | GPIO_PIN_5);
+    GPIOPinTypeSSI(GPIO_PORTB_BASE, GPIO_PIN_5);
     GPIOPinTypeSSI(GPIO_PORTE_BASE, GPIO_PIN_4 | GPIO_PIN_5);
 
+    // controlling the CS pin has to be done manually instead of the SSI peripheria
+    // because there are more than 8 output can be present
+    GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE, GPIO_PIN_4);
     GPIOPinTypeGPIOOutput(GPIO_PORTH_BASE, GPIO_PIN_2);
     LoadOFF();
     GPIOPadConfigSet(GPIO_PORTH_BASE, GPIO_PIN_2 ,GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD);
