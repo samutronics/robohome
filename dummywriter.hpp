@@ -62,33 +62,56 @@ static cu8 input[] = {
 		manager::project::DeferredRisingEdge
 };
 
+static const u8* inputname[] = {
+		"BothEdges       ",
+		"BothEdges       ",
+		"BothEdges       ",
+		"BothEdges       ",
+		"RisingEdge      ",
+		"RisingEdge      ",
+		"RisingEdge      ",
+		"RisingEdge      ",
+		"DeferredBothEdge",
+		"DeferredBothEdge",
+		"DeferredBothEdge",
+		"DeferredBothEdge",
+		"DeferredRisingEd",
+		"DeferredRisingEd",
+		"DeferredRisingEd",
+		"DeferredRisingEd"
+};
+
 inline void makeInputCfg(std::vector<u8>& project) {
 	cu16 inputCount = sizeof(input) / sizeof(input[0]);
 	project.push_back(static_cast<u8>(inputCount & 0XFF));
 	project.push_back(static_cast<u8>((inputCount >> 8) & 0XFF));
 	for(u32 index = 0; index < sizeof(input); index++) {
+		for(u32 c = 0; c < 16; c++) {
+			project.push_back(inputname[index][c]);
+		}
+
 		project.push_back(input[index]);
 	}
 }
 
 //make simple output properties
 static cu16 simpleO[] = {
-		//address        timeOn        TimeOff        inputCount        inputList
-		0,                0,          0,     	       	1,                0,
-		1,                0,          0,        	    1,                4,
-		2,                0,          100,      		1,                1,
-		3,                0,          100,        		1,                5,
-		4,                100,        0,            	1,                8,
-		5,                100,        0,            	1,                12,
-		6,                100,        100,        		1,                9,
-		7,                100,        100,        		1,                13,
-		8,                100,        0,            	2,                2, 10,
-		9,                100,        0,            	2,                6, 11,
-		10,               100,        100,        		2,                3, 14,
-		11,               100,        100,        		2,                7, 15
+		//name						address        timeOn        TimeOff        inputCount        inputList
+		0, 0, 0, 0, 0, 0, 0, 0,		0,                0,          0,     	       	1,                0,
+		0, 0, 0, 0, 0, 0, 0, 0,		1,                0,          0,        	    1,                4,
+		0, 0, 0, 0, 0, 0, 0, 0,		2,                0,          100,      		1,                1,
+		0, 0, 0, 0, 0, 0, 0, 0,		3,                0,          100,        		1,                5,
+		0, 0, 0, 0, 0, 0, 0, 0,		4,                100,        0,            	1,                8,
+		0, 0, 0, 0, 0, 0, 0, 0,		5,                100,        0,            	1,                12,
+		0, 0, 0, 0, 0, 0, 0, 0,		6,                100,        100,        		1,                9,
+		0, 0, 0, 0, 0, 0, 0, 0,		7,                100,        100,        		1,                13,
+		0, 0, 0, 0, 0, 0, 0, 0,		8,                100,        0,            	2,                2, 10,
+		0, 0, 0, 0, 0, 0, 0, 0,		9,                100,        0,            	2,                6, 11,
+		0, 0, 0, 0, 0, 0, 0, 0,		10,               100,        100,        		2,                3, 14,
+		0, 0, 0, 0, 0, 0, 0, 0,		11,               100,        100,        		2,                7, 15
 };
 
-static cu16 simpleOutputCount = 12;
+static cu16 simpleOutputCount = 0;
 
 inline void makeSimpleOutputCfg(std::vector<u8>& project) {
 	project.push_back(static_cast<u8>(simpleOutputCount & 0XFF));
@@ -101,13 +124,13 @@ inline void makeSimpleOutputCfg(std::vector<u8>& project) {
 
 //make tri-state output properties
 static cu16 triStateO[] = {
-		// address, time-out, UpDown-count, UpDown list, extendedaddress, Down-count, Down list, Up-count, Up list,
-		4,	500,	1,		5,		5,		0,				0,
-		6,	0,		0,				7,		1,		8,		1,		9,
-		8,	0,		0,				9,		2,		10, 11,	2,		12, 13
+		// name						address, timeOn, timeOff,	UpDown-count, UpDown list,	extendedaddress, Down-count, Down list, Up-count, Up list,
+		0, 0, 0, 0, 0, 0, 0, 0,		1,			0,		0,			1,				0,			2,				0,						0,
+		0, 0, 0, 0, 0, 0, 0, 0,		3,			0,		100,		1,				1,			4,				2,			7, 15,		2,		6, 14,
+		0, 0, 0, 0, 0, 0, 0, 0,		4,			100,	100,		1,				2,			5,				0,						0
 };
 
-static cu16 triStateOutputCount = 0; // set to 0, so there won't be deployed tri-stat outputs
+static cu16 triStateOutputCount = 3;
 
 inline void makeTriStateOutputCfg(std::vector<u8>& project) {
 	project.push_back(static_cast<u8>(triStateOutputCount & 0XFF));

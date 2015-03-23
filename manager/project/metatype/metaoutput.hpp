@@ -34,7 +34,7 @@ protected: static inline void inputReader(std::vector<u16>& input, cu16 baseAddr
 inline metaOutput::metaOutput(cu16 sectionAddress): abstractMetaIO(sectionAddress) {}
 
 inline cu16 metaOutput::address() const {
-	return read<u16>(_itemAddress);
+	return read<u16>(_itemAddress + _nameSize);
 }
 
 inline cu16 metaOutput::timeoutOFF() const {
@@ -42,6 +42,8 @@ inline cu16 metaOutput::timeoutOFF() const {
 	cu32 address =
 			// the _itemAddress
 			_itemAddress +
+			// size of the IO point
+			_nameSize +
 			// the size of the address property
 			sizeof(u16) +
 			// the size of the timeout ON
@@ -55,6 +57,8 @@ inline cu16 metaOutput::timeoutON() const {
 	cu32 address =
 			// the _itemAddress
 			_itemAddress +
+			// size of the IO point
+			_nameSize +
 			// the size of the address property
 			sizeof(u16);
 
@@ -66,6 +70,8 @@ inline void metaOutput::inputs(std::vector<u16>& input) const {
 	cu32 address =
 			// the _itemAddress
 			_itemAddress +
+			// size of the IO point
+			_nameSize +
 			// the size of the address property
 			sizeof(u16) +
 			// the size of the timeout ON property
@@ -83,6 +89,8 @@ inline cu16 metaOutput::inputCount() const {
 	cu32 address =
 			// the _itemAddress
 			_itemAddress +
+			// size of the IO point
+			_nameSize +
 			// the size of the address property
 			sizeof(u16) +
 			// the size of the timeout ON property

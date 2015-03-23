@@ -37,6 +37,8 @@ inline u16 metaTriStateOutput::extendedAddress() const {
 	cu32 address =
 			// the _itemAddress
 			_itemAddress +
+			// size of the IO point
+			_nameSize +
 			// the size of the address property
 			sizeof(u16) +
 			// the size of the timeout ON property
@@ -56,6 +58,8 @@ inline void metaTriStateOutput::inputsDown(std::vector<u16>& down) const {
 	cu32 address =
 			// the _itemAddress
 			_itemAddress +
+			// size of the IO point
+			_nameSize +
 			// the size of the address property
 			sizeof(u16) +
 			// the size of the timeout ON property
@@ -79,6 +83,8 @@ inline void metaTriStateOutput::inputsUp(std::vector<u16>& up) const {
 	cu32 address =
 			// the _itemAddress
 			_itemAddress +
+			// size of the IO point
+			_nameSize +
 			// the size of the address property
 			sizeof(u16) +
 			// the size of the timeout ON property
@@ -106,6 +112,8 @@ inline u16 metaTriStateOutput::inputDownCount() const {
 	cu32 address =
 			// the _itemAddress
 			_itemAddress +
+			// size of the IO point
+			_nameSize +
 			// the size of the address property
 			sizeof(u16) +
 			// the size of the timeout ON property
@@ -127,6 +135,8 @@ inline u16 metaTriStateOutput::inputUpCount() const {
 	cu32 address =
 			// the _itemAddress
 			_itemAddress +
+			// size of the IO point
+			_nameSize +
 			// the size of the address property
 			sizeof(u16) +
 			// the size of the timeout ON property

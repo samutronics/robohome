@@ -104,8 +104,11 @@ void ProjectManager::parse() const {
 	metaInput in = input();
 	UARTprintf("Total number of inputs: %d\n", in.count());
 	for(u32 index = 0; index < in.count(); index++) {
-		UARTprintf("\tInput %d: %s\n",
+		string str;
+		in.name(str);
+		UARTprintf("\tInput %d: %s, %s\n",
 				index,
+				str.c_str(),
 				in.trigger() == BothEdges ? "BothEdges" :
 						in.trigger() == RisingEdge ? "RisingEdge" :
 								in.trigger() == DeferredBothEdges ? "DeferredBothEdges" :
@@ -116,7 +119,9 @@ void ProjectManager::parse() const {
 	metaOutput out = output();
 	UARTprintf("Total number of simple outputs: %d\n", out.count());
 	for(u32 index = 0; index < out.count(); index++) {
-		UARTprintf("\tAddress of output: %d\n", out.address());
+		string str;
+		out.name(str);
+		UARTprintf("\tAddress of %s: %d\n", str.c_str(), out.address());
 		UARTprintf("\tON/OFF time of output: %d/%d\n", out.timeoutON(), out.timeoutOFF());
 		vector<u16> inputs;
 		out.inputs(inputs);
@@ -132,9 +137,11 @@ void ProjectManager::parse() const {
 	metaTriStateOutput tristate = triStateOutput();
 	UARTprintf("Total number of tri-state outputs: %d\n", tristate.count());
 	for(u32 index = 0; index < tristate.count(); index++) {
-		UARTprintf("\tAddress of ti-state output: %d\n", tristate.address());
+		string str;
+		tristate.name(str);
+		UARTprintf("\tAddress of %s: %d\n", str.c_str(), tristate.address());
 		UARTprintf("\tExtended address of ti-state output: %d\n", tristate.extendedAddress());
-		UARTprintf("\tON/OFF time of output: %d/%d\n", out.timeoutON(), out.timeoutOFF());
+		UARTprintf("\tON/OFF time of output: %d/%d\n", tristate.timeoutON(), tristate.timeoutOFF());
 		vector<u16> inputs;
 		tristate.inputs(inputs);
 		UARTprintf("\tAccessed from UPDown inputs: ");

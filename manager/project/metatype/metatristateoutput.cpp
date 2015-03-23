@@ -12,6 +12,8 @@ using namespace manager::project;
 void metaTriStateOutput::next() {
 	// the total item size in the EEPROM composed of:
 	_itemAddress +=
+			// size of the IO point
+			_nameSize +
 			// the size of the address property
 			sizeof(u16) +
 			// the size of the timeout ON property

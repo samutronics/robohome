@@ -35,7 +35,7 @@ public: inline InputType trigger() const;
 inline metaInput::metaInput(cu16 sectionAddress): abstractMetaIO(sectionAddress) {}
 
 inline InputType metaInput::trigger() const {
-	return static_cast<InputType>(read<u8>(_itemAddress));
+	return static_cast<InputType>(read<u8>(_itemAddress + _nameSize));
 }
 
 } // project

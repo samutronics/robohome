@@ -33,6 +33,7 @@ protected: enum OutputState {
 
 public: inline Output(const u16 hwAddress, const u16 timeoutON, const u16 timeoutOFF, const std::vector<u16>& inputs, std::vector<u32>& data);
 public: inline virtual void evaluate();
+public: inline cu16 time() const;
 
 private: inline void write();
 private: inline void evaluateBranchActive();
@@ -61,6 +62,10 @@ inline Output::Output(const u16 hwAddress, const u16 timeoutON, const u16 timeou
 		_timeoutON(timeoutON),
 		_timeoutOFF(timeoutOFF),
 		_inputs(inputs) {}
+
+inline cu16 Output::time() const {
+	return _timer;
+}
 
 inline void Output::write() {
 	_data[_hwAddress / (sizeof(_data[0]) * 8)] ^= (1 << (_hwAddress % (sizeof(_data[0]) * 8)));

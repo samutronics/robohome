@@ -46,18 +46,18 @@ inline TriStateOutput::TriStateOutput(cu16 hwAddress, cu16 timeoutON, cu16 timeo
 }
 
 inline void TriStateOutput::stop() {
-	_data[_hwAddress / sizeof(_data[0])] &= ~(1 << (_hwAddress % (sizeof(_data[0]) * 8)));
-	_data[_extendedAddress / sizeof(_data[0])] &= ~(1 << (_extendedAddress % (sizeof(_data[0]) * 8)));
+	_data[_hwAddress / (sizeof(_data[0]) * 8)] &= ~(1 << (_hwAddress % (sizeof(_data[0]) * 8)));
+	_data[_extendedAddress / (sizeof(_data[0]) * 8)] &= ~(1 << (_extendedAddress % (sizeof(_data[0]) * 8)));
 }
 
 inline void TriStateOutput::moveUp() {
-	_data[_hwAddress / sizeof(_data[0])] &= ~(1 << (_hwAddress % (sizeof(_data[0]) * 8)));
-	_data[_extendedAddress / sizeof(_data[0])] |= (1 << (_extendedAddress % (sizeof(_data[0]) * 8)));
+	_data[_hwAddress / (sizeof(_data[0]) * 8)] &= ~(1 << (_hwAddress % (sizeof(_data[0]) * 8)));
+	_data[_extendedAddress / (sizeof(_data[0]) * 8)] |= (1 << (_extendedAddress % (sizeof(_data[0]) * 8)));
 }
 
 inline void TriStateOutput::moveDown() {
-	_data[_hwAddress / sizeof(_data[0])] |= (1 << (_hwAddress % (sizeof(_data[0]) * 8)));
-	_data[_extendedAddress / sizeof(_data[0])] &= ~(1 << (_extendedAddress % (sizeof(_data[0]) * 8)));
+	_data[_hwAddress / (sizeof(_data[0]) * 8)] |= (1 << (_hwAddress % (sizeof(_data[0]) * 8)));
+	_data[_extendedAddress / (sizeof(_data[0]) * 8)] &= ~(1 << (_extendedAddress % (sizeof(_data[0]) * 8)));
 }
 
 
@@ -132,14 +132,19 @@ template<bool up> inline void TriStateOutput::evaluateBranchesPassive() {
 	for(u32 index = 0; index < (up ? _inputsDown.size() : _inputsUp.size()); index++) {
 		switch (inputs[(up ? _inputsDown : _inputsUp)[index]]->changed()) {
 		case input::ChangeEvent: {
-			_timer = 1;
-			_state = up ? TimeoutDown : TimeoutUp;
+			_state = up ? ActiveDown : ActiveUp;
+			_timer = _timeoutOFF;
+			up ? moveDown() : moveUp();
 			return;
 		}
 		case input::DeferredChangeEvent: {
-			_timer = _timeoutOFF;
-			_state = up ? TimeoutDown : TimeoutUp;
-			return;
+			if(0 != _timeoutON) {
+				_timer = _timeoutON;
+				_state = up ? TimeoutDown : TimeoutUp;
+				return;
+			}
+
+			break;
 		}
 		default:
 			break;
@@ -149,14 +154,19 @@ template<bool up> inline void TriStateOutput::evaluateBranchesPassive() {
 	for(u32 index = 0; index < _inputs.size(); index++) {
 		switch (inputs[_inputs[index]]->changed()) {
 		case input::ChangeEvent: {
-			_timer = 1;
-			_state = up ? TimeoutDown : TimeoutUp;
+			_state = up ? ActiveDown : ActiveUp;
+			up ? moveDown() : moveUp();
+			_timer = _timeoutOFF;
 			return;
 		}
 		case input::DeferredChangeEvent: {
-			_timer = _timeoutOFF;
-			_state = up ? TimeoutDown : TimeoutUp;
-			return;
+			if(0 != _timeoutON) {
+				_timer = _timeoutON;
+				_state = up ? TimeoutDown : TimeoutUp;
+				return;
+			}
+
+			break;
 		}
 		default:
 			break;
@@ -165,13 +175,6 @@ template<bool up> inline void TriStateOutput::evaluateBranchesPassive() {
 }
 
 template<bool up> inline void TriStateOutput::evaluateBranchesTimeout() {
-	_timer--;
-	if(0 == _timer) {
-		_state = up ? ActiveUp : ActiveDown;
-		_timer = _timeoutOFF;
-		up ? moveUp() : moveDown();
-	}
-
 	const std::vector<input::Input*>& inputs = input::InputManager::getInstance()->inputs();
 	for(u32 index = 0; index < (up ? _inputsDown.size() : _inputsUp.size()); index++) {
 		if(input::NoChangeEvent != inputs[(up ? _inputsDown : _inputsUp)[index]]->changed()) {
@@ -206,6 +209,13 @@ template<bool up> inline void TriStateOutput::evaluateBranchesTimeout() {
 			break;
 		}
 	}
+
+	_timer--;
+	if(0 == _timer) {
+		_state = up ? ActiveUp : ActiveDown;
+		_timer = _timeoutOFF;
+		up ? moveUp() : moveDown();
+	}
 }
 
 template<bool up> inline void TriStateOutput::evaluateBranchesStopped() {
@@ -221,14 +231,18 @@ template<bool up> inline void TriStateOutput::evaluateBranchesStopped() {
 	for(u32 index = 0; index < _inputs.size(); index++) {
 		switch (inputs[_inputs[index]]->changed()) {
 		case input::ChangeEvent: {
-			_timer = 1;
-			_state = up ? TimeoutDown : TimeoutUp;
+			_state = up ? ActiveDown : ActiveUp;
+			up ? moveDown() : moveUp();
 			return;
 		}
 		case input::DeferredChangeEvent: {
-			_timer = _timeoutON;
-			_state = up ? TimeoutDown : TimeoutUp;
-			return;
+			if(0 != _timeoutON) {
+				_timer = _timeoutON;
+				_state = up ? TimeoutDown : TimeoutUp;
+				return;
+			}
+
+			break;
 		}
 		default:
 			break;
@@ -238,14 +252,18 @@ template<bool up> inline void TriStateOutput::evaluateBranchesStopped() {
 	for(u32 index = 0; index < (up ? _inputsDown.size() : _inputsUp.size()); index++) {
 		switch (inputs[(up ? _inputsDown : _inputsUp)[index]]->changed()) {
 		case input::ChangeEvent: {
-			_timer = 1;
-			_state = up ? TimeoutDown : TimeoutUp;
+			_state = up ? ActiveDown : ActiveUp;
+			up ? moveDown() : moveUp();
 			return;
 		}
 		case input::DeferredChangeEvent: {
-			_timer = _timeoutON;
-			_state = up ? TimeoutDown : TimeoutUp;
-			return;
+			if(0 != _timeoutON) {
+				_timer = _timeoutON;
+				_state = up ? TimeoutDown : TimeoutUp;
+				return;
+			}
+
+			break;
 		}
 		default:
 			break;

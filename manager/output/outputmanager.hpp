@@ -19,7 +19,7 @@ namespace output {
 class OutputManager {
 public: static inline OutputManager* getInstance();
 
-public: inline const std::vector<Output*>& outputs() const;
+public: inline const std::map<u32, Output*>& outputs() const;
 
 public: inline bool read(cu16 address) const;
 public: inline const std::vector<u32>& read() const;
@@ -27,8 +27,8 @@ public: inline const std::vector<u32>& read() const;
 public: virtual ~OutputManager();
 private: inline OutputManager();
 
-private: std::vector<Output*>			_output;
-private: std::vector<u32>				_data;
+private: std::map<u32, Output*>	_output;
+private: std::vector<u32>		_data;
 
 private: static OutputManager* _instance;
 };
@@ -55,14 +55,14 @@ inline OutputManager* OutputManager::getInstance() {
 	return _instance;
 }
 
-inline OutputManager::OutputManager():
-				_output(project::ProjectManager::getInstance()->output().count() + project::ProjectManager::getInstance()->triStateOutput().count()),
-				_data(_output.size() / (sizeof(_data[0] * 8)) + ((_output.size() % (sizeof(_data[0]) * 8)) ? 1 : 0), 0) {
+inline OutputManager::OutputManager(): _data(project::ProjectManager::getInstance()->output().count() + project::ProjectManager::getInstance()->triStateOutput().count()
+		/ (sizeof(_data[0] * 8)) + ((project::ProjectManager::getInstance()->output().count() + project::ProjectManager::getInstance()->triStateOutput().count() % (sizeof(_data[0]) * 8)) ? 1 : 0), 0) {
+
 	std::vector<u16> simpleTmp;
 	project::metaOutput simpleoutput = project::ProjectManager::getInstance()->output();
 	for(u32 index = 0; index < simpleoutput.count(); index++) {
 		simpleoutput.inputs(simpleTmp);
-		_output[index] = new Output(simpleoutput.address(), simpleoutput.timeoutON(), simpleoutput.timeoutOFF(), simpleTmp, _data);
+		_output[simpleoutput.address()] = new Output(simpleoutput.address(), simpleoutput.timeoutON(), simpleoutput.timeoutOFF(), simpleTmp, _data);
 		simpleTmp.clear();
 		simpleoutput.next();
 	}
@@ -74,7 +74,16 @@ inline OutputManager::OutputManager():
 		tristateutput.inputs(simpleTmp);
 		tristateutput.inputsUp(tristateTmpUp);
 		tristateutput.inputsDown(tristateTmpDown);
-		_output[index + simpleoutput.count()] = new TriStateOutput(tristateutput.address(), tristateutput.timeoutON(), tristateutput.timeoutOFF(), simpleTmp, _data, tristateutput.extendedAddress(), tristateTmpUp, tristateTmpDown);
+		_output[tristateutput.address()] = new TriStateOutput(
+				tristateutput.address(),
+				tristateutput.timeoutON(),
+				tristateutput.timeoutOFF(),
+				simpleTmp,
+				_data,
+				tristateutput.extendedAddress(),
+				tristateTmpUp,
+				tristateTmpDown);
+
 		simpleTmp.clear();
 		tristateTmpUp.clear();
 		tristateTmpDown.clear();
@@ -82,7 +91,7 @@ inline OutputManager::OutputManager():
 	}
 }
 
-inline const std::vector<Output*>& OutputManager::outputs() const {
+inline const std::map<u32, Output*>& OutputManager::outputs() const {
 	return _output;
 }
 

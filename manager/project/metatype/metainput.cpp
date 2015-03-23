@@ -10,7 +10,7 @@
 using namespace manager::project;
 
 void metaInput::next() {
-	_itemAddress += sizeof(u8);
+	_itemAddress += sizeof(u8) + _nameSize;
 }
 
 // =============================================================================

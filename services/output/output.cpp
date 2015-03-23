@@ -30,9 +30,9 @@ void output::task(void *pvParameters) {
 		// The thread gives up its time-slice, if there is no semaphire given.
 		xSemaphoreTake(_THQueue, portMAX_DELAY);
 
-		const std::vector<Output*>& out = _outputManager->outputs();
-		for(u32 index = 0; index < out.size(); index++) {
-			out[index]->evaluate();
+		const std::map<u32, Output*>& out = _outputManager->outputs();
+		for(std::map<u32, Output*>::const_iterator it = out.begin(); it != out.end(); ++it) {
+			it->second->evaluate();
 		}
 
 		manager::input::InputManager::getInstance()->reset();
