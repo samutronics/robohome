@@ -28,7 +28,7 @@ private: enum httpMethod {
 		DECLARE_LAST_ENUM(httpMethod)
 	};
 
-	TO_BE_RUNABLE(web)
+TO_BE_RUNABLE(web)
 // =============================================================================
 //! \brief Initialize the hardware and necessary objects
 //!
@@ -39,8 +39,10 @@ private: web();
 
 private: httpMethod getHTTPMethodType(const std::string& request) const;
 private: bool parseURI(const std::string& request) const;
-private: bool parseResource(const std::string& request, cu32 startOfURI, cu32 startOfArguments) const;
-private: bool parseDefaultResource(const std::string& request, cu32 startOfURI) const;
+private: bool parseArgs(const std::string& request, cu32 startOfArguments) const;
+private: bool parseResource(const std::string& request, cu32 startOfURI) const;
+
+private: inline FRESULT readResource(cs8* path, u8*& buffer, u32& size) const;
 
 // =============================================================================
 //! \brief Empty implementation of the task.
@@ -52,8 +54,29 @@ private: virtual void task(void *pvParameters);
 private: netconn* _connectionFromClient;
 };
 
-} // web
+// =============================================================================
+// Inline method implementation
+// =============================================================================
 
+inline FRESULT web::readResource(cs8* path, u8*& buffer, u32& size) const {
+	static FIL file;
+	FRESULT error = f_open(&file, path, FA_READ);
+	if(FR_OK != error) {return error;}
+
+	buffer = new u8[f_size(&file)];
+	if(!buffer) {return FR_INT_ERR;}
+
+	size = 0;
+	error = f_read(&file, buffer, f_size(&file), &size);
+	if(FR_OK != error) {return error;}
+
+	error = f_close(&file);
+	if(FR_OK != error) {return error;}
+
+	return error;
+}
+
+} // web
 } // service
 
 #endif // _WEB_HPP_

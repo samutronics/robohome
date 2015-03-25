@@ -155,6 +155,7 @@ namespace web {
 namespace configuration {
 
 cs8 defaultPage[] = "/index.htm";
+cs8 argsPattern[] = "/cgi-bin/";
 cu16 port = 80;
 
 }  // configuration

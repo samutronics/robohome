@@ -5,47 +5,9 @@
 //! \date			03.12.2014.
 //! \note
 // =============================================================================
+#include "ff.h"
 #include "web.hpp"
 #include "projectmanager.hpp"
-
-cu8 page[] = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\
-<html xmlns=\"http://www.w3.org/1999/xhtml\">\
-<head>\
-    <title></title>\
-    <script language=\"javascript\" type=\"text/javascript\">\
-        var timer = setInterval(function () { updateState() }, 5000);\
-        function updateState() {\
-            var req = createXmlHttpRequestObject();\
-            function updateStateReply() {\
-\
-            }\
-\
-            if (req) {\
-                req.open(\"GET\", \"192.168.1.122/processing?\", true);\
-                req.onreadystatechange = updateStateReply;\
-                req.send(null);\
-            }\
-        }\
-        function LED1_onclick() {\
-            var req = new XmlHttpRequest();\
-            req.open(\"GET\", \"request.htm\", false);\
-            req.send();\
-        }\
-\
-    </script>\
-</head>\
-<body>\
-    <p style=\"font-weight: 700; text-decoration: underline; text-align: center; font-size: xx-large\">\
-        Samutronics home automation testportal</p>\
-    <p style=\"font-weight: 700; text-decoration: underline; text-align: center; font-size: xx-large\">\
-        <input id=\"LED0\" name=\"R1\" type=\"radio\" value=\"LED0\" /></p>\
-    <p style=\"font-weight: 700; text-decoration: underline; text-align: center; font-size: xx-large\">\
-        <input id=\"LED1\" name=\"R2\" type=\"radio\" value=\"LED1\" onclick=\"return LED1_onclick()\" /></p>\
-    <p style=\"font-weight: 700; text-decoration: underline; text-align: center; font-size: xx-large\">\
-        <textarea id=\"RTC\" cols=\"20\" name=\"S1\" rows=\"2\" title=\"RTC of Samutronics\"></textarea></p>\
-</body>\
-</html>\
-";
 
 const sp8 httpMethods[] = {
 		"GET ",
@@ -99,7 +61,7 @@ web::web() {
     // =============================================================================
     ProjectManager::getInstance()->sysConfig().network(static_cast<u32&>(IP), static_cast<u32&>(NetMask), static_cast<u32&>(GateWay));
     lwIPInit(currentSystemClockFrequency, mac, IP, NetMask, GateWay, (0 == IP) ? IPADDR_USE_DHCP : IPADDR_USE_STATIC);
-    while((0xFFFFFFFF == lwIPLocalIPAddrGet()) || (0x0 == lwIPLocalIPAddrGet())) {taskYIELD();}
+    while((0 == IP) && ((0xFFFFFFFF == lwIPLocalIPAddrGet()) || (0x0 == lwIPLocalIPAddrGet()))) {taskYIELD();}
 
 	// =============================================================================
 	//! * Print the gathered IP address to the terminal. Guard is required, to
@@ -166,35 +128,38 @@ bool web::parseURI(const std::string& request) const {
 	u32 startOfURI = request.find("/");
 	if(string::npos == startOfURI) {return false;}
 
-	if(parseDefaultResource(request, startOfURI)) {return true;}
-
-	u32 startOfArguments = request.find("?");
-	if(parseResource(request, startOfURI, startOfArguments)) {return true;}
-
-	return false;
-}
-
-bool web::parseResource(const std::string& request, cu32 startOfURI, cu32 startOfArguments) const {
-	u32 endOfURI = request.find(" ", startOfURI);
-	string URI(request.substr(startOfURI, string::npos == startOfArguments ? endOfURI : startOfArguments));
-	if (ERR_OK != netconn_write(_connectionFromClient, (void*)page, sizeof(page), NETCONN_NOCOPY)) {
-		UARTprintf("Failed to reply to URI: %s\n", URI.c_str());
-		return true;
+	u32 startOfArguments = request.find(argsPattern);
+	if(string::npos != startOfArguments) {
+		return parseArgs(request, startOfArguments);
 	}
 
+	return parseResource(request, startOfURI);
+}
+
+bool web::parseArgs(const std::string& request, cu32 startOfArguments) const {
+	UARTprintf("%s\n", request.c_str());
+
 	return false;
 }
 
-bool web::parseDefaultResource(const std::string& request, cu32 startOfURI) const {
+bool web::parseResource(const std::string& request, cu32 startOfURI) const {
+	string uri;
 	if('/' == request[startOfURI] && ' ' == request[startOfURI + 1]) {
-		if (ERR_OK != netconn_write(_connectionFromClient, (void*)page, sizeof(page), NETCONN_NOCOPY)) {
-			UARTprintf("Failed to send default page\n");
-		}
-
-		return true;
+		uri = defaultPage;
+	}
+	else {
+		u32 endOfURI = request.find(" ", startOfURI);
+		uri = request.substr(startOfURI, endOfURI - startOfURI);
 	}
 
-	return false;
+	u32 length = 0;
+	u8* resource = NULL;
+	if(FR_OK != readResource(uri.c_str(), resource, length)) {UARTprintf("Failed to get resource\n");}
+
+	if (ERR_OK != netconn_write(_connectionFromClient, resource, length, NETCONN_NOCOPY)) {UARTprintf("Failed to send default page\n");}
+
+	delete resource;
+	return true;
 }
 
 web::httpMethod web::getHTTPMethodType(const std::string& request) const {

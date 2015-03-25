@@ -11,6 +11,7 @@
 // =============================================================================
 // Custom include files
 // =============================================================================
+#include "ff.h"
 #include "web.hpp"
 #include "sntp.hpp"
 #include "weather.hpp"
@@ -52,6 +53,10 @@ int main(void) {
 	UARTStdioConfig(2, 115200, systemGlobal::currentSystemClockFrequency);
     UARTprintf("\033[2J\033[H");
 	UARTprintf("Application starts\n");
+
+	static FATFS fileSystemMountPoint;
+	if(FR_OK != f_mount(0, &fileSystemMountPoint)) {UARTprintf("fs cannot be mounted\n"); while(true);}
+
 	UARTprintf("Project found\n");
 	manager::project::ProjectManager::getInstance()->parse();
 
@@ -65,6 +70,7 @@ int main(void) {
 	vTaskStartScheduler();
 	while(true);
 }
+
 // =============================================================================
 //! \file
 //! \copyright
