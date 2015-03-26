@@ -91,8 +91,8 @@ inline metaTriStateOutput ProjectManager::triStateOutput() const {
 
 inline metaIrrigation ProjectManager::irrigation() const {
 	u32 section;
-	EEPROMRead(&section, 1, 1);
-	return metaIrrigation(0);
+	EEPROMRead(&section, sizeof(u32), sizeof(section));
+	return metaIrrigation(static_cast<u16>((section >> 16) & 0xFFFF));
 }
 
 } // project

@@ -64,7 +64,10 @@ static cu8 input[] = {
 		manager::project::DeferredRisingEdge,
 		manager::project::DeferredRisingEdge,
 		manager::project::DeferredRisingEdge,
-		manager::project::DeferredRisingEdge
+		manager::project::DeferredRisingEdge,
+		manager::project::BothEdges,
+		manager::project::BothEdges,
+		manager::project::BothEdges
 };
 
 static const u8* inputname[] = {
@@ -83,7 +86,10 @@ static const u8* inputname[] = {
 		"DeferredRisingEd",
 		"DeferredRisingEd",
 		"DeferredRisingEd",
-		"DeferredRisingEd"
+		"DeferredRisingEd",
+		"BothEdges       ",
+		"BothEdges       ",
+		"BothEdges       "
 };
 
 inline void makeInputCfg(std::vector<u8>& project) {
@@ -146,6 +152,24 @@ inline void makeTriStateOutputCfg(std::vector<u8>& project) {
 	}
 }
 
+static cu16 irrigation[] = {
+		// name						area, input, up time,	start time, 		mode,				offset time, dailyPrecipitation,	unitPrecipitation
+		0, 0, 0, 0, 0, 0, 0, 0,		10,		16,		100,		1,		manager::project::Normal,		200,			1000,					10,
+		0, 0, 0, 0, 0, 0, 0, 0,		10,		17,		100,		1,		manager::project::Normal,		200,			2000,					10,
+		0, 0, 0, 0, 0, 0, 0, 0,		10,		18,		100,		1,		manager::project::Grown,		200,			1500,					10
+};
+
+static cu16 irrigationCount = 3;
+
+inline void makeIrrigationCfg(std::vector<u8>& project) {
+	project.push_back(static_cast<u8>(irrigationCount & 0XFF));
+	project.push_back(static_cast<u8>((irrigationCount >> 8) & 0XFF));
+	for(u32 index = 0; index < sizeof(irrigation) / sizeof(irrigation[0]); index++) {
+		project.push_back(static_cast<u8>(irrigation[index] & 0XFF));
+		project.push_back(static_cast<u8>((irrigation[index] >> 8) & 0XFF));
+	}
+}
+
 inline void makeCfg(std::vector<u32>& project) {
 	std::vector<u8> data;
 	cu16 sysCfgAddress		= 8; // start directly after the main section table
@@ -163,6 +187,8 @@ inline void makeCfg(std::vector<u32>& project) {
 	makeSimpleOutputCfg(data);
 	makeTriStateOutputCfg(data);
 	cu16 irrigationAddress	= sysCfgAddress + data.size();
+
+	makeIrrigationCfg(data);
 
 	project.push_back((inputAddress << 16) | sysCfgAddress);
 	project.push_back((irrigationAddress << 16) | outputAddress);

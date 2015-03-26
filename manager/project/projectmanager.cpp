@@ -130,7 +130,7 @@ void ProjectManager::parse() const {
 			UARTprintf("%d ", inputs[item]);
 		}
 
-		UARTprintf("\n");
+		UARTprintf("\n\n");
 		out.next();
 	}
 
@@ -167,9 +167,25 @@ void ProjectManager::parse() const {
 			UARTprintf("%d ", inputs[item]);
 		}
 
-		UARTprintf("\n");
-
+		UARTprintf("\n\n");
 		tristate.next();
+	}
+
+	metaIrrigation irr = irrigation();
+	UARTprintf("Total round of irrigations: %d\n", irr.count());
+	for(u32 index = 0; index < irr.count(); index++) {
+		string str;
+		irr.name(str);
+		UARTprintf("\tIrrigated area name: %s\n", str.c_str());
+		UARTprintf("\tIrrigated area size: %d\n", irr.area());
+		UARTprintf("\tMode: %s\n", Normal == irr.mode() ? "Normal" : "Grown");
+		UARTprintf("\tAssigned to input: %d\n", irr.input());
+		UARTprintf("\tDaily start: %d\n", irr.startTime());
+		UARTprintf("\tUptime: %d\n", irr.upTime());
+		UARTprintf("\tOffset between uptimes: %d\n", irr.offsetTime());
+		UARTprintf("\tUnit and total precipitation: %d/%d\n\n", irr.unitPrecipitation(), irr.dailyPrecipitation());
+
+		irr.next();
 	}
 }
 
