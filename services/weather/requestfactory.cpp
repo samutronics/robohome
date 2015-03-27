@@ -15,20 +15,25 @@ cs8 weatherRequestForecast[]	= "GET http://api.openweathermap.org/data/2.5/forec
 cs8 mode[]						= "&mode=json&units=metric";
 cs8 APPIDOpenWeather[]			= "&APIID=afc5370fef1dfec1666a5676346b163b";
 cs8 HTTP11[]					= " HTTP/1.0\r\n\r\n";
-cs8 countOfDays[]				= "&cnt=1";
+cs8 countOfDays[]				= "&cnt=";
 
-const std::string& weatherRequestFactory::request(cs8* location, bool forecast, u32 days) {
+const std::string& weatherRequestFactory::request(cs8* location, cu32 days) {
 	if(!_request.empty()) {return _request;}
 
 	if(!location) {return _request;}
 
-	if(forecast) {_request.append(weatherRequestForecast);}
+	if(0 < days) {_request.append(weatherRequestForecast);}
 	else {_request.append(weatherRequest);}
 
 	_request.append(location);
 	_request.append(mode);
 
-	if(forecast) {_request.append(countOfDays);}
+	if(0 < days) {
+		_request.append(countOfDays);
+		s8 buf[10];
+		sprintf(buf, "%d", days);
+		_request.append(buf);
+	}
 
 	_request.append(APPIDOpenWeather);
 	_request.append(HTTP11);

@@ -18,14 +18,13 @@ namespace weather {
 class weatherRequestFactory {
 public: inline weatherRequestFactory();
 
-public: const std::string& request(cs8* location, bool forecast, u32 days);
+public: const std::string& request(cs8* location, cu32 days);
 public: inline void reset();
 
 private: std::string _request;
 };
 
-weatherRequestFactory::weatherRequestFactory() {
-	_request.reserve(255);
+inline weatherRequestFactory::weatherRequestFactory(): _request(255, 0) {
 }
 
 inline void weatherRequestFactory::reset() {

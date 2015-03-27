@@ -22,6 +22,8 @@ namespace weather {
 class weather: public abstractclientservice {
 	TO_BE_RUNABLE(weather)
 
+public: inline const std::vector<u32>& statistic() const;
+
 protected: virtual bool processingReply(netbuf* reply);
 protected: virtual netbuf* generateRequest();
 
@@ -29,16 +31,29 @@ protected: virtual netbuf* generateRequest();
 //! \brief There is no tasks assigned to the constructor, but it has to be
 //! declared as private.
 // =============================================================================
-private: weather();
+private: inline weather();
 
 // =============================================================================
 // Member declarations
 // =============================================================================
+private: u32				 	_forecast;
+private: std::vector<u32>		_statistic;
 private: weatherRequestFactory	_requestFactory;
 };
 
-} // weather
+// =============================================================================
+// Inline method implementation
+// =============================================================================
+inline weather::weather():
+		abstractclientservice(configuration::url, configuration::port, NETCONN_TCP, configuration::updatePeriode),
+		_forecast(0),
+		_statistic(3, 0) {}
 
+inline const std::vector<u32>& weather::statistic() const {
+	return _statistic;
+}
+
+} // weather
 } // service
 
 #endif // _WEATHER_H_
