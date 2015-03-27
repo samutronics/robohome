@@ -18,9 +18,8 @@ DECLARE_TH(output)
 
 output::output():
 		_dataByteCount(ProjectManager::getInstance()->sysConfig().hwOutputNumber() / 8),
-		_outputManager(OutputManager::getInstance()) {
+		_outputManager(OutputManagerFactory::get()) {
 	_THQueue = xSemaphoreCreateBinary();
-
 	timerStart();
 	IOStart();
 }
@@ -35,7 +34,7 @@ void output::task(void *pvParameters) {
 			it->second->evaluate();
 		}
 
-		manager::input::InputManager::getInstance()->reset();
+		manager::input::InputManagerFactory::get()->reset();
 
 		IOWrite();
 

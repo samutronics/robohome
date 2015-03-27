@@ -11,49 +11,30 @@
 #include "output.hpp"
 #include "tristateoutput.hpp"
 #include "projectmanager.hpp"
+#include "singletonfactory.hpp"
 #include "../projectconfiguration.hpp"
 
 namespace manager {
 namespace output {
 
 class OutputManager {
-public: static inline OutputManager* getInstance();
-
 public: inline const std::map<u32, Output*>& outputs() const;
-
 public: inline bool read(cu16 address) const;
 public: inline const std::vector<u32>& read() const;
 
 public: virtual ~OutputManager();
-private: inline OutputManager();
+
+protected: inline OutputManager();
 
 private: std::map<u32, Output*>	_output;
 private: std::vector<u32>		_data;
-
-private: static OutputManager* _instance;
 };
+
+typedef libs::SingletonFactory<OutputManager>	OutputManagerFactory;
 
 // =============================================================================
 // Inline method implementation
 // =============================================================================
-
-inline OutputManager* OutputManager::getInstance() {
-	if(!_instance) {
-		xSemaphoreHandle sync = NULL;
-		if(!sync) {
-			sync = xSemaphoreCreateMutex();
-		}
-
-		 xSemaphoreTake(sync, 0);
-		if(!_instance) {
-			_instance = new OutputManager();
-		}
-
-		xSemaphoreGive(sync);
-	}
-
-	return _instance;
-}
 
 inline OutputManager::OutputManager(): _data(project::ProjectManager::getInstance()->output().count() + project::ProjectManager::getInstance()->triStateOutput().count()
 		/ (sizeof(_data[0] * 8)) + ((project::ProjectManager::getInstance()->output().count() + project::ProjectManager::getInstance()->triStateOutput().count() % (sizeof(_data[0]) * 8)) ? 1 : 0), 0) {

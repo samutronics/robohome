@@ -10,52 +10,33 @@
 
 #include "input.hpp"
 #include "projectmanager.hpp"
+#include "singletonfactory.hpp"
 #include "../projectconfiguration.hpp"
 
 namespace manager {
 namespace input {
 
 class InputManager {
-public: static inline InputManager* getInstance();
-
 public: virtual ~InputManager();
 public: inline const std::vector<Input*>& inputs() const;
 public: inline void reset();
 public: inline void write(cu16 address, cu8 data);
 public: inline void write(const std::vector<u32>& data);
 
-private: inline InputManager();
+protected: inline InputManager();
 
 private: std::vector<Input*>			_inputs;
 private: std::vector<u32>				_dataChanged;
 private: std::vector<u32>				_dataCurrent;
 private: std::vector<u32>				_dataPrevious;
 private: std::vector<xSemaphoreHandle>	_lock;
-
-private: static InputManager* _instance;
 };
+
+typedef libs::SingletonFactory<InputManager>	InputManagerFactory;
 
 // =============================================================================
 // Inline method implementation
 // =============================================================================
-
-inline InputManager* InputManager::getInstance() {
-	if(!_instance) {
-		xSemaphoreHandle sync = NULL;
-		if(!sync) {
-			sync = xSemaphoreCreateMutex();
-		}
-
-		 xSemaphoreTake(sync, 0);
-		if(!_instance) {
-			_instance = new InputManager();
-		}
-
-		xSemaphoreGive(sync);
-	}
-
-	return _instance;
-}
 
 inline InputManager::InputManager():
 				_inputs(project::ProjectManager::getInstance()->input().count()),

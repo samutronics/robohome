@@ -10,18 +10,16 @@
 
 #include "iservice.hpp"
 #include "inputmanager.hpp"
+#include "singletonfactory.hpp"
 #include "../projectconfiguration.hpp"
 
 namespace service {
 namespace inbound {
 
 class input {
-public: static inline void deploy(void* pvParameters = NULL);
-public: static void ISRHandler();
+protected: input();
 
-private: input();
-
-private: void task(void *pvParameters);
+public: void task(void *pvParameters);
 private: void timerStart() const;
 private: void IOStart() const;
 private: inline void IORead();
@@ -31,31 +29,14 @@ private: inline void LoadOFF() const;
 private: cu32							_dataByteCount;
 private: std::vector<u32>				_data;
 private: manager::input::InputManager*	_iputManager;
-
-private: static input* _instance;
-private: static xSemaphoreHandle _ISRQueue;
+DEFINE_TH
 };
+
+typedef libs::SingletonFactory<input> InputFactory;
 
 // =============================================================================
 // Inline method implementation
 // =============================================================================
-
-inline void input::deploy(void* pvParameters) {
-	if(!_instance) {
-		xSemaphoreHandle sync = NULL;
-		if(!sync) {sync = xSemaphoreCreateMutex();}
-
-		 xSemaphoreTake(sync, 0);
-		if(!_instance) {
-			_ISRQueue = xSemaphoreCreateBinary();
-			_instance = new input();
-		}
-
-		xSemaphoreGive(sync);
-	}
-
-	_instance->task(pvParameters);
-}
 
 inline void input::LoadON() const {
 	GPIOPinWrite(GPIO_PORTH_BASE, GPIO_PIN_0, 0x0);

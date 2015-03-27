@@ -14,13 +14,13 @@ using namespace manager::project;
 using namespace service::inbound;
 using namespace service::inbound::configuration;
 
-xSemaphoreHandle input::_ISRQueue = NULL;
-input* input::_instance = NULL;
+DECLARE_TH(input)
 
 input::input():
 		_dataByteCount(ProjectManager::getInstance()->sysConfig().hwInputNumber() / 8),
 		_data(_dataByteCount / sizeof(_data[0]) + (_dataByteCount % sizeof(_data[0]) ? 1 : 0), 0),
-		_iputManager(InputManager::getInstance()) {
+		_iputManager(InputManagerFactory::get()) {
+	_THQueue = xSemaphoreCreateBinary();
 	IOStart();
 	timerStart();
 }
@@ -28,7 +28,7 @@ input::input():
 void input::task(void *pvParameters) {
 	while(true) {
 		// The thread gives up its time-slice, if there is no semaphore given.
-		xSemaphoreTake(_ISRQueue, portMAX_DELAY);
+		xSemaphoreTake(_THQueue, portMAX_DELAY);
 
 		IORead();
 
@@ -45,7 +45,7 @@ void input::timerStart() const {
 	SysCtlPeripheralEnable(configuration::timerPeriphery);
 	TimerConfigure	(configuration::timer, TIMER_CFG_PERIODIC);
 	TimerLoadSet	(configuration::timer, TIMER_A, systemGlobal::requestedSystemClockFrequency / configuration::pollingFrequency);
-	TimerIntRegister(configuration::timer, TIMER_A, &ISRHandler);
+	TimerIntRegister(configuration::timer, TIMER_A, &handlerTH);
 	TimerIntEnable	(configuration::timer, TIMER_TIMA_TIMEOUT);
 	TimerEnable		(configuration::timer, TIMER_A);
 }
@@ -68,9 +68,9 @@ void input::IOStart() const {
 	SSIEnable(SSI0_BASE);
 }
 
-void input::ISRHandler() {
+void input::handlerTH() {
 	TimerIntClear(timer, TIMER_TIMA_TIMEOUT);
-	xSemaphoreGiveFromISR(_ISRQueue, NULL);
+	xSemaphoreGiveFromISR(_THQueue, NULL);
 }
 
 // =============================================================================

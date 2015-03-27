@@ -97,7 +97,7 @@ inline void Output::evaluate() {
 }
 
 inline void Output::evaluateBranchActive() {
-	const std::vector<input::Input*>& inputs = input::InputManager::getInstance()->inputs();
+	const std::vector<input::Input*>& inputs = input::InputManagerFactory::get()->inputs();
 	for(u32 index = 0; index < _inputs.size(); index++) {
 		if(input::NoChangeEvent != inputs[_inputs[index]]->changed()) {
 			if(0 != _timeoutOFF) {
@@ -115,7 +115,7 @@ inline void Output::evaluateBranchActive() {
 }
 
 inline void Output::evaluateBranchPassive() {
-	const std::vector<input::Input*>& inputs = input::InputManager::getInstance()->inputs();
+	const std::vector<input::Input*>& inputs = input::InputManagerFactory::get()->inputs();
 	for(u32 index = 0; index < _inputs.size(); index++) {
 		switch (inputs[_inputs[index]]->changed()) {
 		case input::NoChangeEvent: {
@@ -143,7 +143,7 @@ inline void Output::evaluateBranchPassive() {
 }
 
 inline void Output::evaluateBranchTimeOutOn() {
-	const std::vector<input::Input*>& inputs = input::InputManager::getInstance()->inputs();
+	const std::vector<input::Input*>& inputs = input::InputManagerFactory::get()->inputs();
 	for(u32 index = 0; index < _inputs.size(); index++) {
 		switch (inputs[_inputs[index]]->changed()) {
 		case input::NoChangeEvent: {
@@ -176,7 +176,7 @@ inline void Output::evaluateBranchTimeOutOn() {
 }
 
 inline void Output::evaluateBranchTimeOutOff() {
-	const std::vector<input::Input*>& inputs = input::InputManager::getInstance()->inputs();
+	const std::vector<input::Input*>& inputs = input::InputManagerFactory::get()->inputs();
 	for(u32 index = 0; index < _inputs.size(); index++) {
 		if(input::NoChangeEvent != inputs[_inputs[index]]->changed()) {
 			_state = Active;

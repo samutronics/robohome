@@ -21,7 +21,6 @@ bool weather::processingReply(netbuf* reply) {
 	pbuf* p = reply->p;
 	s8* found = NULL;
 	while(p) {
-		UARTwrite((s8*)p->payload, p->len);
 		found = strstr(static_cast<s8*>(p->payload), "\"rain\":");
 		if(found) {break;}
 

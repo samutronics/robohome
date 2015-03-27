@@ -9,8 +9,6 @@
 
 using namespace manager::output;
 
-OutputManager* OutputManager::_instance = NULL;
-
 OutputManager::~OutputManager() {
 	for(std::map<u32, Output*>::iterator it = _output.begin(); it != _output.end(); ++it) {delete it->second;}
 }

@@ -109,7 +109,7 @@ template<bool up> inline void TriStateOutput::evaluateBranchesActive() {
 		stop();
 	}
 
-	const std::vector<input::Input*>& inputs = input::InputManager::getInstance()->inputs();
+	const std::vector<input::Input*>& inputs = input::InputManagerFactory::get()->inputs();
 	for(u32 index = 0; index < (up ? _inputsDown.size() : _inputsUp.size()); index++) {
 		if(input::NoChangeEvent != inputs[(up ? _inputsDown : _inputsUp)[index]]->changed()) {
 			_state = up ? StoppedUp : StoppedDown;
@@ -128,7 +128,7 @@ template<bool up> inline void TriStateOutput::evaluateBranchesActive() {
 }
 
 template<bool up> inline void TriStateOutput::evaluateBranchesPassive() {
-	const std::vector<input::Input*>& inputs = input::InputManager::getInstance()->inputs();
+	const std::vector<input::Input*>& inputs = input::InputManagerFactory::get()->inputs();
 	for(u32 index = 0; index < (up ? _inputsDown.size() : _inputsUp.size()); index++) {
 		switch (inputs[(up ? _inputsDown : _inputsUp)[index]]->changed()) {
 		case input::ChangeEvent: {
@@ -175,7 +175,7 @@ template<bool up> inline void TriStateOutput::evaluateBranchesPassive() {
 }
 
 template<bool up> inline void TriStateOutput::evaluateBranchesTimeout() {
-	const std::vector<input::Input*>& inputs = input::InputManager::getInstance()->inputs();
+	const std::vector<input::Input*>& inputs = input::InputManagerFactory::get()->inputs();
 	for(u32 index = 0; index < (up ? _inputsDown.size() : _inputsUp.size()); index++) {
 		if(input::NoChangeEvent != inputs[(up ? _inputsDown : _inputsUp)[index]]->changed()) {
 			_state = up ? PassiveDown : PassiveUp;
@@ -219,7 +219,7 @@ template<bool up> inline void TriStateOutput::evaluateBranchesTimeout() {
 }
 
 template<bool up> inline void TriStateOutput::evaluateBranchesStopped() {
-	const std::vector<input::Input*>& inputs = input::InputManager::getInstance()->inputs();
+	const std::vector<input::Input*>& inputs = input::InputManagerFactory::get()->inputs();
 	for(u32 index = 0; index < (up ? _inputsUp.size() : _inputsDown.size()); index++) {
 		if(input::NoChangeEvent != inputs[(up ? _inputsUp : _inputsDown)[index]]->changed()) {
 			_state = up ? ActiveUp : ActiveDown;

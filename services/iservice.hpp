@@ -54,7 +54,7 @@ class IService {
 //! \brief Declaration of the queue in the Top Halve part of THBH model
 // =============================================================================
 #define DECLARE_TH(derived)										\
-		xSemaphoreHandle derived::_THQueue;
+		xSemaphoreHandle derived::_THQueue = NULL;
 
 #endif //_IMANAGER_H_
 // =============================================================================

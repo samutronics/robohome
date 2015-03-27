@@ -16,9 +16,9 @@
 namespace service {
 namespace outbound {
 
-class output: public IService {
-private: output();
-private: virtual void task(void *pvParameters);
+class output {
+protected: output();
+public: void task(void *pvParameters);
 
 private: void timerStart() const;
 private: void IOStart() const;
@@ -31,9 +31,14 @@ private: inline void LatchOFF() const;
 private: cu32 _dataByteCount;
 private: manager::output::OutputManager* _outputManager;
 
-TO_BE_RUNABLE(output)
 DEFINE_TH
 };
+
+typedef libs::SingletonFactory<output> OutputFactory;
+
+// =============================================================================
+// Inline method implementation
+// =============================================================================
 
 inline void output::LoadON() const {
 	GPIOPinWrite(GPIO_PORTH_BASE, GPIO_PIN_2, GPIO_PIN_2);
