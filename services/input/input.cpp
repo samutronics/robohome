@@ -35,9 +35,6 @@ void input::task(void *pvParameters) {
 		_iputManager->write(_data);
 
 		for(u32 index = 0; index < _data.size(); _data[index++] = 0);
-
-		// The task gives up its remained time-slice
-		taskYIELD();
 	}
 }
 

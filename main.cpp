@@ -62,7 +62,7 @@ int main(void) {
 	if(FR_OK != f_mount(0, &fileSystemMountPoint)) {UARTprintf("fs cannot be mounted\n"); while(true);}
 
 	UARTprintf("Project found\n");
-	manager::project::ProjectManager::getInstance()->parse();
+	manager::project::ProjectManagerFactory::get()->parse();
 
 	if(pdPASS != xTaskCreate(&libs::TaskFactory<InputFactory>::start,		"TaaT_TBHB_Input",	configUSER_SPACE_STACK_SIZE, NULL, 2, NULL)) { while(true);}
 	if(pdPASS != xTaskCreate(&libs::TaskFactory<OutputFactory>::start,		"TaaT_Output",		configUSER_SPACE_STACK_SIZE, NULL, 2, NULL)) { while(true);}

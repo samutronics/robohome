@@ -9,6 +9,9 @@
 #define _IRRIGATION_H_
 
 #include "iservice.hpp"
+#include "evaluatorgrowm.hpp"
+#include "metairrigation.hpp"
+#include "evaluatornormal.hpp"
 #include "singletonfactory.hpp"
 #include "../projectconfiguration.hpp"
 
@@ -20,6 +23,11 @@ protected: irrigation();
 public: void task(void *pvParameters);
 
 private: void timerStart() const;
+private: EvaluatorNormal* evaluatorFactory(const manager::project::metaIrrigation& irr);
+
+private: tm											_currentTime;
+private: std::vector<EvaluatorNormal*>				_evaluators;
+private: std::vector<EvaluatorNormal*>::iterator	_active;
 
 DEFINE_TH
 };

@@ -37,9 +37,6 @@ void output::task(void *pvParameters) {
 		manager::input::InputManagerFactory::get()->reset();
 
 		IOWrite();
-
-		// The task gives up its remained time-slice
-		taskYIELD();
 	}
 }
 
