@@ -12,6 +12,7 @@
 #include "metaoutput.hpp"
 #include "metasysconfig.hpp"
 #include "metairrigation.hpp"
+#include "singletonfactory.hpp"
 #include "metatristateoutput.hpp"
 #include "../projectconfiguration.hpp"
 
@@ -19,8 +20,6 @@ namespace manager {
 namespace project {
 
 class ProjectManager {
-public: static inline ProjectManager* getInstance();
-
 public: void read(std::vector<u32>& project) const;
 public: bool write(std::vector<u32>& project) const;
 
@@ -33,32 +32,14 @@ public: inline metaTriStateOutput	triStateOutput()	const;
 public: inline metaSysConfig		sysConfig()			const;
 public: inline metaIrrigation		irrigation()		const;
 
-private: inline ProjectManager();
-
-private: static ProjectManager* _instance;
+protected: inline ProjectManager();
 };
+
+typedef libs::SingletonFactory<ProjectManager>	ProjectManagerFactory;
 
 // =============================================================================
 // Inline method implementation
 // =============================================================================
-
-inline ProjectManager* ProjectManager::getInstance() {
-	if(!_instance) {
-		xSemaphoreHandle sync = NULL;
-		if(!sync) {
-			sync = xSemaphoreCreateMutex();
-		}
-
-		 xSemaphoreTake(sync, 0);
-		if(!_instance) {
-			_instance = new ProjectManager();
-		}
-
-		xSemaphoreGive(sync);
-	}
-
-	return _instance;
-}
 
 inline ProjectManager::ProjectManager() {
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_EEPROM0);

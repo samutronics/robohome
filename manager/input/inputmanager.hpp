@@ -39,12 +39,12 @@ typedef libs::SingletonFactory<InputManager>	InputManagerFactory;
 // =============================================================================
 
 inline InputManager::InputManager():
-				_inputs(project::ProjectManager::getInstance()->input().count()),
+				_inputs(project::ProjectManagerFactory::get()->input().count()),
 				_dataChanged((_inputs.size() / (sizeof(_dataChanged[0]) * 8)) + ((_inputs.size() % (sizeof(_dataChanged[0]) * 8)) ? 1 : 0), 0),
 				_dataCurrent(_dataChanged.size(), 0),
 				_dataPrevious(_dataChanged.size(), 0),
 				_lock(_dataChanged.size()) {
-	project::metaInput data = project::ProjectManager::getInstance()->input();
+	project::metaInput data = project::ProjectManagerFactory::get()->input();
 	for(u32 index = 0; index < data.count(); index++) {
 		_inputs[index] = new Input(data.trigger(), index, _dataChanged, _dataCurrent, _dataPrevious);
 		data.next();

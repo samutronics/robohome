@@ -17,7 +17,7 @@ using namespace service::inbound::configuration;
 DECLARE_TH(input)
 
 input::input():
-		_dataByteCount(ProjectManager::getInstance()->sysConfig().hwInputNumber() / 8),
+		_dataByteCount(ProjectManagerFactory::get()->sysConfig().hwInputNumber() / 8),
 		_data(_dataByteCount / sizeof(_data[0]) + (_dataByteCount % sizeof(_data[0]) ? 1 : 0), 0),
 		_iputManager(InputManagerFactory::get()) {
 	_THQueue = xSemaphoreCreateBinary();

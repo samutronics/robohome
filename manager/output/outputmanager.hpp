@@ -36,11 +36,11 @@ typedef libs::SingletonFactory<OutputManager>	OutputManagerFactory;
 // Inline method implementation
 // =============================================================================
 
-inline OutputManager::OutputManager(): _data(project::ProjectManager::getInstance()->output().count() + project::ProjectManager::getInstance()->triStateOutput().count()
-		/ (sizeof(_data[0] * 8)) + ((project::ProjectManager::getInstance()->output().count() + project::ProjectManager::getInstance()->triStateOutput().count() % (sizeof(_data[0]) * 8)) ? 1 : 0), 0) {
+inline OutputManager::OutputManager(): _data(project::ProjectManagerFactory::get()->output().count() + project::ProjectManagerFactory::get()->triStateOutput().count()
+		/ (sizeof(_data[0] * 8)) + ((project::ProjectManagerFactory::get()->output().count() + project::ProjectManagerFactory::get()->triStateOutput().count() % (sizeof(_data[0]) * 8)) ? 1 : 0), 0) {
 
 	std::vector<u16> simpleTmp;
-	project::metaOutput simpleoutput = project::ProjectManager::getInstance()->output();
+	project::metaOutput simpleoutput = project::ProjectManagerFactory::get()->output();
 	for(u32 index = 0; index < simpleoutput.count(); index++) {
 		simpleoutput.inputs(simpleTmp);
 		_output[simpleoutput.address()] = new Output(simpleoutput.address(), simpleoutput.timeoutON(), simpleoutput.timeoutOFF(), simpleTmp, _data);
@@ -50,7 +50,7 @@ inline OutputManager::OutputManager(): _data(project::ProjectManager::getInstanc
 
 	std::vector<u16> tristateTmpUp;
 	std::vector<u16> tristateTmpDown;
-	project::metaTriStateOutput tristateutput = project::ProjectManager::getInstance()->triStateOutput();
+	project::metaTriStateOutput tristateutput = project::ProjectManagerFactory::get()->triStateOutput();
 	for(u32 index = 0; index < tristateutput.count(); index++) {
 		tristateutput.inputs(simpleTmp);
 		tristateutput.inputsUp(tristateTmpUp);

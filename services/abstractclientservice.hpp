@@ -78,7 +78,7 @@ inline abstractclientservice::abstractclientservice(cs8* url, u16 port, netconn_
     u32 NetMask = 0;
     u32 GateWay = 0;
 
-    manager::project::ProjectManager::getInstance()->sysConfig().network(static_cast<u32&>(IP), static_cast<u32&>(NetMask), static_cast<u32&>(GateWay));
+    manager::project::ProjectManagerFactory::get()->sysConfig().network(static_cast<u32&>(IP), static_cast<u32&>(NetMask), static_cast<u32&>(GateWay));
     while((0xFFFFFFFF == lwIPLocalIPAddrGet()) || (0x0 == lwIPLocalIPAddrGet())) {taskYIELD();}
 }
 

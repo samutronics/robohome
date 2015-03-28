@@ -17,7 +17,7 @@ using namespace service::outbound::configuration;
 DECLARE_TH(output)
 
 output::output():
-		_dataByteCount(ProjectManager::getInstance()->sysConfig().hwOutputNumber() / 8),
+		_dataByteCount(ProjectManagerFactory::get()->sysConfig().hwOutputNumber() / 8),
 		_outputManager(OutputManagerFactory::get()) {
 	_THQueue = xSemaphoreCreateBinary();
 	timerStart();

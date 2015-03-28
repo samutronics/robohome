@@ -59,7 +59,7 @@ web::web() {
     //! * Initialize the LwIP stack and block the thread until a valid
     //!		IP adress will be there.
     // =============================================================================
-    ProjectManager::getInstance()->sysConfig().network(static_cast<u32&>(IP), static_cast<u32&>(NetMask), static_cast<u32&>(GateWay));
+    ProjectManagerFactory::get()->sysConfig().network(static_cast<u32&>(IP), static_cast<u32&>(NetMask), static_cast<u32&>(GateWay));
     lwIPInit(currentSystemClockFrequency, mac, IP, NetMask, GateWay, (0 == IP) ? IPADDR_USE_DHCP : IPADDR_USE_STATIC);
     while((0 == IP) && ((0xFFFFFFFF == lwIPLocalIPAddrGet()) || (0x0 == lwIPLocalIPAddrGet()))) {taskYIELD();}
 

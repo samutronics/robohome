@@ -10,8 +10,6 @@
 using namespace std;
 using namespace manager::project;
 
-ProjectManager* ProjectManager::_instance;
-
 void ProjectManager::read(vector<u32>& project) const {
 	project.reserve(EEPROMSizeGet() / sizeof(project[0]));
 	for(u32 index = 0; index < EEPROMSizeGet() / sizeof(project[0]); index++) {
