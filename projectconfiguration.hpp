@@ -118,6 +118,23 @@ static u32 currentSystemClockFrequency = 0;
 
 namespace service {
 
+namespace irrigation {
+namespace configuration {
+
+cu32 timer = TIMER2_BASE;
+cu32 pollingFrequency = 1;
+cu32 timerPeriphery =
+		(timer == TIMER0_BASE) ?
+				SYSCTL_PERIPH_TIMER0 :
+				(timer == TIMER1_BASE) ?
+						SYSCTL_PERIPH_TIMER1 :
+						(timer == TIMER2_BASE) ?
+								SYSCTL_PERIPH_TIMER2 :
+								0;
+
+}  // configuration
+}  // irrigation
+
 namespace outbound {
 namespace configuration {
 
@@ -129,9 +146,6 @@ cu32 timerPeriphery =
 				(timer == TIMER1_BASE) ?
 						SYSCTL_PERIPH_TIMER1 :
 						0;
-
-cu32 outboundQueueLength = 4;
-cu32 outboundQueueWidth = 1;
 
 }  // configuration
 }  // outbound

@@ -16,18 +16,21 @@
 #include "sntp.hpp"
 #include "weather.hpp"
 #include "exosite.hpp"
+#include "irrigation.hpp"
 #include "taskfactory.hpp"
 #include "projectmanager.hpp"
 #include "services/input/input.hpp"
 #include "projectconfiguration.hpp"
 #include "services/output/output.hpp"
 
+using namespace systemGlobal;
 using namespace service::sntp;
 using namespace service::inbound;
 using namespace service::web;
 using namespace service::weather;
 using namespace service::exosite;
 using namespace service::outbound;
+using namespace service::irrigation;
 
 //! =============================================================================
 //! The main method is responsible for:
@@ -38,7 +41,7 @@ using namespace service::outbound;
 //! =============================================================================
 int main(void) {
 	SysCtlMOSCConfigSet(SYSCTL_MOSC_HIGHFREQ);
-	systemGlobal::currentSystemClockFrequency = SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN | SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480), 120000000);
+	currentSystemClockFrequency = SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN | SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480), requestedSystemClockFrequency);
 
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
 	GPIOPinConfigure(GPIO_PA0_U0RX);
@@ -50,8 +53,8 @@ int main(void) {
     GPIOPinConfigure(GPIO_PD5_U2TX);
     GPIOPinTypeUART(GPIO_PORTD_BASE, GPIO_PIN_4 | GPIO_PIN_5);
 
-//	UARTStdioConfig(0, 115200, systemGlobal::currentSystemClockFrequency);
-	UARTStdioConfig(2, 115200, systemGlobal::currentSystemClockFrequency);
+//	UARTStdioConfig(0, 115200, currentSystemClockFrequency);
+	UARTStdioConfig(2, 115200, currentSystemClockFrequency);
     UARTprintf("\033[2J\033[H");
 	UARTprintf("Application starts\n");
 
@@ -61,8 +64,9 @@ int main(void) {
 	UARTprintf("Project found\n");
 	manager::project::ProjectManager::getInstance()->parse();
 
-	if(pdPASS != xTaskCreate(&libs::TaskFactory<InputFactory>::start,	"TaaT_TBHB_Input",	configUSER_SPACE_STACK_SIZE, NULL, 2, NULL)) { while(true);}
-	if(pdPASS != xTaskCreate(&libs::TaskFactory<OutputFactory>::start,	"TaaT_Output",		configUSER_SPACE_STACK_SIZE, NULL, 2, NULL)) { while(true);}
+	if(pdPASS != xTaskCreate(&libs::TaskFactory<InputFactory>::start,		"TaaT_TBHB_Input",	configUSER_SPACE_STACK_SIZE, NULL, 2, NULL)) { while(true);}
+	if(pdPASS != xTaskCreate(&libs::TaskFactory<OutputFactory>::start,		"TaaT_Output",		configUSER_SPACE_STACK_SIZE, NULL, 2, NULL)) { while(true);}
+	if(pdPASS != xTaskCreate(&libs::TaskFactory<IrrigationFactory>::start,	"TaaT_Irrigation",	configUSER_SPACE_STACK_SIZE, NULL, 2, NULL)) { while(true);}
 	if(pdPASS != xTaskCreate(&web::start,		"TaaT_THBH_NP",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(true);}
 	if(pdPASS != xTaskCreate(&sntp::start,		"TaaT_RTC",			configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(true);}
 	if(pdPASS != xTaskCreate(&weather::start,	"TaaT_WEATHER",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(true);}
