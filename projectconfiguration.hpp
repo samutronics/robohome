@@ -114,6 +114,15 @@ namespace systemGlobal {
 cu32 requestedSystemClockFrequency = 120000000;
 static u32 currentSystemClockFrequency = 0;
 
+cu32 cmdRead = 0x00000000;
+cu32 cmdWrite = 0x80000000;
+
+cu32 ComponentIDMask		= 0x0F000000;
+cu32 ComponentIDInput		= 0x00000000;
+cu32 ComponentIDOutput		= 0x01000000;
+cu32 ComponentIDProject		= 0x02000000;
+cu32 ComponentIDIrrigation	= 0x03000000;
+
 }  // system
 
 namespace service {
@@ -153,6 +162,7 @@ cu32 timerPeriphery =
 namespace inbound {
 namespace configuration {
 
+cu32 addressMask = 0xFFFF;
 cu32 timer = TIMER0_BASE;
 cu32 pollingFrequency = 20;
 cu32 timerPeriphery =
@@ -169,7 +179,7 @@ namespace web {
 namespace configuration {
 
 cs8 defaultPage[] = "/index.htm";
-cs8 argsPattern[] = "/cgi-bin/";
+cs8 argsPattern[] = "/host?";
 cu16 port = 80;
 
 }  // configuration

@@ -8,6 +8,8 @@
 #include "ff.h"
 #include "web.hpp"
 #include "projectmanager.hpp"
+#include "commandexecutor.hpp"
+#include "commandsiterator.hpp"
 
 const sp8 httpMethods[] = {
 		"GET ",
@@ -17,6 +19,7 @@ const sp8 httpMethods[] = {
 };
 
 using namespace std;
+using namespace libs;
 using namespace systemGlobal;
 using namespace service::web;
 using namespace manager::project;
@@ -130,16 +133,24 @@ bool web::parseURI(const std::string& request) const {
 
 	u32 startOfArguments = request.find(argsPattern);
 	if(string::npos != startOfArguments) {
-		return parseArgs(request, startOfArguments);
+		return parseArgs(request, startOfArguments + sizeof(argsPattern) - 1);
 	}
 
 	return parseResource(request, startOfURI);
 }
 
 bool web::parseArgs(const std::string& request, cu32 startOfArguments) const {
-	UARTprintf("%s\n", request.c_str());
+	u32 endOfArguments = request.find(' ', startOfArguments);
+	if(string::npos == endOfArguments) {
+		return false;
+	}
 
-	return false;
+	CommandsIterator it(request.substr(startOfArguments, endOfArguments - startOfArguments));
+	while(it.next()) {
+		CommandExecutor::execute(it);
+	}
+
+	return true;
 }
 
 bool web::parseResource(const std::string& request, cu32 startOfURI) const {
