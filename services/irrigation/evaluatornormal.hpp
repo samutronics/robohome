@@ -20,7 +20,7 @@ protected: enum CircleState {
 	Wait
 };
 
-public: inline EvaluatorNormal(cu32 startTime, cu16 upTime, cu16 downTime, cu16 repeatCount, const tm& currentTime);
+public: inline EvaluatorNormal(cu32 startTime, cu16 upTime, cu16 downTime, cu16 input, cu16 repeatCount, const tm& currentTime);
 public: inline bool evaluate();
 
 protected: virtual inline bool evaluateBranchActive();
@@ -28,10 +28,13 @@ protected: virtual inline bool evaluateBranchPassive();
 protected: virtual inline bool evaluateBranchWait();
 
 protected: u16			_count;
+protected: u16			_timer;
+protected: u8			_day;
 protected: CircleState	_state;
 protected: cu32			_startTime;
 protected: cu16			_upTime;
 protected: cu16			_downTime;
+protected: cu16			_input;
 protected: cu16			_repeatCount;
 protected: const tm&	_currentTime;
 };
@@ -40,12 +43,14 @@ protected: const tm&	_currentTime;
 // Inline method implementation
 // =============================================================================
 
-inline EvaluatorNormal::EvaluatorNormal(cu32 startTime, cu16 upTime, cu16 downTime, cu16 repeatCount, const tm& currentTime):
+inline EvaluatorNormal::EvaluatorNormal(cu32 startTime, cu16 upTime, cu16 downTime, cu16 input, cu16 repeatCount, const tm& currentTime):
 				_count(0),
+				_day(0),
 				_state(Passive),
 				_startTime(startTime),
 				_upTime(upTime),
 				_downTime(downTime),
+				_input(input),
 				_repeatCount(repeatCount),
 				_currentTime(currentTime) {}
 
@@ -70,15 +75,15 @@ inline bool EvaluatorNormal::evaluate() {
 }
 
 inline bool EvaluatorNormal::evaluateBranchActive() {
-
+	return false;
 }
 
 inline bool EvaluatorNormal::evaluateBranchPassive() {
-
+	return false;
 }
 
 inline bool EvaluatorNormal::evaluateBranchWait() {
-
+	return false;
 }
 
 } // irrigation
