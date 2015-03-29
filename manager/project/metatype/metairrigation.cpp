@@ -29,6 +29,8 @@ void metaIrrigation::next() {
 			// the size of the daily precipitation property
 			sizeof(u16) +
 			// the size of the unit precipitation property
+			sizeof(u16) +
+			// the size of the daily repeat count property
 			sizeof(u16);
 }
 

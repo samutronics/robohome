@@ -81,7 +81,7 @@ inline const std::vector<u32>& OutputManager::read() const {
 }
 
 inline bool OutputManager::read(cu16 address) const {
-	return (_data[address / sizeof(_data[0])] & (1 << (address % sizeof(_data[0]))));
+	return (_data[address / (_data.size() * sizeof(_data[0]) * 8)] & (1 << (address % sizeof(_data[0]) * 8)));
 }
 
 } // output

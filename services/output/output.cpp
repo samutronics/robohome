@@ -22,6 +22,7 @@ output::output():
 	_THQueue = xSemaphoreCreateBinary();
 	timerStart();
 	IOStart();
+	IOWrite();
 }
 
 void output::task(void *pvParameters) {

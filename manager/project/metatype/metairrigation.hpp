@@ -31,6 +31,7 @@ public: inline CircleMode mode() const;
 public: inline cu16 offsetTime() const;
 public: inline cu16 dailyPrecipitation() const;
 public: inline cu16 unitPrecipitation() const;
+public: inline cu16 repeatCount() const;
 };
 
 // =============================================================================
@@ -171,6 +172,33 @@ inline cu16 metaIrrigation::unitPrecipitation() const {
 			// the size of the offset time property
 			sizeof(u16) +
 			// the size of the daily precipitation property
+			sizeof(u16);
+
+	return read<u16>(address);
+}
+
+inline cu16 metaIrrigation::repeatCount() const {
+	// The address daily repeat count property in the EEPROM is composed of:
+	cu32 address =
+			// the _itemAddress
+			_itemAddress +
+			// size of the IO point
+			_nameSize +
+			// the size of the area property
+			sizeof(u16) +
+			// the size of the input property
+			sizeof(u16) +
+			// the size of the upTime property
+			sizeof(u16) +
+			// the size of the startTime property
+			sizeof(u16) +
+			// the size of the irrigation mode property
+			sizeof(u16) +
+			// the size of the offset time property
+			sizeof(u16) +
+			// the size of the daily precipitation property
+			sizeof(u16) +
+			// the size of the unit precipitation property
 			sizeof(u16);
 
 	return read<u16>(address);

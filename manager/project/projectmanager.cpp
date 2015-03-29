@@ -177,8 +177,9 @@ void ProjectManager::parse() const {
 		UARTprintf("\tIrrigated area name: %s\n", str.c_str());
 		UARTprintf("\tIrrigated area size: %d\n", irr.area());
 		UARTprintf("\tMode: %s\n", Normal == irr.mode() ? "Normal" : "Grown");
+		UARTprintf("\tRepeats during the day: %d\n", irr.repeatCount());
 		UARTprintf("\tAssigned to input: %d\n", irr.input());
-		UARTprintf("\tDaily start: %d\n", irr.startTime());
+		UARTprintf("\tDaily start: %d:%d\n", irr.startTime() / 3600, (irr.startTime() % 3600) / 60);
 		UARTprintf("\tUptime: %d\n", irr.upTime());
 		UARTprintf("\tOffset between uptimes: %d\n", irr.offsetTime());
 		UARTprintf("\tUnit and total precipitation: %d/%d\n\n", irr.unitPrecipitation(), irr.dailyPrecipitation());
