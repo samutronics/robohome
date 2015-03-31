@@ -22,6 +22,7 @@ protected: enum CircleState {
 
 public: inline EvaluatorNormal(cu32 startTime, cu16 upTime, cu16 downTime, cu16 input, cu16 repeatCount, const tm& currentTime);
 public: inline bool evaluate();
+public: inline cu16 time() const;
 
 protected: virtual inline bool evaluateBranchActive();
 protected: virtual inline bool evaluateBranchPassive();
@@ -53,6 +54,10 @@ inline EvaluatorNormal::EvaluatorNormal(cu32 startTime, cu16 upTime, cu16 downTi
 				_input(input),
 				_repeatCount(repeatCount),
 				_currentTime(currentTime) {}
+
+inline cu16 EvaluatorNormal::time() const {
+	return _timer;
+}
 
 inline bool EvaluatorNormal::evaluate() {
 	switch (_state) {

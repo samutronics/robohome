@@ -38,9 +38,10 @@ TO_BE_RUNABLE(web)
 private: web();
 
 private: httpMethod getHTTPMethodType(const std::string& request) const;
-private: bool parseURI(const std::string& request) const;
 private: bool parseArgs(const std::string& request, cu32 startOfArguments) const;
 private: bool parseResource(const std::string& request, cu32 startOfURI) const;
+
+private: void makeHttpHeader(std::string& header, cu32 lenght) const;
 
 private: inline FRESULT readResource(cs8* path, u8*& buffer, u32& size) const;
 

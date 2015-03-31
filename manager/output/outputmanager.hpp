@@ -9,18 +9,23 @@
 #define _OUTPUTMANAGER_HPP_
 
 #include "output.hpp"
+#include "iinform.hpp"
 #include "tristateoutput.hpp"
 #include "projectmanager.hpp"
 #include "singletonfactory.hpp"
+#include "commandsiterator.hpp"
 #include "../projectconfiguration.hpp"
 
 namespace manager {
 namespace output {
 
-class OutputManager {
+class OutputManager: public libs::IInform {
 public: inline const std::map<u32, Output*>& outputs() const;
 public: inline bool read(cu16 address) const;
 public: inline const std::vector<u32>& read() const;
+
+public: virtual bool write(const libs::CommandsIterator& it);
+public: virtual bool read(const libs::CommandsIterator& it, std::string& result) const;
 
 public: virtual ~OutputManager();
 

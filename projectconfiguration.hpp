@@ -32,6 +32,7 @@
 #include <stdbool.h>
 
 #include <map>
+#include <string>
 #include <vector>
 #include <limits>
 
@@ -114,8 +115,8 @@ namespace systemGlobal {
 cu32 requestedSystemClockFrequency = 120000000;
 static u32 currentSystemClockFrequency = 0;
 
-cu32 cmdRead = 0x00000000;
-cu32 cmdWrite = 0x80000000;
+cu32 cmdRead				= 0x00000000;
+cu32 cmdWrite				= 0x80000000;
 
 cu32 ComponentIDMask		= 0x0F000000;
 cu32 ComponentIDInput		= 0x00000000;
@@ -129,6 +130,11 @@ namespace service {
 
 namespace irrigation {
 namespace configuration {
+
+cu32 addressMask = 0xF;
+
+cu32 CmdIrrigationMask		= 0x00F00000;
+cu32 CmdTimer				= 0x00000000;
 
 cu32 timer = TIMER2_BASE;
 cu32 pollingFrequency = 1;
@@ -147,6 +153,12 @@ cu32 timerPeriphery =
 namespace outbound {
 namespace configuration {
 
+cu32 addressMask = 0xFFFF;
+
+cu32 CmdOutputMask			= 0x00F00000;
+cu32 CmdReadOutput			= 0x00000000;
+cu32 CmdReadOutputTime		= 0x00100000;
+
 cu32 timer = TIMER1_BASE;
 cu32 pollingFrequency = 10;
 cu32 timerPeriphery =
@@ -163,6 +175,7 @@ namespace inbound {
 namespace configuration {
 
 cu32 addressMask = 0xFFFF;
+
 cu32 timer = TIMER0_BASE;
 cu32 pollingFrequency = 20;
 cu32 timerPeriphery =

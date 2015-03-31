@@ -8,6 +8,7 @@
 #ifndef _IRRIGATION_H_
 #define _IRRIGATION_H_
 
+#include "iinform.hpp"
 #include "iservice.hpp"
 #include "evaluatorgrowm.hpp"
 #include "metairrigation.hpp"
@@ -18,9 +19,12 @@
 namespace service {
 namespace irrigation {
 
-class irrigation {
+class irrigation: public libs::IInform {
 protected: irrigation();
 public: void task(void *pvParameters);
+
+public: virtual bool write(const libs::CommandsIterator& it);
+public: virtual bool read(const libs::CommandsIterator& it, std::string& result) const;
 
 private: void timerStart() const;
 private: EvaluatorNormal* evaluatorFactory(const manager::project::metaIrrigation& irr);

@@ -8,32 +8,55 @@
 #ifndef _COMMANDEXECUTOR_HPP_
 #define _COMMANDEXECUTOR_HPP_
 
+#include "irrigation.hpp"
+#include "inputmanager.hpp"
+#include "outputmanager.hpp"
+#include "projectmanager.hpp"
 #include "commandsiterator.hpp"
 #include "../projectconfiguration.hpp"
 
 namespace libs {
 
-class CommandExecutor {
-public: static inline bool execute(const CommandsIterator& it);
+class IInform;
 
-private: static bool executeRead(const CommandsIterator& it);
-private: static bool executeWrite(const CommandsIterator& it);
+class Mediator {
+public: inline bool execute(const CommandsIterator& it, std::string& result) const;
+public: inline void attach(cu32 ComponentID, IInform* info);
+public: inline void dettach(cu32 ComponentID);
 
-private: inline CommandExecutor();
+protected: inline Mediator();
+
+private: std::map<u32, IInform*> _components;
 };
+
+typedef SingletonFactory<Mediator>	MediatorFactory;
 
 // =============================================================================
 // Inline method implementation
 // =============================================================================
 
-inline CommandExecutor::CommandExecutor() {}
+inline Mediator::Mediator() {
+}
 
-inline bool CommandExecutor::execute(const CommandsIterator& it) {
+inline void Mediator::attach(cu32 ComponentID, IInform* info) {
+	_components[ComponentID] = info;
+}
+
+inline void Mediator::dettach(cu32 ComponentID) {
+	_components.erase(ComponentID);
+}
+
+inline bool Mediator::execute(const CommandsIterator& it, std::string& result) const {
+	std::map<u32, IInform*>::const_iterator info = _components.find(it.key() & systemGlobal::ComponentIDMask);
+	if(!info->second) {
+		return false;
+	}
+
 	if(systemGlobal::cmdWrite & it.key()) {
-		return executeWrite(it);
+		return info->second->write(it);
 	}
 	else {
-		return executeRead(it);
+		return info->second->read(it, result);
 	}
 }
 
@@ -43,4 +66,4 @@ inline bool CommandExecutor::execute(const CommandsIterator& it) {
 // =============================================================================
 //! \file
 //! \copyright
-// ======================= end of file: commandexecutor.hpp ====================
+// =========================== end of file: commander.hpp ======================

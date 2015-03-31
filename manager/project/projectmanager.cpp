@@ -8,6 +8,7 @@
 #include "projectmanager.hpp"
 
 using namespace std;
+using namespace libs;
 using namespace manager::project;
 
 void ProjectManager::read(vector<u32>& project) const {
@@ -24,6 +25,22 @@ bool ProjectManager::write(vector<u32>& project) const {
 	for(u32 index = 0; index < project.size(); index++) {
 		EEPROMProgram(&project[index], index * sizeof(project[0]), sizeof(project[0]));
 	}
+	return true;
+}
+
+bool ProjectManager::write(const CommandsIterator& it) {
+	return false;
+}
+
+bool ProjectManager::read(const CommandsIterator& it, std::string& result) const {
+	vector<u32> v;
+	read(v);
+	for(u32 index = 0; index < v.size(); index++) {
+		s8 buf[10];
+		sprintf(buf, "%d", v[index]);
+		result += buf;
+	}
+
 	return true;
 }
 

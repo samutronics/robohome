@@ -9,19 +9,24 @@
 #define _INPUTMANAGER_HPP_
 
 #include "input.hpp"
+#include "iinform.hpp"
 #include "projectmanager.hpp"
 #include "singletonfactory.hpp"
+#include "commandsiterator.hpp"
 #include "../projectconfiguration.hpp"
 
 namespace manager {
 namespace input {
 
-class InputManager {
+class InputManager: public libs::IInform {
 public: virtual ~InputManager();
 public: inline const std::vector<Input*>& inputs() const;
 public: inline void reset();
 public: inline void write(cu16 address, cu8 data);
 public: inline void write(const std::vector<u8>& data);
+
+public: virtual bool write(const libs::CommandsIterator& it);
+public: virtual bool read(const libs::CommandsIterator& it, std::string& result) const;
 
 protected: inline InputManager();
 
