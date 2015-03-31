@@ -37,7 +37,7 @@ public: inline metaTriStateOutput	triStateOutput()	const;
 public: inline metaSysConfig		sysConfig()			const;
 public: inline metaIrrigation		irrigation()		const;
 
-protected: inline ProjectManager();
+protected: ProjectManager();
 };
 
 typedef libs::SingletonFactory<ProjectManager>	ProjectManagerFactory;
@@ -45,11 +45,6 @@ typedef libs::SingletonFactory<ProjectManager>	ProjectManagerFactory;
 // =============================================================================
 // Inline method implementation
 // =============================================================================
-
-inline ProjectManager::ProjectManager() {
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_EEPROM0);
-	EEPROMInit();
-}
 
 inline metaSysConfig ProjectManager::sysConfig() const {
 	u32 section;

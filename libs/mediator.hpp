@@ -5,19 +5,15 @@
 //! \date			29.03.2015.
 //! \note
 // =============================================================================
-#ifndef _COMMANDEXECUTOR_HPP_
-#define _COMMANDEXECUTOR_HPP_
+#ifndef _MEDIATOR_HPP_
+#define _MEDIATOR_HPP_
 
-#include "irrigation.hpp"
-#include "inputmanager.hpp"
-#include "outputmanager.hpp"
-#include "projectmanager.hpp"
+#include "iinform.hpp"
 #include "commandsiterator.hpp"
+#include "singletonfactory.hpp"
 #include "../projectconfiguration.hpp"
 
 namespace libs {
-
-class IInform;
 
 class Mediator {
 public: inline bool execute(const CommandsIterator& it, std::string& result) const;
@@ -48,7 +44,7 @@ inline void Mediator::dettach(cu32 ComponentID) {
 
 inline bool Mediator::execute(const CommandsIterator& it, std::string& result) const {
 	std::map<u32, IInform*>::const_iterator info = _components.find(it.key() & systemGlobal::ComponentIDMask);
-	if(!info->second) {
+	if(info != _components.end()) {
 		return false;
 	}
 
@@ -62,8 +58,8 @@ inline bool Mediator::execute(const CommandsIterator& it, std::string& result) c
 
 } // libs
 
-#endif // _COMMANDEXECUTOR_HPP_
+#endif // _MEDIATOR_HPP_
 // =============================================================================
 //! \file
 //! \copyright
-// =========================== end of file: commander.hpp ======================
+// =========================== end of file: mediator.hpp =======================

@@ -28,7 +28,7 @@ public: inline void write(const std::vector<u8>& data);
 public: virtual bool write(const libs::CommandsIterator& it);
 public: virtual bool read(const libs::CommandsIterator& it, std::string& result) const;
 
-protected: inline InputManager();
+protected: InputManager();
 
 private: std::vector<Input*>			_inputs;
 private: std::vector<u32>				_dataChanged;
@@ -42,21 +42,6 @@ typedef libs::SingletonFactory<InputManager>	InputManagerFactory;
 // =============================================================================
 // Inline method implementation
 // =============================================================================
-
-inline InputManager::InputManager():
-				_inputs(project::ProjectManagerFactory::get()->input().count()),
-				_dataChanged((_inputs.size() / (sizeof(_dataChanged[0]) * 8)) + ((_inputs.size() % (sizeof(_dataChanged[0]) * 8)) ? 1 : 0), 0),
-				_dataCurrent(_dataChanged.size(), 0),
-				_dataPrevious(_dataChanged.size(), 0),
-				_lock(_dataChanged.size()) {
-	project::metaInput data = project::ProjectManagerFactory::get()->input();
-	for(u32 index = 0; index < data.count(); index++) {
-		_inputs[index] = new Input(data.trigger(), index, _dataChanged, _dataCurrent, _dataPrevious);
-		data.next();
-	}
-
-	for(u32 index = 0; index < _dataChanged.size(); index++) {_lock[index] = xSemaphoreCreateMutex();}
-}
 
 inline const std::vector<Input*>& InputManager::inputs() const {
 	return _inputs;

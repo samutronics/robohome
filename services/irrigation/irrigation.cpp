@@ -5,11 +5,13 @@
 //! \date			03.27.2015.
 //! \note
 // =============================================================================
+#include "mediator.hpp"
 #include "irrigation.hpp"
 #include "projectmanager.hpp"
 #include "../projectconfiguration.hpp"
 
 using namespace libs;
+using namespace systemGlobal;
 using namespace manager::project;
 using namespace service::irrigation;
 using namespace service::irrigation::configuration;
@@ -26,6 +28,7 @@ irrigation::irrigation():
 	}
 
 	_THQueue = xSemaphoreCreateBinary();
+	MediatorFactory::get()->attach(ComponentIDIrrigation, this);
 	timerStart();
 }
 
