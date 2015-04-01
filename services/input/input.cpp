@@ -17,8 +17,8 @@ using namespace service::inbound::configuration;
 
 DECLARE_TH(input)
 
-input::input(): tmp(1, 0), _data(ProjectManagerFactory::get()->sysConfig().hwInputNumber() / 8, 0) {
-	_THQueue = xSemaphoreCreateBinary();
+input::input(): _data(ProjectManagerFactory::get()->sysConfig().hwInputNumber() / 8, 0) {
+	_THQueue = xSemaphoreCreateMutex();
 	IOStart();
 	timerStart();
 }
@@ -30,14 +30,9 @@ void input::task(void *pvParameters) {
 
 		IORead();
 
-		for(u32 index = 0; index < _data.size(); index++) {
-			tmp[index / sizeof(tmp[0])] |= _data[index] << ((index % sizeof(tmp[0])) * 8);
-		}
-
-		InputManagerFactory::get()->write(tmp);
+		InputManagerFactory::get()->write(_data);
 
 		for(u32 index = 0; index < _data.size(); _data[index++] = 0);
-		for(u32 index = 0; index < tmp.size(); tmp[index++] = 0);
 	}
 }
 

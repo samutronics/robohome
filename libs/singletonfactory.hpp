@@ -33,7 +33,7 @@ template<typename T> inline SingletonFactory<T>* SingletonFactory<T>::get() {
 			sync = xSemaphoreCreateMutex();
 		}
 
-		 xSemaphoreTake(sync, 0);
+		 xSemaphoreTake(sync, portMAX_DELAY);
 		if(!_instance) {
 			_instance = new SingletonFactory<T>();
 		}

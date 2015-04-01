@@ -21,7 +21,7 @@ public: virtual ~InputManager();
 public: inline const std::vector<Input*>& inputs() const;
 public: inline void reset();
 public: inline void write(cu16 address, cu8 data);
-public: inline void write(const std::vector<u32>& data);
+public: inline void write(const std::vector<u8>& data);
 
 protected: inline InputManager();
 
@@ -58,36 +58,41 @@ inline const std::vector<Input*>& InputManager::inputs() const {
 }
 
 inline void InputManager::reset() {
-	for(u32 index = 0; index < _dataChanged.size(); index++) {_dataChanged[index] = 0;}
+	for(u32 index = 0; index < _dataChanged.size(); index++) {
+		xSemaphoreTake(_lock[index], portMAX_DELAY);
+		_dataChanged[index] = 0;
+		xSemaphoreGive(_lock[index]);
+	}
 }
 
 inline void InputManager::write(cu16 address, cu8 data) {
-	if(address < _dataChanged.size() * sizeof(_dataChanged[0]) * 8) {return;}
+	cu32 bitCount = (sizeof(_dataChanged[0]) * 8);
+	if(address > _dataChanged.size() * bitCount) {return;}
 
-	xSemaphoreTake(_lock[address / sizeof(_dataChanged[0])], 0);
-	if(!(_dataChanged[address / sizeof(_dataChanged[0])] & (1 << address % sizeof(_dataChanged[0])))) {
-		_dataPrevious[address / sizeof(_dataChanged[0])] = ((_dataPrevious[address / sizeof(_dataChanged[0])] & ~(1 << address % sizeof(_dataChanged[0]))) | (_dataCurrent[address / sizeof(_dataChanged[0])] & (1 << address % sizeof(_dataChanged[0]))));
-		_dataCurrent[address / sizeof(_dataChanged[0])] = ((_dataCurrent[address / sizeof(_dataChanged[0])] & ~(1 << address % sizeof(_dataChanged[0]))) | ((data ? 1 : 0) << (address % sizeof(_dataChanged[0]))));
-		_dataChanged[address / sizeof(_dataChanged[0])] |= (1 << address % sizeof(_dataChanged[0]));
+	xSemaphoreTake(_lock[address / bitCount], portMAX_DELAY);
+	if(!(_dataChanged[address / bitCount] & (1 << address % bitCount))) {
+		_dataPrevious[address / bitCount] = ((_dataPrevious[address / bitCount] & ~(1 << address % bitCount)) | (_dataCurrent[address / bitCount] & (1 << address % bitCount)));
+		_dataCurrent[address / bitCount] = ((_dataCurrent[address / bitCount] & ~(1 << address % bitCount)) | ((data ? 1 : 0) << (address % bitCount)));
+		_dataChanged[address / bitCount] |= (1 << address % bitCount);
 	}
 
-	xSemaphoreGive(_lock[address / sizeof(_dataChanged[0])]);
+	xSemaphoreGive(_lock[address / bitCount]);
 }
 
-inline void InputManager::write(const std::vector<u32>& data) {
-	if(data.size() != _dataChanged.size()) {return;}
+inline void InputManager::write(const std::vector<u8>& data) {
+	for(u32 index = 0; index < data.size(); index++) {
+		cu32 word = index / sizeof(_dataChanged[0]);
+		xSemaphoreTake(_lock[word], portMAX_DELAY);
 
-	for(u32 dwordIndex = 0; dwordIndex < _dataChanged.size(); dwordIndex++) {
-		xSemaphoreTake(_lock[dwordIndex], 0);
-		for(u32 bitIndex = 0; bitIndex < sizeof(_dataChanged[0]) * 8; bitIndex++) {
-			if(!(_dataChanged[dwordIndex] & (1 << bitIndex))) {
-				_dataPrevious[dwordIndex] = ((_dataPrevious[dwordIndex] & ~(1 << bitIndex)) | (_dataCurrent[dwordIndex] & (1 << bitIndex)));
-				_dataCurrent[dwordIndex] = ((_dataCurrent[dwordIndex] & ~(1 << bitIndex)) | (data[dwordIndex] & (1 << bitIndex)));
-				_dataChanged[dwordIndex] |= (1 << bitIndex);
-			}
-		}
+		cu32 byteMask = 0xFF << (index % sizeof(_dataChanged[0]) * 8);
+		cu32 changeMask = ((~_dataChanged[word]) & byteMask);
+		_dataPrevious[word] &= ~changeMask;
+		_dataPrevious[word] |= (_dataCurrent[word] & changeMask);
+		_dataCurrent[word] &= ~changeMask;
+		_dataCurrent[word] |= ((data[index] << (index % sizeof(_dataCurrent[0]) * 8)) & changeMask);
+		_dataChanged[word] |= byteMask;
 
-		xSemaphoreGive(_lock[dwordIndex]);
+		xSemaphoreGive(_lock[word]);
 	}
 }
 

@@ -26,8 +26,7 @@ private: inline void IORead();
 private: inline void LoadON() const;
 private: inline void LoadOFF() const;
 
-private: std::vector<u32> tmp;
-private: std::vector<u8>				_data;
+private: std::vector<u8> _data;
 DEFINE_TH
 };
 
