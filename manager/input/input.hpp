@@ -21,13 +21,12 @@ enum StateChange {
 };
 
 class Input {
-public: inline Input(const project::InputType type, cu16 hwAddress, const std::vector<u32>& dataChanged, const std::vector<u32>& dataCurrent, const std::vector<u32>& dataPrevious);
+public: inline Input(const project::InputType type, cu16 hwAddress, const std::vector<u32>& dataCurrent, const std::vector<u32>& dataPrevious);
 
 public: inline StateChange changed() const;
 
 private: const project::InputType	_type;
 private: cu16						_hwAddress;
-private: const std::vector<u32>&	_dataChanged;
 private: const std::vector<u32>&	_dataCurrent;
 private: const std::vector<u32>&	_dataPrevious;
 };
@@ -36,17 +35,14 @@ private: const std::vector<u32>&	_dataPrevious;
 // Inline method implementation
 // =============================================================================
 
-inline Input::Input(const project::InputType type, cu16 hwAddress, const std::vector<u32>& dataChanged, const std::vector<u32>& dataCurrent, const std::vector<u32>& dataPrevious):
-		_type(type),
-		_hwAddress(hwAddress),
-		_dataChanged(dataChanged),
-		_dataCurrent(dataCurrent),
-		_dataPrevious(dataPrevious) {}
+inline Input::Input(const project::InputType type, cu16 hwAddress, const std::vector<u32>& dataCurrent, const std::vector<u32>& dataPrevious):
+				_type(type),
+				_hwAddress(hwAddress),
+				_dataCurrent(dataCurrent),
+				_dataPrevious(dataPrevious) {}
 
 inline StateChange Input::changed() const {
-	cu32 bitCount = (sizeof(_dataChanged[0]) * 8);
-
-	if(!(_dataChanged[_hwAddress / bitCount] & (1 << (_hwAddress % bitCount)))) { return NoChangeEvent;}
+	cu32 bitCount = (sizeof(_dataCurrent[0]) * 8);
 
 	switch(_type) {
 	case project::BothEdges: {
@@ -65,9 +61,11 @@ inline StateChange Input::changed() const {
 		return ((_dataCurrent[_hwAddress / bitCount] & (1 << (_hwAddress % bitCount))) &&
 				!(_dataPrevious[_hwAddress / bitCount] & (1 << (_hwAddress % bitCount)))) ? DeferredChangeEvent : NoChangeEvent;
 	}
+	default: {
+		UARTprintf("Unsupported input type\n");
+		return NoChangeEvent;
 	}
-
-	return NoChangeEvent;
+	}
 }
 
 } // input

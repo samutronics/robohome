@@ -21,7 +21,7 @@ InputManager::InputManager():
 				_lock(_dataChanged.size()) {
 	project::metaInput data = project::ProjectManagerFactory::get()->input();
 	for(u32 index = 0; index < data.count(); index++) {
-		_inputs[index] = new Input(data.trigger(), index, _dataChanged, _dataCurrent, _dataPrevious);
+		_inputs[index] = new Input(data.trigger(), index, _dataCurrent, _dataPrevious);
 		data.next();
 	}
 
