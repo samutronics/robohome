@@ -5,10 +5,13 @@
 //! \date			03.27.2015.
 //! \note
 // =============================================================================
+#include "mediator.hpp"
 #include "irrigation.hpp"
 #include "projectmanager.hpp"
 #include "../projectconfiguration.hpp"
 
+using namespace libs;
+using namespace systemGlobal;
 using namespace manager::project;
 using namespace service::irrigation;
 using namespace service::irrigation::configuration;
@@ -16,12 +19,16 @@ using namespace service::irrigation::configuration;
 DECLARE_TH(irrigation);
 
 irrigation::irrigation():
-		_evaluators(ProjectManagerFactory::get()->irrigation().count(), 0),
-		_active(_evaluators.begin()) {
+				_evaluators(ProjectManagerFactory::get()->irrigation().count(), 0),
+				_active(_evaluators.begin()) {
 	metaIrrigation irr = ProjectManagerFactory::get()->irrigation();
-	for(u32 index = 0; index < irr.count(); index++) {_evaluators[index] = evaluatorFactory(irr);}
+	for(u32 index = 0; index < irr.count(); index++) {
+		_evaluators[index] = evaluatorFactory(irr);
+		irr.next();
+	}
 
 	_THQueue = xSemaphoreCreateBinary();
+	MediatorFactory::get()->attach(ComponentIDIrrigation, this);
 	timerStart();
 }
 
@@ -31,6 +38,7 @@ void irrigation::task(void *pvParameters) {
 		xSemaphoreTake(_THQueue, portMAX_DELAY);
 
 		HibernateCalendarGet(&_currentTime);
+		_currentTime.tm_hour++;
 
 		for(_active = ((_active == _evaluators.end()) ? _evaluators.begin() : _active); _active != _evaluators.end(); ++_active) {
 			if((*_active)->evaluate()) {break;}
@@ -41,10 +49,10 @@ void irrigation::task(void *pvParameters) {
 EvaluatorNormal* irrigation::evaluatorFactory(const metaIrrigation& irr) {
 	switch (irr.mode()) {
 	case Normal: {
-		return new EvaluatorNormal(irr.startTime(), irr.upTime(), irr.offsetTime() - irr.upTime(), irr.count(), _currentTime);
+		return new EvaluatorNormal(irr.startTime(), irr.upTime(), irr.offsetTime() - irr.upTime(), irr.input(), irr.repeatCount(), _currentTime);
 	}
 	case Grown: {
-		return new EvaluatorGrowm(irr.startTime(), irr.upTime(), irr.offsetTime() - irr.upTime(), irr.count(), _currentTime);
+		return new EvaluatorGrowm(irr.startTime(), irr.upTime(), irr.offsetTime() - irr.upTime(), irr.input(), irr.repeatCount(), _currentTime);
 	}
 	default: {
 		UARTprintf("Unsuported evalator type in irrigation::evaluatorFactory()\n");
@@ -62,6 +70,22 @@ void irrigation::timerStart() const {
 	TimerIntEnable	(timer, TIMER_TIMA_TIMEOUT);
 	TimerEnable		(timer, TIMER_A);
 }
+
+bool irrigation::write(const CommandsIterator& it) {
+	return false;
+}
+
+bool irrigation::read(const CommandsIterator& it, std::string& result) const {
+	if((CmdTimer == (it.key() & CmdIrrigationMask)) && (it.key() & addressMask < _evaluators.size())) {
+		s8 buf[10];
+		sprintf(buf, "%d", _evaluators[it.key() & addressMask]->time());
+		result += buf;
+		return true;
+	}
+
+	return false;
+}
+
 
 void irrigation::handlerTH() {
 	TimerIntClear(timer, TIMER_TIMA_TIMEOUT);

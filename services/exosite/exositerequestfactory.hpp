@@ -25,9 +25,9 @@ private: enum lineTypes {
   EMPTY_LINE
 };
 
-public: bool writeRequest(const std::string& request, std::string& buf);
+public: void writeRequest(const std::string& request, std::string& buf);
 public: void parseWriteResult(pbuf* buf);
-public: int readRequest(const std::string& request, std::string& buf);
+public: void readRequest(const std::string& request, std::string& buf);
 public: void parseReadResult(pbuf* buf, std::string& result);
 
 private: int getHTTPStatus(pbuf* buf);

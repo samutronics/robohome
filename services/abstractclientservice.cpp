@@ -11,9 +11,9 @@ using namespace service;
 using namespace systemGlobal;
 
 void abstractclientservice::task(void* pvParameters) {
-	netconn* connection = NULL;
-	s32 error = ERR_OK;
 	while(true) {
+		s32 error = ERR_OK;
+		netconn* connection = NULL;
 		retryContext(connection, error);
 		if(!connection) {
 			UARTprintf("%s: Out of memory, retry later\n", _url);
@@ -22,7 +22,6 @@ void abstractclientservice::task(void* pvParameters) {
 			UARTprintf("%s: Error occured: %d\n", _url, error);
 			netconn_close(connection);
 			netconn_delete(connection);
-			connection = NULL;
 		}
 		else {
 			UARTprintf("%s: Undefined error occured\n", _url);

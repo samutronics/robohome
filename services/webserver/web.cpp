@@ -7,7 +7,9 @@
 // =============================================================================
 #include "ff.h"
 #include "web.hpp"
+#include "mediator.hpp"
 #include "projectmanager.hpp"
+#include "commandsiterator.hpp"
 
 const sp8 httpMethods[] = {
 		"GET ",
@@ -16,7 +18,11 @@ const sp8 httpMethods[] = {
 		""
 };
 
+cs8 httpHeader[] = "HTTP/1.1 200 OK\r\n";
+cs8 httpContentLength[] = "Content-Length: ";
+
 using namespace std;
+using namespace libs;
 using namespace systemGlobal;
 using namespace service::web;
 using namespace manager::project;
@@ -74,10 +80,6 @@ web::web() {
     	UARTprintf("Device IP address: %d.%d.%d.%d\n", (IP & 0xff), ((IP >> 8) & 0xff), ((IP >> 16) & 0xff), ((IP >> 24) & 0xff));
     	taskEXIT_CRITICAL();
     }
-
-	// =============================================================================
-	//! * Initialize HTTP daemon, that is responsible for the webpage.
-    // =============================================================================
 }
 
 void web::task(void *pvParameters) {
@@ -108,7 +110,15 @@ void web::task(void *pvParameters) {
 			// serve the request by the method type
 			switch(getHTTPMethodType(httpRequest)) {
 			case get: {
-				parseURI(httpRequest);
+				u32 startOfURI = httpRequest.find("/");
+				if(string::npos == startOfURI) {break;}
+
+				u32 startOfArguments = httpRequest.find(argsPattern);
+				if(string::npos != startOfArguments) {
+					parseArgs(httpRequest, startOfArguments + sizeof(argsPattern) - 1);
+				}
+
+				parseResource(httpRequest, startOfURI);
 				break;
 			}
 			default: {
@@ -124,22 +134,21 @@ void web::task(void *pvParameters) {
 	}
 }
 
-bool web::parseURI(const std::string& request) const {
-	u32 startOfURI = request.find("/");
-	if(string::npos == startOfURI) {return false;}
+bool web::parseArgs(const std::string& request, cu32 startOfArguments) const {
+	u32 endOfArguments = request.find(' ', startOfArguments);
+	if(string::npos == endOfArguments) {return false;}
 
-	u32 startOfArguments = request.find(argsPattern);
-	if(string::npos != startOfArguments) {
-		return parseArgs(request, startOfArguments);
+	CommandsIterator it(request.substr(startOfArguments, endOfArguments - startOfArguments));
+	while(it.next()) {
+		string result;
+		MediatorFactory::get()->execute(it, result);
+		string header;
+		makeHttpHeader(header, result.size());
+		if (ERR_OK != netconn_write(_connectionFromClient, header.c_str(), header.size(), NETCONN_NOCOPY)) {UARTprintf("Failed to send default page\n");}
+		if (ERR_OK != netconn_write(_connectionFromClient, result.c_str(), result.size(), NETCONN_NOCOPY)) {UARTprintf("Failed to send default page\n");}
 	}
 
-	return parseResource(request, startOfURI);
-}
-
-bool web::parseArgs(const std::string& request, cu32 startOfArguments) const {
-	UARTprintf("%s\n", request.c_str());
-
-	return false;
+	return true;
 }
 
 bool web::parseResource(const std::string& request, cu32 startOfURI) const {
@@ -156,6 +165,9 @@ bool web::parseResource(const std::string& request, cu32 startOfURI) const {
 	u8* resource = NULL;
 	if(FR_OK != readResource(uri.c_str(), resource, length)) {UARTprintf("Failed to get resource\n");}
 
+	string header;
+	makeHttpHeader(header, length);
+	if (ERR_OK != netconn_write(_connectionFromClient, header.c_str(), header.size(), NETCONN_NOCOPY)) {UARTprintf("Failed to send default page\n");}
 	if (ERR_OK != netconn_write(_connectionFromClient, resource, length, NETCONN_NOCOPY)) {UARTprintf("Failed to send default page\n");}
 
 	delete resource;
@@ -168,6 +180,14 @@ web::httpMethod web::getHTTPMethodType(const std::string& request) const {
 	}
 
 	return last_httpMethod_element;
+}
+
+void web::makeHttpHeader(std::string& header, cu32 lenght) const {
+	header = httpHeader;
+	header += httpContentLength;
+	s8 buf[10];
+	sprintf(buf, "%d\r\n\r\n", lenght);
+	header += buf;
 }
 
 // =============================================================================

@@ -9,22 +9,27 @@
 #define _OUTPUTMANAGER_HPP_
 
 #include "output.hpp"
+#include "iinform.hpp"
 #include "tristateoutput.hpp"
 #include "projectmanager.hpp"
 #include "singletonfactory.hpp"
+#include "commandsiterator.hpp"
 #include "../projectconfiguration.hpp"
 
 namespace manager {
 namespace output {
 
-class OutputManager {
+class OutputManager: public libs::IInform {
 public: inline const std::map<u32, Output*>& outputs() const;
 public: inline bool read(cu16 address) const;
 public: inline const std::vector<u32>& read() const;
 
+public: virtual bool write(const libs::CommandsIterator& it);
+public: virtual bool read(const libs::CommandsIterator& it, std::string& result) const;
+
 public: virtual ~OutputManager();
 
-protected: inline OutputManager();
+protected: OutputManager();
 
 private: std::map<u32, Output*>	_output;
 private: std::vector<u32>		_data;
@@ -35,42 +40,6 @@ typedef libs::SingletonFactory<OutputManager>	OutputManagerFactory;
 // =============================================================================
 // Inline method implementation
 // =============================================================================
-
-inline OutputManager::OutputManager(): _data(project::ProjectManagerFactory::get()->output().count() + project::ProjectManagerFactory::get()->triStateOutput().count()
-		/ (sizeof(_data[0] * 8)) + ((project::ProjectManagerFactory::get()->output().count() + project::ProjectManagerFactory::get()->triStateOutput().count() % (sizeof(_data[0]) * 8)) ? 1 : 0), 0) {
-
-	std::vector<u16> simpleTmp;
-	project::metaOutput simpleoutput = project::ProjectManagerFactory::get()->output();
-	for(u32 index = 0; index < simpleoutput.count(); index++) {
-		simpleoutput.inputs(simpleTmp);
-		_output[simpleoutput.address()] = new Output(simpleoutput.address(), simpleoutput.timeoutON(), simpleoutput.timeoutOFF(), simpleTmp, _data);
-		simpleTmp.clear();
-		simpleoutput.next();
-	}
-
-	std::vector<u16> tristateTmpUp;
-	std::vector<u16> tristateTmpDown;
-	project::metaTriStateOutput tristateutput = project::ProjectManagerFactory::get()->triStateOutput();
-	for(u32 index = 0; index < tristateutput.count(); index++) {
-		tristateutput.inputs(simpleTmp);
-		tristateutput.inputsUp(tristateTmpUp);
-		tristateutput.inputsDown(tristateTmpDown);
-		_output[tristateutput.address()] = new TriStateOutput(
-				tristateutput.address(),
-				tristateutput.timeoutON(),
-				tristateutput.timeoutOFF(),
-				simpleTmp,
-				_data,
-				tristateutput.extendedAddress(),
-				tristateTmpUp,
-				tristateTmpDown);
-
-		simpleTmp.clear();
-		tristateTmpUp.clear();
-		tristateTmpDown.clear();
-		tristateutput.next();
-	}
-}
 
 inline const std::map<u32, Output*>& OutputManager::outputs() const {
 	return _output;

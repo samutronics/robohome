@@ -5,10 +5,19 @@
 //! \date			28.02.2015.
 //! \note
 // =============================================================================
+#include "mediator.hpp"
 #include "projectmanager.hpp"
 
 using namespace std;
+using namespace libs;
+using namespace systemGlobal;
 using namespace manager::project;
+
+ProjectManager::ProjectManager() {
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_EEPROM0);
+	EEPROMInit();
+	MediatorFactory::get()->attach(ComponentIDProject, this);
+}
 
 void ProjectManager::read(vector<u32>& project) const {
 	project.reserve(EEPROMSizeGet() / sizeof(project[0]));
@@ -24,6 +33,23 @@ bool ProjectManager::write(vector<u32>& project) const {
 	for(u32 index = 0; index < project.size(); index++) {
 		EEPROMProgram(&project[index], index * sizeof(project[0]), sizeof(project[0]));
 	}
+
+	return true;
+}
+
+bool ProjectManager::write(const CommandsIterator& it) {
+	return false;
+}
+
+bool ProjectManager::read(const CommandsIterator& it, std::string& result) const {
+	vector<u32> v;
+	read(v);
+	for(u32 index = 0; index < v.size(); index++) {
+		s8 buf[10];
+		sprintf(buf, "%d", v[index]);
+		result += buf;
+	}
+
 	return true;
 }
 

@@ -8,20 +8,25 @@
 #ifndef _PROJECTMANAGER_HPP_
 #define _PROJECTMANAGER_HPP_
 
+#include "iinform.hpp"
 #include "metainput.hpp"
 #include "metaoutput.hpp"
 #include "metasysconfig.hpp"
 #include "metairrigation.hpp"
 #include "singletonfactory.hpp"
+#include "commandsiterator.hpp"
 #include "metatristateoutput.hpp"
 #include "../projectconfiguration.hpp"
 
 namespace manager {
 namespace project {
 
-class ProjectManager {
+class ProjectManager: public libs::IInform {
 public: void read(std::vector<u32>& project) const;
 public: bool write(std::vector<u32>& project) const;
+
+public: virtual bool write(const libs::CommandsIterator& it);
+public: virtual bool read(const libs::CommandsIterator& it, std::string& result) const;
 
 public: void trace() const;
 public: void parse() const;
@@ -32,7 +37,7 @@ public: inline metaTriStateOutput	triStateOutput()	const;
 public: inline metaSysConfig		sysConfig()			const;
 public: inline metaIrrigation		irrigation()		const;
 
-protected: inline ProjectManager();
+protected: ProjectManager();
 };
 
 typedef libs::SingletonFactory<ProjectManager>	ProjectManagerFactory;
@@ -40,11 +45,6 @@ typedef libs::SingletonFactory<ProjectManager>	ProjectManagerFactory;
 // =============================================================================
 // Inline method implementation
 // =============================================================================
-
-inline ProjectManager::ProjectManager() {
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_EEPROM0);
-	EEPROMInit();
-}
 
 inline metaSysConfig ProjectManager::sysConfig() const {
 	u32 section;

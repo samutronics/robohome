@@ -108,7 +108,7 @@ inline void makeInputCfg(std::vector<u8>& project) {
 //make simple output properties
 static cu16 simpleO[] = {
 		//name						address        timeOn        TimeOff        inputCount        inputList
-		0, 0, 0, 0, 0, 0, 0, 0,		0,                0,          0,     	       	1,                0,
+		0, 0, 0, 0, 0, 0, 0, 0,		0,                0,          0,     	       	1,                16,
 		0, 0, 0, 0, 0, 0, 0, 0,		1,                0,          0,        	    1,                4,
 		0, 0, 0, 0, 0, 0, 0, 0,		2,                0,          100,      		1,                1,
 		0, 0, 0, 0, 0, 0, 0, 0,		3,                0,          100,        		1,                5,
@@ -122,7 +122,7 @@ static cu16 simpleO[] = {
 		0, 0, 0, 0, 0, 0, 0, 0,		11,               100,        100,        		2,                7, 15
 };
 
-static cu16 simpleOutputCount = 0;
+static cu16 simpleOutputCount = 1;
 
 inline void makeSimpleOutputCfg(std::vector<u8>& project) {
 	project.push_back(static_cast<u8>(simpleOutputCount & 0XFF));
@@ -141,7 +141,7 @@ static cu16 triStateO[] = {
 		0, 0, 0, 0, 0, 0, 0, 0,		4,			100,	100,		1,				2,			5,				0,						0
 };
 
-static cu16 triStateOutputCount = 3;
+static cu16 triStateOutputCount = 0;
 
 inline void makeTriStateOutputCfg(std::vector<u8>& project) {
 	project.push_back(static_cast<u8>(triStateOutputCount & 0XFF));
@@ -153,10 +153,10 @@ inline void makeTriStateOutputCfg(std::vector<u8>& project) {
 }
 
 static cu16 irrigation[] = {
-		// name						area, input, up time,	start time, 		mode,				offset time, dailyPrecipitation,	unitPrecipitation
-		0, 0, 0, 0, 0, 0, 0, 0,		10,		16,		100,		1,		manager::project::Normal,		200,			1000,					10,
-		0, 0, 0, 0, 0, 0, 0, 0,		10,		17,		100,		1,		manager::project::Normal,		200,			2000,					10,
-		0, 0, 0, 0, 0, 0, 0, 0,		10,		18,		100,		1,		manager::project::Grown,		200,			1500,					10
+		// name						area, input, up time,	start time, 		mode,				offset time, dailyPrecipitation,	unitPrecipitation,	repeat
+		0, 0, 0, 0, 0, 0, 0, 0,		10,		18,		10,			1,		manager::project::Normal,		20,			1000,					10,				1,
+		0, 0, 0, 0, 0, 0, 0, 0,		10,		17,		10,			1,		manager::project::Normal,		20,			2000,					10,				1,
+		0, 0, 0, 0, 0, 0, 0, 0,		10,		16,		10,		42300,		manager::project::Grown,		20,			1500,					10,				3
 };
 
 static cu16 irrigationCount = 3;

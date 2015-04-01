@@ -41,7 +41,7 @@ private: bool					_requestPost;
 
 inline exosite::exosite():
 		abstractclientservice(configuration::url, configuration::port, NETCONN_TCP, configuration::updatePeriode),
-		_workerBuffer(1024, ' '),
+		_workerBuffer(1024, 0),
 		_requestPost(true) {}
 
 } // exosite

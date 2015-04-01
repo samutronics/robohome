@@ -11,7 +11,7 @@ using namespace std;
 using namespace service::exosite;
 
 cs8 _requestPartCIKHeader[]		= "X-Exosite-CIK: ";
-cs8 _requestPartCIK[]			= "15e4890a88d79261608b194c8217c486c68f0007";
+cs8 _requestPartCIK[]			= "4298029770c90c46ca91d91a7106643fd36b7a39";
 cs8 _requestPartContentLength[]	= "Content-Length: ";
 cs8 _requestPartGetURL[]		= "GET /onep:v1/stack/alias?";
 cs8 _requestPartHTTP[]			= "  HTTP/1.1\r\n";
@@ -20,7 +20,7 @@ cs8 _requestPartAccept[]		= "Accept: application/x-www-form-urlencoded; charset=
 cs8 _requestPartContent[]		= "Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n";
 cs8 _requestPartCRLF[]			= "\r\n";
 
-bool exositeRequestFactory::writeRequest(const std::string& request, std::string& buf) {
+void exositeRequestFactory::writeRequest(const std::string& request, std::string& buf) {
 	char strBuf[10];
 
 	// This is an example write POST...
@@ -41,26 +41,24 @@ bool exositeRequestFactory::writeRequest(const std::string& request, std::string
 	sendLine<LENGTH_LINE>(buf, strBuf);
 
 	buf.append(request);
-	return true;
 }
 
 void exositeRequestFactory::parseWriteResult(pbuf* buf) {
 	getHTTPStatus(buf);
 }
 
-int exositeRequestFactory::readRequest(const std::string& request, std::string& buf) {
+void exositeRequestFactory::readRequest(const std::string& request, std::string& buf) {
 	// This is an example read GET
 	//  s.send('GET /onep:v1/stack/alias?temp HTTP/1.1\r\n')
 	//  s.send('Host: m2.exosite.com\r\n')
 	//  s.send('X-Exosite-CIK: 5046454a9a1666c3acfae63bc854ec1367167815\r\n')
 	//  s.send('Accept: application/x-www-form-urlencoded; charset=utf-8\r\n\r\n')
 
+	buf.clear();
 	sendLine<GETDATA_LINE>(buf, request.c_str());
 	sendLine<HOST_LINE>(buf, NULL);
 	sendLine<CIK_LINE>(buf, NULL);
 	sendLine<ACCEPT_LINE>(buf, "\r\n");
-
-	return 1;
 }
 
 void exositeRequestFactory::parseReadResult(pbuf* buf, std::string& result) {
