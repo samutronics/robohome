@@ -9,6 +9,7 @@
 #include "projectmanager.hpp"
 #include "../projectconfiguration.hpp"
 
+using namespace std;
 using namespace manager::input;
 using namespace manager::project;
 using namespace service::inbound;
@@ -16,10 +17,7 @@ using namespace service::inbound::configuration;
 
 DECLARE_TH(input)
 
-input::input():
-		_dataByteCount(ProjectManagerFactory::get()->sysConfig().hwInputNumber() / 8),
-		_data(_dataByteCount / sizeof(_data[0]) + (_dataByteCount % sizeof(_data[0]) ? 1 : 0), 0),
-		_iputManager(InputManagerFactory::get()) {
+input::input(): tmp(1, 0), _data(ProjectManagerFactory::get()->sysConfig().hwInputNumber() / 8, 0) {
 	_THQueue = xSemaphoreCreateBinary();
 	IOStart();
 	timerStart();
@@ -32,9 +30,14 @@ void input::task(void *pvParameters) {
 
 		IORead();
 
-		_iputManager->write(_data);
+		for(u32 index = 0; index < _data.size(); index++) {
+			tmp[index / sizeof(tmp[0])] |= _data[index] << ((index % sizeof(tmp[0])) * 8);
+		}
+
+		InputManagerFactory::get()->write(tmp);
 
 		for(u32 index = 0; index < _data.size(); _data[index++] = 0);
+		for(u32 index = 0; index < tmp.size(); tmp[index++] = 0);
 	}
 }
 

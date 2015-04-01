@@ -26,9 +26,8 @@ private: inline void IORead();
 private: inline void LoadON() const;
 private: inline void LoadOFF() const;
 
-private: cu32							_dataByteCount;
-private: std::vector<u32>				_data;
-private: manager::input::InputManager*	_iputManager;
+private: std::vector<u32> tmp;
+private: std::vector<u8>				_data;
 DEFINE_TH
 };
 
@@ -48,13 +47,13 @@ inline void input::LoadOFF() const {
 
 inline void input::IORead() {
 	LoadOFF();
-	for(u32 index = 0; index < _dataByteCount; index++) {
+	for(u32 index = 0; index < _data.size(); index++) {
 		SSIDataPut(SSI0_BASE, 0XFF);
 		while(SSIBusy(SSI0_BASE)) {taskYIELD();}
 
 		u32 tmp = 0;
 		SSIDataGet(SSI0_BASE, &tmp);
-		_data[(_dataByteCount / sizeof(_data[0])) - (index / sizeof(_data[0]))] |= (tmp & 0XFF) << ((_dataByteCount - 1 - (index % _dataByteCount)) * 8);
+		_data[_data.size() - index - 1] |= (tmp & 0XFF) << ((_data.size() - (index % _data.size()) - 1) * 8);
 	}
 
 	LoadON();
