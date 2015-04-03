@@ -107,7 +107,15 @@
 //!				* lists of address of Up inputs represented on unsigned short
 //!				.
 //!			.
-//! * <b>Irrigation description:</b>
+//! * <b>Irrigation properties:</b>
+//!		* area: the area of the given round in SI unit
+//!		* input: input that will be written by the given round
+//!		* upTime: irrigating time
+//!		* startTime: the first start at the day
+//!		* mode: configured operating mode
+//!		* offsetTime: offset between the start of uptimes during the day
+//!		* dailyPrecipitation: the amount of precipitation during the day. It's the sum of precipication of the uptimes
+//!		* unitPrecipitation: the precipication in mm/60s
 //!
 // =============================================================================
 //! \file

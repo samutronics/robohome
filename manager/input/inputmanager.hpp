@@ -22,7 +22,7 @@ class InputManager: public libs::IInform {
 public: virtual ~InputManager();
 public: inline const std::vector<Input*>& inputs() const;
 public: inline void reset();
-public: inline void write(cu16 address, cu8 data);
+public: inline void write(cu16 address, cu8 data, bool isBlocking = true);
 public: inline void write(const std::vector<u8>& data);
 
 public: virtual bool write(const libs::CommandsIterator& it);
@@ -49,22 +49,25 @@ inline const std::vector<Input*>& InputManager::inputs() const {
 
 inline void InputManager::reset() {
 	for(u32 index = 0; index < _dataChanged.size(); index++) {
-		xSemaphoreTake(_lock[index], portMAX_DELAY);
 		_dataChanged[index] = 0;
-		xSemaphoreGive(_lock[index]);
 	}
 }
 
-inline void InputManager::write(cu16 address, cu8 data) {
+inline void InputManager::write(cu16 address, cu8 data, bool isBlocking) {
 	cu32 bitCount = (sizeof(_dataChanged[0]) * 8);
 	if(address > _dataChanged.size() * bitCount) {return;}
 
 	xSemaphoreTake(_lock[address / bitCount], portMAX_DELAY);
-	if(!(_dataChanged[address / bitCount] & (1 << address % bitCount))) {
-		_dataPrevious[address / bitCount] = ((_dataPrevious[address / bitCount] & ~(1 << address % bitCount)) | (_dataCurrent[address / bitCount] & (1 << address % bitCount)));
-		_dataCurrent[address / bitCount] = ((_dataCurrent[address / bitCount] & ~(1 << address % bitCount)) | ((data ? 1 : 0) << (address % bitCount)));
-		_dataChanged[address / bitCount] |= (1 << address % bitCount);
-	}
+	do {
+		if(!(_dataChanged[address / bitCount] & (1 << address % bitCount))) {
+			_dataPrevious[address / bitCount] = ((_dataPrevious[address / bitCount] & ~(1 << address % bitCount)) | (_dataCurrent[address / bitCount] & (1 << address % bitCount)));
+			_dataCurrent[address / bitCount] = ((_dataCurrent[address / bitCount] & ~(1 << address % bitCount)) | ((data ? 1 : 0) << (address % bitCount)));
+			_dataChanged[address / bitCount] |= (1 << address % bitCount);
+			break;
+		}
+
+		taskYIELD();
+	} while(isBlocking);
 
 	xSemaphoreGive(_lock[address / bitCount]);
 }

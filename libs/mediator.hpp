@@ -44,7 +44,7 @@ inline void Mediator::dettach(cu32 ComponentID) {
 
 inline bool Mediator::execute(const CommandsIterator& it, std::string& result) const {
 	std::map<u32, IInform*>::const_iterator info = _components.find(it.key() & systemGlobal::ComponentIDMask);
-	if(info != _components.end()) {
+	if(info == _components.end()) {
 		return false;
 	}
 

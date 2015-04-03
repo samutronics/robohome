@@ -130,7 +130,7 @@ typedef struct {
 
 /* Provide a default maximum number of mailboxes. */
 #ifndef SYS_MBOX_MAX
-#define SYS_MBOX_MAX            4
+#define SYS_MBOX_MAX            5
 #endif /* SYS_MBOX_MAX */
 
 /* An array to hold the memory for the available semaphores. */

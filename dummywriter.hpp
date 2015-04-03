@@ -49,8 +49,8 @@ inline void makeSysCfg(std::vector<u8>& project) {
 
 //make input properties
 static cu8 input[] = {
-		manager::project::BothEdges,
-		manager::project::BothEdges,
+		manager::project::RisingEdge,
+		manager::project::RisingEdge,
 		manager::project::BothEdges,
 		manager::project::BothEdges,
 		manager::project::RisingEdge,
@@ -71,8 +71,8 @@ static cu8 input[] = {
 };
 
 static const u8* inputname[] = {
-		"BothEdges       ",
-		"BothEdges       ",
+		"RisingEdge      ",
+		"RisingEdge      ",
 		"BothEdges       ",
 		"BothEdges       ",
 		"RisingEdge      ",
@@ -108,7 +108,7 @@ inline void makeInputCfg(std::vector<u8>& project) {
 //make simple output properties
 static cu16 simpleO[] = {
 		//name						address        timeOn        TimeOff        inputCount        inputList
-		0, 0, 0, 0, 0, 0, 0, 0,		0,                0,          0,     	       	1,                16,
+		0, 0, 0, 0, 0, 0, 0, 0,		0,                0,          0,     	       	2,                0, 1,
 		0, 0, 0, 0, 0, 0, 0, 0,		1,                0,          0,        	    1,                4,
 		0, 0, 0, 0, 0, 0, 0, 0,		2,                0,          100,      		1,                1,
 		0, 0, 0, 0, 0, 0, 0, 0,		3,                0,          100,        		1,                5,
@@ -159,7 +159,7 @@ static cu16 irrigation[] = {
 		0, 0, 0, 0, 0, 0, 0, 0,		10,		16,		10,		42300,		manager::project::Grown,		20,			1500,					10,				3
 };
 
-static cu16 irrigationCount = 3;
+static cu16 irrigationCount = 0;
 
 inline void makeIrrigationCfg(std::vector<u8>& project) {
 	project.push_back(static_cast<u8>(irrigationCount & 0XFF));

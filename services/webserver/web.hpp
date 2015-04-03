@@ -72,8 +72,6 @@ inline FRESULT web::readResource(cs8* path, u8*& buffer, u32& size) const {
 	if(FR_OK != error) {return error;}
 
 	error = f_close(&file);
-	if(FR_OK != error) {return error;}
-
 	return error;
 }
 

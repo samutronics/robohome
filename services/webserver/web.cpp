@@ -18,8 +18,10 @@ const sp8 httpMethods[] = {
 		""
 };
 
-cs8 httpHeader[] = "HTTP/1.1 200 OK\r\n";
-cs8 httpContentLength[] = "Content-Length: ";
+cs8 httpHeader[] =
+		"HTTP/1.1 200 OK\r\n\
+		Connection: close\r\n\
+		Content-Length: ";
 
 using namespace std;
 using namespace libs;
@@ -91,7 +93,10 @@ void web::task(void *pvParameters) {
 		{
 			// wait for an incomming connection from the remote client
 			_connectionFromClient = NULL;
-			if (ERR_OK != netconn_accept(connection, &_connectionFromClient)) {continue;}
+			if (ERR_OK != netconn_accept(connection, &_connectionFromClient)) {
+				UARTprintf("An error occured during connection accept\n");
+				break;
+			}
 
 			// get data from the connection request
 			netbuf* reply = NULL;
@@ -99,10 +104,10 @@ void web::task(void *pvParameters) {
 				UARTprintf("Failed to receive data\n");
 				netconn_close(_connectionFromClient);
 				netconn_delete(_connectionFromClient);
-				continue;
+				break;
 			}
 
-			// put the data into an std::string object to the parse becamores easier
+			// put the data into an std::string object to the parse becames more easier
 			string httpRequest(static_cast<s8*>(reply->p->payload), reply->p->len);
 			// the std::string object took over the data. Delete the netbuf to avoid the memory leaks
 			netbuf_delete(reply);
@@ -116,6 +121,7 @@ void web::task(void *pvParameters) {
 				u32 startOfArguments = httpRequest.find(argsPattern);
 				if(string::npos != startOfArguments) {
 					parseArgs(httpRequest, startOfArguments + sizeof(argsPattern) - 1);
+					break;
 				}
 
 				parseResource(httpRequest, startOfURI);
@@ -131,6 +137,9 @@ void web::task(void *pvParameters) {
 			netconn_close(_connectionFromClient);
 			netconn_delete(_connectionFromClient);
 		}
+
+		netconn_close(connection);
+		netconn_delete(connection);
 	}
 }
 
@@ -144,8 +153,8 @@ bool web::parseArgs(const std::string& request, cu32 startOfArguments) const {
 		MediatorFactory::get()->execute(it, result);
 		string header;
 		makeHttpHeader(header, result.size());
-		if (ERR_OK != netconn_write(_connectionFromClient, header.c_str(), header.size(), NETCONN_NOCOPY)) {UARTprintf("Failed to send default page\n");}
-		if (ERR_OK != netconn_write(_connectionFromClient, result.c_str(), result.size(), NETCONN_NOCOPY)) {UARTprintf("Failed to send default page\n");}
+		if (ERR_OK != netconn_write(_connectionFromClient, header.c_str(), header.size(), NETCONN_COPY)) {UARTprintf("Failed to send default page\n");}
+		if (ERR_OK != netconn_write(_connectionFromClient, result.c_str(), result.size(), NETCONN_COPY)) {UARTprintf("Failed to send default page\n");}
 	}
 
 	return true;
@@ -167,7 +176,7 @@ bool web::parseResource(const std::string& request, cu32 startOfURI) const {
 
 	string header;
 	makeHttpHeader(header, length);
-	if (ERR_OK != netconn_write(_connectionFromClient, header.c_str(), header.size(), NETCONN_NOCOPY)) {UARTprintf("Failed to send default page\n");}
+	if (ERR_OK != netconn_write(_connectionFromClient, header.c_str(), header.size(), NETCONN_COPY)) {UARTprintf("Failed to send default page\n");}
 	if (ERR_OK != netconn_write(_connectionFromClient, resource, length, NETCONN_NOCOPY)) {UARTprintf("Failed to send default page\n");}
 
 	delete resource;
@@ -184,7 +193,6 @@ web::httpMethod web::getHTTPMethodType(const std::string& request) const {
 
 void web::makeHttpHeader(std::string& header, cu32 lenght) const {
 	header = httpHeader;
-	header += httpContentLength;
 	s8 buf[10];
 	sprintf(buf, "%d\r\n\r\n", lenght);
 	header += buf;
