@@ -46,13 +46,13 @@ void Irrigation::task(void *pvParameters) {
 	}
 }
 
-EvaluatorNormal* Irrigation::evaluatorFactory(const metaIrrigation& irr) {
+EvaluatorGrowm* Irrigation::evaluatorFactory(const metaIrrigation& irr) {
 	switch (irr.mode()) {
 	case Normal: {
-		return new EvaluatorNormal(irr.startTime(), irr.upTime(), irr.offsetTime() - irr.upTime(), irr.input(), irr.repeatCount(), _currentTime);
+		return new EvaluatorNormal(irr, _currentTime);
 	}
 	case Grown: {
-		return new EvaluatorGrowm(irr.startTime(), irr.upTime(), irr.offsetTime() - irr.upTime(), irr.input(), irr.repeatCount(), _currentTime);
+		return new EvaluatorGrowm(irr, _currentTime);
 	}
 	default: {
 		UARTprintf("Unsuported evalator type in irrigation::evaluatorFactory()\n");

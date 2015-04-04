@@ -9,26 +9,77 @@
 #define _EVALUATORGROWN_H_
 
 #include "inputmanager.hpp"
-#include "evaluatornormal.hpp"
+#include "metairrigation.hpp"
 #include "projectconfiguration.hpp"
 
 namespace service {
 namespace irrigation {
 
-class EvaluatorGrowm: public EvaluatorNormal {
-public: inline EvaluatorGrowm(cu32 startTime, cu16 upTime, cu16 downTime, cu16 input, cu16 repeatCount, const tm& currentTime);
+class EvaluatorGrowm {
+protected: enum CircleState {
+	Active,
+	Passive,
+	Wait
+};
+
+public: inline EvaluatorGrowm(const manager::project::metaIrrigation& irr, const tm& currentTime);
+public: inline bool evaluate();
+public: inline cu16 time() const;
 
 protected: virtual inline bool evaluateBranchActive();
 protected: virtual inline bool evaluateBranchPassive();
 protected: virtual inline bool evaluateBranchWait();
+
+protected: u16			_count;
+protected: u16			_timer;
+protected: u8			_day;
+protected: CircleState	_state;
+protected: cu32			_startTime;
+protected: cu16			_upTime;
+protected: cu16			_downTime;
+protected: cu16			_input;
+protected: cu16			_repeatCount;
+protected: const tm&	_currentTime;
 };
 
 // =============================================================================
 // Inline method implementation
 // =============================================================================
 
-inline EvaluatorGrowm::EvaluatorGrowm(cu32 startTime, cu16 upTime, cu16 downTime, cu16 input, cu16 repeatCount, const tm& currentTime):
-		EvaluatorNormal(startTime, upTime, downTime, input, repeatCount, currentTime) {}
+inline EvaluatorGrowm::EvaluatorGrowm(const manager::project::metaIrrigation& irr, const tm& currentTime):
+				_count(0),
+				_day(std::numeric_limits<u8>::max()),
+				_state(Passive),
+				_startTime(irr.startTime()),
+				_upTime(irr.upTime()),
+				_downTime(irr.offsetTime() - irr.upTime()),
+				_input(irr.input()),
+				_repeatCount(irr.repeatCount()),
+				_currentTime(currentTime) {}
+
+inline cu16 EvaluatorGrowm::time() const {
+	return _timer;
+}
+
+inline bool EvaluatorGrowm::evaluate() {
+	switch (_state) {
+	case Active: {
+		return evaluateBranchActive();
+	}
+	case Passive: {
+		return evaluateBranchPassive();
+	}
+	case Wait: {
+		return evaluateBranchWait();
+	}
+	default: {
+		UARTprintf("Unsupported switch case in EvaluatorNormal::evaluate()\n");
+		break;
+	}
+	}
+
+	return false;
+}
 
 inline bool EvaluatorGrowm::evaluateBranchActive() {
 	_timer--;
