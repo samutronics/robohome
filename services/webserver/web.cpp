@@ -30,7 +30,7 @@ using namespace service::web;
 using namespace manager::project;
 using namespace service::web::configuration;
 
-web::web(): _connectionFromClient(NULL), _httpRequest(512, 0), _operationResult(512, 0) {
+Web::Web(): _connectionFromClient(NULL), _httpRequest(512, 0), _operationResult(512, 0) {
 	// =============================================================================
 	//! * Enable GPIO Port F, and configure Pin 0 and Pin 4 for Ethernet LEDs
 	// =============================================================================
@@ -78,13 +78,14 @@ web::web(): _connectionFromClient(NULL), _httpRequest(512, 0), _operationResult(
     // =============================================================================
     {
     	taskENTER_CRITICAL();
+    	UARTprintf("Device MAC address: %x:%x:%x:%x:%x:%x\n", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     	u32 IP = lwIPLocalIPAddrGet();
     	UARTprintf("Device IP address: %d.%d.%d.%d\n", (IP & 0xff), ((IP >> 8) & 0xff), ((IP >> 16) & 0xff), ((IP >> 24) & 0xff));
     	taskEXIT_CRITICAL();
     }
 }
 
-void web::task(void *pvParameters) {
+void Web::task(void *pvParameters) {
 	while(true) {
 		netconn* connection = netconn_new (NETCONN_TCP);
 		netconn_bind(connection, IPADDR_ANY, port);
@@ -147,7 +148,7 @@ void web::task(void *pvParameters) {
 	}
 }
 
-bool web::parseArgs(cu32 startOfArguments) {
+bool Web::parseArgs(cu32 startOfArguments) {
 	u32 endOfArguments = _httpRequest.find(' ', startOfArguments);
 	if(string::npos == endOfArguments) {return false;}
 
@@ -164,7 +165,7 @@ bool web::parseArgs(cu32 startOfArguments) {
 	return true;
 }
 
-bool web::parseResource(cu32 startOfURI) const {
+bool Web::parseResource(cu32 startOfURI) const {
 	string uri;
 	if('/' == _httpRequest[startOfURI] && ' ' == _httpRequest[startOfURI + 1]) {
 		uri = defaultPage;
@@ -187,7 +188,7 @@ bool web::parseResource(cu32 startOfURI) const {
 	return true;
 }
 
-web::httpMethod web::getHTTPMethodType(const std::string& request) const {
+Web::httpMethod Web::getHTTPMethodType(const std::string& request) const {
 	for(u32 method = get; method <= last_httpVersion_element; method++) {
 		if(0 == request.find(httpMethods[method])) {return static_cast<httpMethod>(method);}
 	}
@@ -195,7 +196,7 @@ web::httpMethod web::getHTTPMethodType(const std::string& request) const {
 	return last_httpMethod_element;
 }
 
-void web::makeHttpHeader(std::string& header, cu32 lenght) const {
+void Web::makeHttpHeader(std::string& header, cu32 lenght) const {
 	header = httpHeader;
 	s8 buf[10];
 	sprintf(buf, "%d\r\n\r\n", lenght);

@@ -10,8 +10,9 @@
 
 #include "report.hpp"
 #include "requestfactory.hpp"
+#include "singletonfactory.hpp"
 #include "abstractclientservice.hpp"
-#include "../projectconfiguration.hpp"
+#include "projectconfiguration.hpp"
 
 namespace service {
 namespace weather {
@@ -19,9 +20,7 @@ namespace weather {
 // =============================================================================
 //! \brief Service implementation to gather weather informations for the system.
 // =============================================================================
-class weather: public abstractclientservice {
-	TO_BE_RUNABLE(weather)
-
+class Weather: public abstractclientservice {
 public: inline const std::vector<u32>& statistic() const;
 
 protected: virtual bool processingReply(netbuf* reply);
@@ -31,7 +30,7 @@ protected: virtual netbuf* generateRequest();
 //! \brief There is no tasks assigned to the constructor, but it has to be
 //! declared as private.
 // =============================================================================
-private: inline weather();
+protected: inline Weather();
 
 // =============================================================================
 // Member declarations
@@ -41,15 +40,17 @@ private: std::vector<u32>		_statistic;
 private: weatherRequestFactory	_requestFactory;
 };
 
+typedef libs::SingletonFactory<Weather> WeatherFactory;
+
 // =============================================================================
 // Inline method implementation
 // =============================================================================
-inline weather::weather():
+inline Weather::Weather():
 		abstractclientservice(configuration::url, configuration::port, NETCONN_TCP, configuration::updatePeriode),
 		_forecast(0),
 		_statistic(3, 0) {}
 
-inline const std::vector<u32>& weather::statistic() const {
+inline const std::vector<u32>& Weather::statistic() const {
 	return _statistic;
 }
 

@@ -10,7 +10,7 @@
 
 #include "input.hpp"
 #include "inputmanager.hpp"
-#include "../projectconfiguration.hpp"
+#include "projectconfiguration.hpp"
 
 namespace manager {
 namespace output {

@@ -14,13 +14,13 @@
 #include "metairrigation.hpp"
 #include "evaluatornormal.hpp"
 #include "singletonfactory.hpp"
-#include "../projectconfiguration.hpp"
+#include "projectconfiguration.hpp"
 
 namespace service {
 namespace irrigation {
 
-class irrigation: public libs::IInform {
-protected: irrigation();
+class Irrigation: public libs::IInform {
+protected: Irrigation();
 public: void task(void *pvParameters);
 
 public: virtual bool write(const libs::CommandsIterator& it);
@@ -36,7 +36,7 @@ private: std::vector<EvaluatorNormal*>::iterator	_active;
 DEFINE_TH
 };
 
-typedef libs::SingletonFactory<irrigation> IrrigationFactory;
+typedef libs::SingletonFactory<Irrigation> IrrigationFactory;
 
 // =============================================================================
 // Inline method implementation

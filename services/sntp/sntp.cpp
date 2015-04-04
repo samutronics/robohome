@@ -41,7 +41,7 @@ PACK_STRUCT_END
 using namespace service::sntp;
 using namespace service::sntp::configuration;
 
-sntp::sntp(): abstractclientservice(url, port, NETCONN_UDP, updatePeriode) {
+Sntp::Sntp(): abstractclientservice(url, port, NETCONN_UDP, updatePeriode) {
 	HibernateEnableExpClk(systemGlobal::currentSystemClockFrequency);
 	HibernateCounterMode(HIBERNATE_COUNTER_24HR);
 
@@ -51,11 +51,11 @@ sntp::sntp(): abstractclientservice(url, port, NETCONN_UDP, updatePeriode) {
 	HibernateCalendarMatchSet(0, &t);
 	HibernateIntClear(HIBERNATE_INT_PIN_WAKE | HIBERNATE_INT_LOW_BAT | HIBERNATE_INT_RTC_MATCH_0);
 	HibernateIntEnable(HIBERNATE_INT_RTC_MATCH_0);
-	HibernateIntRegister(&sntp::handlerTH);
+	HibernateIntRegister(&Sntp::handlerTH);
 	HibernateRTCEnable();
 }
 
-bool sntp::processingReply(netbuf* reply) {
+bool Sntp::processingReply(netbuf* reply) {
 	u8 mode;
 	sntp_msg* reference = NULL;
 	if (reply->p->tot_len == 48) {
@@ -106,7 +106,7 @@ bool sntp::processingReply(netbuf* reply) {
 	return true;
 }
 
-netbuf* sntp::generateRequest() {
+netbuf* Sntp::generateRequest() {
 	netbuf* request = netbuf_new();
 	static sntp_msg msg;
 	msg.li_vn_mode[0] = (SNTP_LI_NO_WARNING | SNTP_VERSION | SNTP_MODE_CLIENT);
@@ -115,7 +115,7 @@ netbuf* sntp::generateRequest() {
 	return request;
 }
 
-void sntp::handlerTH() {
+void Sntp::handlerTH() {
 	HibernateIntClear(HIBERNATE_INT_RTC_MATCH_0);
 }
 

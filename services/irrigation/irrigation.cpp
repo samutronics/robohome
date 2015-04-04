@@ -8,7 +8,7 @@
 #include "mediator.hpp"
 #include "irrigation.hpp"
 #include "projectmanager.hpp"
-#include "../projectconfiguration.hpp"
+#include "projectconfiguration.hpp"
 
 using namespace libs;
 using namespace systemGlobal;
@@ -16,9 +16,9 @@ using namespace manager::project;
 using namespace service::irrigation;
 using namespace service::irrigation::configuration;
 
-DECLARE_TH(irrigation);
+DECLARE_TH(Irrigation);
 
-irrigation::irrigation():
+Irrigation::Irrigation():
 				_evaluators(ProjectManagerFactory::get()->irrigation().count(), 0),
 				_active(_evaluators.begin()) {
 	metaIrrigation irr = ProjectManagerFactory::get()->irrigation();
@@ -32,7 +32,7 @@ irrigation::irrigation():
 	timerStart();
 }
 
-void irrigation::task(void *pvParameters) {
+void Irrigation::task(void *pvParameters) {
 	while(true) {
 		// The thread gives up its time-slice, if there is no semaphore given.
 		xSemaphoreTake(_THQueue, portMAX_DELAY);
@@ -46,7 +46,7 @@ void irrigation::task(void *pvParameters) {
 	}
 }
 
-EvaluatorNormal* irrigation::evaluatorFactory(const metaIrrigation& irr) {
+EvaluatorNormal* Irrigation::evaluatorFactory(const metaIrrigation& irr) {
 	switch (irr.mode()) {
 	case Normal: {
 		return new EvaluatorNormal(irr.startTime(), irr.upTime(), irr.offsetTime() - irr.upTime(), irr.input(), irr.repeatCount(), _currentTime);
@@ -62,7 +62,7 @@ EvaluatorNormal* irrigation::evaluatorFactory(const metaIrrigation& irr) {
 	return NULL;
 }
 
-void irrigation::timerStart() const {
+void Irrigation::timerStart() const {
 	SysCtlPeripheralEnable(timerPeriphery);
 	TimerConfigure	(timer, TIMER_CFG_PERIODIC);
 	TimerLoadSet	(timer, TIMER_A, systemGlobal::requestedSystemClockFrequency / pollingFrequency);
@@ -71,12 +71,12 @@ void irrigation::timerStart() const {
 	TimerEnable		(timer, TIMER_A);
 }
 
-bool irrigation::write(const CommandsIterator& it) {
+bool Irrigation::write(const CommandsIterator& it) {
 	return false;
 }
 
-bool irrigation::read(const CommandsIterator& it, std::string& result) const {
-	if((CmdTimer == (it.key() & CmdIrrigationMask)) && (it.key() & addressMask < _evaluators.size())) {
+bool Irrigation::read(const CommandsIterator& it, std::string& result) const {
+	if((CmdTimer == (it.key() & CmdIrrigationMask)) && ((it.key() & addressMask) < _evaluators.size())) {
 		s8 buf[10];
 		sprintf(buf, "%d", _evaluators[it.key() & addressMask]->time());
 		result += buf;
@@ -87,7 +87,7 @@ bool irrigation::read(const CommandsIterator& it, std::string& result) const {
 }
 
 
-void irrigation::handlerTH() {
+void Irrigation::handlerTH() {
 	TimerIntClear(timer, TIMER_TIMA_TIMEOUT);
 	xSemaphoreGiveFromISR(_THQueue, NULL);
 }

@@ -13,7 +13,7 @@
 using namespace std;
 using namespace service::exosite;
 
-bool exosite::processingReply(netbuf* reply) {
+bool Exosite::processingReply(netbuf* reply) {
 	if(_requestPost) {
 		_exositeRequestFactory.parseWriteResult(reply->p);
 	}
@@ -40,7 +40,7 @@ bool exosite::processingReply(netbuf* reply) {
 	return true;
 }
 
-netbuf* exosite::generateRequest() {
+netbuf* Exosite::generateRequest() {
 	_requestPost ?
 			_exositeRequestFactory.writeRequest(_deviceRequestFactory.writeRequest(), _workerBuffer):
 			_exositeRequestFactory.readRequest(_deviceRequestFactory.readRequest(), _workerBuffer);

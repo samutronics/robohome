@@ -8,13 +8,13 @@
 #ifndef _WEB_HPP_
 #define _WEB_HPP_
 
-#include "iservice.hpp"
-#include "../projectconfiguration.hpp"
+#include "singletonfactory.hpp"
+#include "projectconfiguration.hpp"
 
 namespace service {
 namespace web {
 
-class web: public IService {
+class Web {
 private: enum httpVersion {
 		version10 = 0,
 		version11 = 1,
@@ -28,14 +28,13 @@ private: enum httpMethod {
 		DECLARE_LAST_ENUM(httpMethod)
 	};
 
-TO_BE_RUNABLE(web)
 // =============================================================================
 //! \brief Initialize the hardware and necessary objects
 //!
 //!	Due to the singleton implementation, it will be done whitin the thread context.
 //! The initialization consist of the following steps:
 // =============================================================================
-private: web();
+protected: Web();
 
 private: httpMethod getHTTPMethodType(const std::string& request) const;
 private: bool parseArgs(cu32 startOfArguments);
@@ -50,18 +49,20 @@ private: inline FRESULT readResource(cs8* path, u8*& buffer, u32& size) const;
 //!
 //!	This basic implementation is required due to the architecture convenience.
 // =============================================================================
-private: virtual void task(void *pvParameters);
+public: void task(void *pvParameters);
 
 private: netconn*		_connectionFromClient;
 private: std::string	_httpRequest;
 private: std::string	_operationResult;
 };
 
+typedef libs::SingletonFactory<Web> WebFactory;
+
 // =============================================================================
 // Inline method implementation
 // =============================================================================
 
-inline FRESULT web::readResource(cs8* path, u8*& buffer, u32& size) const {
+inline FRESULT Web::readResource(cs8* path, u8*& buffer, u32& size) const {
 	static FIL file;
 	FRESULT error = f_open(&file, path, FA_READ);
 	if(FR_OK != error) {return error;}

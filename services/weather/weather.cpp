@@ -14,7 +14,7 @@ using namespace std;
 using namespace service::weather;
 using namespace service::weather::configuration;
 
-bool weather::processingReply(netbuf* reply) {
+bool Weather::processingReply(netbuf* reply) {
 	// =============================================================================
 	// Get field "rain":
 	// =============================================================================
@@ -64,7 +64,7 @@ bool weather::processingReply(netbuf* reply) {
 	return true;
 }
 
-netbuf* weather::generateRequest() {
+netbuf* Weather::generateRequest() {
 	netbuf* buf = netbuf_new();
 	_requestFactory.reset();
 	const string& request = _requestFactory.request("Budapest,HU", _forecast);

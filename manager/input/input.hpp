@@ -9,7 +9,7 @@
 #define _INPUT_HPP_
 
 #include "metainput.hpp"
-#include "../projectconfiguration.hpp"
+#include "projectconfiguration.hpp"
 
 namespace manager {
 namespace input {

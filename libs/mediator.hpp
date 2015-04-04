@@ -11,7 +11,7 @@
 #include "iinform.hpp"
 #include "commandsiterator.hpp"
 #include "singletonfactory.hpp"
-#include "../projectconfiguration.hpp"
+#include "projectconfiguration.hpp"
 
 namespace libs {
 

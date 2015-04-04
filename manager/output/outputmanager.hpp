@@ -14,7 +14,7 @@
 #include "projectmanager.hpp"
 #include "singletonfactory.hpp"
 #include "commandsiterator.hpp"
-#include "../projectconfiguration.hpp"
+#include "projectconfiguration.hpp"
 
 namespace manager {
 namespace output {

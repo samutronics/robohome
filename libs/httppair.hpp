@@ -8,7 +8,7 @@
 #ifndef _HTTPPAIR_HPP_
 #define _HTTPPAIR_HPP_
 
-#include "../projectconfiguration.hpp"
+#include "projectconfiguration.hpp"
 
 namespace libs {
 

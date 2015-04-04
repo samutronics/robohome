@@ -8,16 +8,15 @@
 #ifndef _ASBTRACTCLIENTSERVICE_H_
 #define _ASBTRACTCLIENTSERVICE_H_
 
-#include "iservice.hpp"
 #include "projectmanager.hpp"
-#include "../projectconfiguration.hpp"
+#include "projectconfiguration.hpp"
 
 class netbuf;
 class netconn;
 
 namespace service {
 
-class abstractclientservice: public IService {
+class abstractclientservice {
 // =============================================================================
 //! \brief Assign the necessary connection informations to the service instance
 //! \note Keep in mind, that the constructor blocks the task execution until the
@@ -52,7 +51,7 @@ protected: virtual netbuf* generateRequest() = 0;
 //! the error handling to be separeted. This method is responsible for managing
 //!	the error handling.
 // =============================================================================
-protected: void task(void *pvParameters);
+public: void task(void *pvParameters);
 
 // =============================================================================
 //! \brief The method is responsible for the data transmission.
@@ -79,7 +78,8 @@ inline abstractclientservice::abstractclientservice(cs8* url, u16 port, netconn_
     u32 GateWay = 0;
 
     manager::project::ProjectManagerFactory::get()->sysConfig().network(static_cast<u32&>(IP), static_cast<u32&>(NetMask), static_cast<u32&>(GateWay));
-    while((0xFFFFFFFF == lwIPLocalIPAddrGet()) || (0x0 == lwIPLocalIPAddrGet())) {taskYIELD();}
+    while((0 == IP) && ((0xFFFFFFFF == lwIPLocalIPAddrGet()) || (0x0 == lwIPLocalIPAddrGet()))) {taskYIELD();}
+//    while((0xFFFFFFFF == lwIPLocalIPAddrGet()) || (0x0 == lwIPLocalIPAddrGet())) {taskYIELD();}
 }
 
 } // service

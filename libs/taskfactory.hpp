@@ -9,7 +9,7 @@
 #define _TASKFACTORY_HPP_
 
 #include "singletonfactory.hpp"
-#include "../projectconfiguration.hpp"
+#include "projectconfiguration.hpp"
 
 namespace libs {
 

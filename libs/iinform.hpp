@@ -8,7 +8,7 @@
 #ifndef _IINFORM_HPP_
 #define _IINFORM_HPP_
 
-#include "../projectconfiguration.hpp"
+#include "projectconfiguration.hpp"
 
 namespace libs {
 

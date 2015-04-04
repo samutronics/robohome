@@ -10,35 +10,6 @@
 #ifndef _IMANAGER_H_
 #define _IMANAGER_H_
 
-namespace service {
-
-// =============================================================================
-//! \brief Interface for tasks
-//!
-//!	The interface provide the method, that is harmed to the requirement of FreeRTOS
-//! threads
-// =============================================================================
-class IService {
-	protected: virtual void task(void *pvParameters) = 0;
-};
-
-}  // service
-
-// =============================================================================
-//! \brief C source capable thread implementation for wrapping the interface implementations
-//!
-//!	Due to C sources cannot work on C++ obejct, C++ statis method needs to
-//! wrap the thread implementation. Furthermore, only one thread is required and
-//! allowed per type. To fulfill that, a special singleton design pattern is applied.
-// =============================================================================
-#define TO_BE_RUNABLE(derived)									\
-	public: static inline void start(void *pvParameters) {		\
-		static derived* d;										\
-		if(!d) {d = new derived();}								\
-		d->task(pvParameters);									\
-		while(1);												\
-	};															\
-
 // =============================================================================
 //! \brief Definition of Top Halve part of THBH model
 //!

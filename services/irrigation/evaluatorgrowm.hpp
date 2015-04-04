@@ -10,7 +10,7 @@
 
 #include "inputmanager.hpp"
 #include "evaluatornormal.hpp"
-#include "../projectconfiguration.hpp"
+#include "projectconfiguration.hpp"
 
 namespace service {
 namespace irrigation {

@@ -8,7 +8,7 @@
 #ifndef _COMMANDSITERATOR_HPP_
 #define _COMMANDSITERATOR_HPP_
 
-#include "../projectconfiguration.hpp"
+#include "projectconfiguration.hpp"
 
 namespace libs {
 

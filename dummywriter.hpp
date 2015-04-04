@@ -8,7 +8,7 @@
 #ifndef DUMMYWRITER_HPP_
 #define DUMMYWRITER_HPP_
 
-#include "../projectconfiguration.hpp"
+#include "projectconfiguration.hpp"
 
 //make system configuration
 static cs8 cik[] = "15e4890a88d79261608b194c8217c486c68f0007";
@@ -19,12 +19,12 @@ inline void makeSysCfg(std::vector<u8>& project) {
 	project.push_back(0);	// write hw input count
 	project.push_back(16);	// write hw output count
 	project.push_back(0);	// write hw output count
-/*
-	project.push_back(11);	// write IP address
-	project.push_back(1);	// write IP address
-	project.push_back(168);	// write IP address
-	project.push_back(192);	// write IP address
-*/
+
+//	project.push_back(10);	// write IP address
+//	project.push_back(1);	// write IP address
+//	project.push_back(168);	// write IP address
+//	project.push_back(192);	// write IP address
+
 	project.push_back(0);	// write IP address
 	project.push_back(0);	// write IP address
 	project.push_back(0);	// write IP address
