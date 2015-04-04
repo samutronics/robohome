@@ -30,7 +30,7 @@ using namespace service::web;
 using namespace manager::project;
 using namespace service::web::configuration;
 
-web::web() {
+web::web(): _connectionFromClient(NULL), _httpRequest(512, 0), _operationResult(512, 0) {
 	// =============================================================================
 	//! * Enable GPIO Port F, and configure Pin 0 and Pin 4 for Ethernet LEDs
 	// =============================================================================
@@ -108,23 +108,27 @@ void web::task(void *pvParameters) {
 			}
 
 			// put the data into an std::string object to the parse becames more easier
-			string httpRequest(static_cast<s8*>(reply->p->payload), reply->p->len);
+			_httpRequest.clear();
+			_httpRequest.append(static_cast<s8*>(reply->p->payload), reply->p->len);
 			// the std::string object took over the data. Delete the netbuf to avoid the memory leaks
 			netbuf_delete(reply);
 
 			// serve the request by the method type
-			switch(getHTTPMethodType(httpRequest)) {
+			switch(getHTTPMethodType(_httpRequest)) {
 			case get: {
-				u32 startOfURI = httpRequest.find("/");
-				if(string::npos == startOfURI) {break;}
-
-				u32 startOfArguments = httpRequest.find(argsPattern);
-				if(string::npos != startOfArguments) {
-					parseArgs(httpRequest, startOfArguments + sizeof(argsPattern) - 1);
+				u32 startOfURI = _httpRequest.find("/");
+				if(string::npos == startOfURI) {
+					UARTprintf("%s\n", _httpRequest.c_str());
 					break;
 				}
 
-				parseResource(httpRequest, startOfURI);
+				u32 startOfArguments = _httpRequest.find(argsPattern);
+				if(string::npos != startOfArguments) {
+					parseArgs(startOfArguments + sizeof(argsPattern) - 1);
+					break;
+				}
+
+				parseResource(startOfURI);
 				break;
 			}
 			default: {
@@ -143,31 +147,31 @@ void web::task(void *pvParameters) {
 	}
 }
 
-bool web::parseArgs(const std::string& request, cu32 startOfArguments) const {
-	u32 endOfArguments = request.find(' ', startOfArguments);
+bool web::parseArgs(cu32 startOfArguments) {
+	u32 endOfArguments = _httpRequest.find(' ', startOfArguments);
 	if(string::npos == endOfArguments) {return false;}
 
-	CommandsIterator it(request.substr(startOfArguments, endOfArguments - startOfArguments));
+	CommandsIterator it(_httpRequest.substr(startOfArguments, endOfArguments - startOfArguments));
 	while(it.next()) {
-		string result;
-		MediatorFactory::get()->execute(it, result);
+		_operationResult.clear();
+		MediatorFactory::get()->execute(it, _operationResult);
 		string header;
-		makeHttpHeader(header, result.size());
+		makeHttpHeader(header, _operationResult.size());
 		if (ERR_OK != netconn_write(_connectionFromClient, header.c_str(), header.size(), NETCONN_COPY)) {UARTprintf("Failed to send default page\n");}
-		if (ERR_OK != netconn_write(_connectionFromClient, result.c_str(), result.size(), NETCONN_COPY)) {UARTprintf("Failed to send default page\n");}
+		if (ERR_OK != netconn_write(_connectionFromClient, _operationResult.c_str(), _operationResult.size(), NETCONN_NOCOPY)) {UARTprintf("Failed to send default page\n");}
 	}
 
 	return true;
 }
 
-bool web::parseResource(const std::string& request, cu32 startOfURI) const {
+bool web::parseResource(cu32 startOfURI) const {
 	string uri;
-	if('/' == request[startOfURI] && ' ' == request[startOfURI + 1]) {
+	if('/' == _httpRequest[startOfURI] && ' ' == _httpRequest[startOfURI + 1]) {
 		uri = defaultPage;
 	}
 	else {
-		u32 endOfURI = request.find(" ", startOfURI);
-		uri = request.substr(startOfURI, endOfURI - startOfURI);
+		u32 endOfURI = _httpRequest.find(" ", startOfURI);
+		uri = _httpRequest.substr(startOfURI, endOfURI - startOfURI);
 	}
 
 	u32 length = 0;
