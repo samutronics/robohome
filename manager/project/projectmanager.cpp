@@ -208,7 +208,7 @@ void ProjectManager::parse() const {
 		UARTprintf("\tDaily start: %d:%d\n", irr.startTime() / 3600, (irr.startTime() % 3600) / 60);
 		UARTprintf("\tUptime: %d\n", irr.upTime());
 		UARTprintf("\tOffset between uptimes: %d\n", irr.offsetTime());
-		UARTprintf("\tUnit and total precipitation: %d/%d\n\n", irr.unitPrecipitation(), irr.dailyPrecipitation());
+		UARTprintf("\tUnit and total precipitation: %d [mm/s] / %d[mm/day]\n\n", irr.unitPrecipitation(), irr.dailyPrecipitation());
 
 		irr.next();
 	}

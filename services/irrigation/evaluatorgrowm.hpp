@@ -30,16 +30,13 @@ protected: virtual inline bool evaluateBranchActive();
 protected: virtual inline bool evaluateBranchPassive();
 protected: virtual inline bool evaluateBranchWait();
 
-protected: u16			_count;
 protected: u16			_timer;
 protected: u8			_day;
 protected: CircleState	_state;
-protected: cu32			_startTime;
-protected: cu16			_upTime;
-protected: cu16			_downTime;
-protected: cu16			_input;
-protected: cu16			_repeatCount;
+protected: const manager::project::metaIrrigation _descriptor;
 protected: const tm&	_currentTime;
+
+private: u16			_count;
 };
 
 // =============================================================================
@@ -47,15 +44,11 @@ protected: const tm&	_currentTime;
 // =============================================================================
 
 inline EvaluatorGrowm::EvaluatorGrowm(const manager::project::metaIrrigation& irr, const tm& currentTime):
-				_count(0),
 				_day(std::numeric_limits<u8>::max()),
 				_state(Passive),
-				_startTime(irr.startTime()),
-				_upTime(irr.upTime()),
-				_downTime(irr.offsetTime() - irr.upTime()),
-				_input(irr.input()),
-				_repeatCount(irr.repeatCount()),
-				_currentTime(currentTime) {}
+				_descriptor(irr),
+				_currentTime(currentTime),
+				_count(0) {}
 
 inline cu16 EvaluatorGrowm::time() const {
 	return _timer;
@@ -84,9 +77,9 @@ inline bool EvaluatorGrowm::evaluate() {
 inline bool EvaluatorGrowm::evaluateBranchActive() {
 	_timer--;
 	if(0 == _timer) {
-		manager::input::InputManagerFactory::get()->write(_input, 0);
+		manager::input::InputManagerFactory::get()->write(_descriptor.input(), 0);
 		_count++;
-		_timer = _downTime;
+		_timer = _descriptor.offsetTime() - _descriptor.upTime();
 		_state = Wait;
 		return false;
 	}
@@ -99,13 +92,13 @@ inline bool EvaluatorGrowm::evaluateBranchPassive() {
 		return false;
 	}
 
-	cs32 startHour = _startTime / 3600;
-	cs32 startMin = (_startTime - startHour * 3600) / 60;
+	cs32 startHour = _descriptor.startTime() / 3600;
+	cs32 startMin = (_descriptor.startTime() - startHour * 3600) / 60;
 	if((startHour <= _currentTime.tm_hour) || ((startHour == _currentTime.tm_hour) && (startMin <= _currentTime.tm_min))) {
-		manager::input::InputManagerFactory::get()->write(_input, 1);
+		manager::input::InputManagerFactory::get()->write(_descriptor.input(), 1);
 		_count = 0;
 		_day = _currentTime.tm_mday;
-		_timer = _upTime;
+		_timer = _descriptor.offsetTime() - _descriptor.upTime();
 		_state = Active;
 		return true;
 	}
@@ -114,15 +107,15 @@ inline bool EvaluatorGrowm::evaluateBranchPassive() {
 }
 
 inline bool EvaluatorGrowm::evaluateBranchWait() {
-	if(_count == _repeatCount) {
+	if(_count ==  _descriptor.repeatCount()) {
 		_state = Passive;
 		return false;
 	}
 
 	_timer--;
 	if(0 == _timer) {
-		manager::input::InputManagerFactory::get()->write(_input, 1);
-		_timer = _upTime;
+		manager::input::InputManagerFactory::get()->write(_descriptor.input(), 1);
+		_timer = _descriptor.upTime();
 		_state = Active;
 		return true;
 	}
