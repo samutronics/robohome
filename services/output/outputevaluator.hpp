@@ -5,17 +5,17 @@
 //! \date			01.03.2015.
 //! \note
 // =============================================================================
-#ifndef _OUTPUT_HPP_
-#define _OUTPUT_HPP_
+#ifndef _OUTPUTEVALUATOR_HPP_
+#define _OUTPUTEVALUATOR_HPP_
 
 #include "inputtask.hpp"
 #include "inputevaluator.hpp"
 #include "projectconfiguration.hpp"
 
-namespace manager {
-namespace output {
+namespace service {
+namespace outbound {
 
-class Output {
+class OutputEvaluator {
 protected: enum OutputState {
 	Active,
 	Passive,
@@ -31,7 +31,7 @@ protected: enum OutputState {
 	StoppedDown
 };
 
-public: inline Output(const u16 hwAddress, const u16 timeoutON, const u16 timeoutOFF, const std::vector<u16>& inputs, std::vector<u32>& data);
+public: inline OutputEvaluator(const u16 hwAddress, const u16 timeoutON, const u16 timeoutOFF, const std::vector<u16>& inputs, std::vector<u32>& data);
 public: inline virtual void evaluate();
 public: inline cu16 time() const;
 
@@ -54,7 +54,7 @@ protected: const std::vector<u16>	_inputs;
 // Inline method implementation
 // =============================================================================
 
-inline Output::Output(const u16 hwAddress, const u16 timeoutON, const u16 timeoutOFF, const std::vector<u16>& inputs, std::vector<u32>& data):
+inline OutputEvaluator::OutputEvaluator(const u16 hwAddress, const u16 timeoutON, const u16 timeoutOFF, const std::vector<u16>& inputs, std::vector<u32>& data):
 		_timer(0),
 		_state(Passive),
 		_data(data),
@@ -63,15 +63,15 @@ inline Output::Output(const u16 hwAddress, const u16 timeoutON, const u16 timeou
 		_timeoutOFF(timeoutOFF),
 		_inputs(inputs) {}
 
-inline cu16 Output::time() const {
+inline cu16 OutputEvaluator::time() const {
 	return _timer;
 }
 
-inline void Output::write() {
+inline void OutputEvaluator::write() {
 	_data[_hwAddress / (sizeof(_data[0]) * 8)] ^= (1 << (_hwAddress % (sizeof(_data[0]) * 8)));
 }
 
-inline void Output::evaluate() {
+inline void OutputEvaluator::evaluate() {
 	switch (_state) {
 	case Active: {
 		evaluateBranchActive();
@@ -96,7 +96,7 @@ inline void Output::evaluate() {
 	}
 }
 
-inline void Output::evaluateBranchActive() {
+inline void OutputEvaluator::evaluateBranchActive() {
 	const std::vector<service::inbound::InputEvaluator*>& inputs = service::inbound::InputTaskFactory::get()->inputs();
 	for(u32 index = 0; index < _inputs.size(); index++) {
 		if(service::inbound::NoChangeEvent != inputs[_inputs[index]]->changed()) {
@@ -114,7 +114,7 @@ inline void Output::evaluateBranchActive() {
 	}
 }
 
-inline void Output::evaluateBranchPassive() {
+inline void OutputEvaluator::evaluateBranchPassive() {
 	const std::vector<service::inbound::InputEvaluator*>& inputs = service::inbound::InputTaskFactory::get()->inputs();
 	for(u32 index = 0; index < _inputs.size(); index++) {
 		switch (inputs[_inputs[index]]->changed()) {
@@ -142,7 +142,7 @@ inline void Output::evaluateBranchPassive() {
 	}
 }
 
-inline void Output::evaluateBranchTimeOutOn() {
+inline void OutputEvaluator::evaluateBranchTimeOutOn() {
 	const std::vector<service::inbound::InputEvaluator*>& inputs = service::inbound::InputTaskFactory::get()->inputs();
 	for(u32 index = 0; index < _inputs.size(); index++) {
 		switch (inputs[_inputs[index]]->changed()) {
@@ -175,7 +175,7 @@ inline void Output::evaluateBranchTimeOutOn() {
 	}
 }
 
-inline void Output::evaluateBranchTimeOutOff() {
+inline void OutputEvaluator::evaluateBranchTimeOutOff() {
 	const std::vector<service::inbound::InputEvaluator*>& inputs = service::inbound::InputTaskFactory::get()->inputs();
 	for(u32 index = 0; index < _inputs.size(); index++) {
 		if(service::inbound::NoChangeEvent != inputs[_inputs[index]]->changed()) {
@@ -191,11 +191,11 @@ inline void Output::evaluateBranchTimeOutOff() {
 	}
 }
 
-} // output
-} // manager
+} // outbound
+} // service
 
-#endif // _OUTPUT_HPP_
+#endif // _OUTPUTEVALUATOR_HPP_
 // =============================================================================
 //! \file
 //! \copyright
-// =========================== end of file: output.hpp =========================
+// ====================== end of file: outputevaluator.hpp =====================

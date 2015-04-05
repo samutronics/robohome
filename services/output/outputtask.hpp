@@ -8,17 +8,25 @@
 #ifndef _OUTPUTTASK_HPP_
 #define _OUTPUTTASK_HPP_
 
+#include "iinform.hpp"
 #include "iservice.hpp"
-#include "outputmanager.hpp"
 #include "projectmanager.hpp"
+#include "outputevaluator.hpp"
+#include "commandsiterator.hpp"
 #include "projectconfiguration.hpp"
 
 namespace service {
 namespace outbound {
 
-class OutputTask {
-protected: OutputTask();
+class OutputTask: public libs::IInform {
+public: virtual ~OutputTask();
+
 public: void task(void *pvParameters);
+
+public: virtual bool write(const libs::CommandsIterator& it);
+public: virtual bool read(const libs::CommandsIterator& it, std::string& result) const;
+
+protected: OutputTask();
 
 private: void timerStart() const;
 private: void IOStart() const;
@@ -29,7 +37,9 @@ private: inline void LatchON() const;
 private: inline void LatchOFF() const;
 
 private: cu32 _dataByteCount;
-private: manager::output::OutputManager* _outputManager;
+
+private: std::map<u32, OutputEvaluator*>	_output;
+private: std::vector<u32>					_data;
 
 DEFINE_TH
 };
@@ -57,10 +67,9 @@ inline void OutputTask::LatchOFF() const {
 }
 
 inline void OutputTask::IOTransmit() const {
-	const std::vector<u32>& out = _outputManager->read();
 	LatchOFF();
 	for(u32 index = 0; index < _dataByteCount; index++) {
-		SSIDataPut(SSI1_BASE, (out[(_dataByteCount / sizeof(out[0])) - (index / sizeof(out[0]))] >> ((_dataByteCount - 1 - (index % _dataByteCount)) * 8)) & 0XFF);
+		SSIDataPut(SSI1_BASE, (_data[(_dataByteCount / sizeof(_data[0])) - (index / sizeof(_data[0]))] >> ((_dataByteCount - 1 - (index % _dataByteCount)) * 8)) & 0XFF);
 		while(SSIBusy(SSI1_BASE)) {taskYIELD();}
 	}
 

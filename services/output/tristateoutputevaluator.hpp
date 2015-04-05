@@ -5,17 +5,17 @@
 //! \date			01.03.2015.
 //! \note
 // =============================================================================
-#ifndef _TRISTATEOUTPUT_HPP_
-#define _TRISTATEOUTPUT_HPP_
+#ifndef _TRISTATEOUTPUTEVALUATOR_HPP_
+#define _TRISTATEOUTPUTEVALUATOR_HPP_
 
-#include "output.hpp"
+#include "outputevaluator.hpp"
 #include "projectconfiguration.hpp"
 
-namespace manager {
-namespace output {
+namespace service {
+namespace outbound {
 
-class TriStateOutput: public Output {
-public: inline TriStateOutput(cu16 hwAddress, cu16 timeoutON, cu16 timeoutOFF, const std::vector<u16>& inputsUpDown, std::vector<u32>& data, cu16 extendedAddress, const std::vector<u16>& inputsUp, const std::vector<u16>& inputsDown);
+class TriStateOutputEvaluator: public OutputEvaluator {
+public: inline TriStateOutputEvaluator(cu16 hwAddress, cu16 timeoutON, cu16 timeoutOFF, const std::vector<u16>& inputsUpDown, std::vector<u32>& data, cu16 extendedAddress, const std::vector<u16>& inputsUp, const std::vector<u16>& inputsDown);
 
 public: inline virtual void evaluate();
 
@@ -37,31 +37,31 @@ private: const std::vector<u16>	_inputsDown;
 // Inline method implementation
 // =============================================================================
 
-inline TriStateOutput::TriStateOutput(cu16 hwAddress, cu16 timeoutON, cu16 timeoutOFF, const std::vector<u16>& inputsUpDown, std::vector<u32>& data, cu16 extendedAddress, const std::vector<u16>& inputsUp, const std::vector<u16>& inputsDown):
-						Output(hwAddress, timeoutON, timeoutOFF, inputsUpDown, data),
+inline TriStateOutputEvaluator::TriStateOutputEvaluator(cu16 hwAddress, cu16 timeoutON, cu16 timeoutOFF, const std::vector<u16>& inputsUpDown, std::vector<u32>& data, cu16 extendedAddress, const std::vector<u16>& inputsUp, const std::vector<u16>& inputsDown):
+						OutputEvaluator(hwAddress, timeoutON, timeoutOFF, inputsUpDown, data),
 						_extendedAddress(extendedAddress),
 						_inputsUp(inputsUp),
 						_inputsDown(inputsDown) {
 	_state = PassiveUp;
 }
 
-inline void TriStateOutput::stop() {
+inline void TriStateOutputEvaluator::stop() {
 	_data[_hwAddress / (sizeof(_data[0]) * 8)] &= ~(1 << (_hwAddress % (sizeof(_data[0]) * 8)));
 	_data[_extendedAddress / (sizeof(_data[0]) * 8)] &= ~(1 << (_extendedAddress % (sizeof(_data[0]) * 8)));
 }
 
-inline void TriStateOutput::moveUp() {
+inline void TriStateOutputEvaluator::moveUp() {
 	_data[_hwAddress / (sizeof(_data[0]) * 8)] &= ~(1 << (_hwAddress % (sizeof(_data[0]) * 8)));
 	_data[_extendedAddress / (sizeof(_data[0]) * 8)] |= (1 << (_extendedAddress % (sizeof(_data[0]) * 8)));
 }
 
-inline void TriStateOutput::moveDown() {
+inline void TriStateOutputEvaluator::moveDown() {
 	_data[_hwAddress / (sizeof(_data[0]) * 8)] |= (1 << (_hwAddress % (sizeof(_data[0]) * 8)));
 	_data[_extendedAddress / (sizeof(_data[0]) * 8)] &= ~(1 << (_extendedAddress % (sizeof(_data[0]) * 8)));
 }
 
 
-inline void TriStateOutput::evaluate() {
+inline void TriStateOutputEvaluator::evaluate() {
 	switch (_state) {
 	case ActiveUp: {
 		evaluateBranchesActive<true>();
@@ -102,7 +102,7 @@ inline void TriStateOutput::evaluate() {
 	}
 }
 
-template<bool up> inline void TriStateOutput::evaluateBranchesActive() {
+template<bool up> inline void TriStateOutputEvaluator::evaluateBranchesActive() {
 	_timer--;
 	if(0 == _timer) {
 		_state = up ? PassiveUp : PassiveDown;
@@ -127,7 +127,7 @@ template<bool up> inline void TriStateOutput::evaluateBranchesActive() {
 	}
 }
 
-template<bool up> inline void TriStateOutput::evaluateBranchesPassive() {
+template<bool up> inline void TriStateOutputEvaluator::evaluateBranchesPassive() {
 	const std::vector<service::inbound::InputEvaluator*>& inputs = service::inbound::InputTaskFactory::get()->inputs();
 	for(u32 index = 0; index < (up ? _inputsDown.size() : _inputsUp.size()); index++) {
 		switch (inputs[(up ? _inputsDown : _inputsUp)[index]]->changed()) {
@@ -174,7 +174,7 @@ template<bool up> inline void TriStateOutput::evaluateBranchesPassive() {
 	}
 }
 
-template<bool up> inline void TriStateOutput::evaluateBranchesTimeout() {
+template<bool up> inline void TriStateOutputEvaluator::evaluateBranchesTimeout() {
 	const std::vector<service::inbound::InputEvaluator*>& inputs = service::inbound::InputTaskFactory::get()->inputs();
 	for(u32 index = 0; index < (up ? _inputsDown.size() : _inputsUp.size()); index++) {
 		if(service::inbound::NoChangeEvent != inputs[(up ? _inputsDown : _inputsUp)[index]]->changed()) {
@@ -218,7 +218,7 @@ template<bool up> inline void TriStateOutput::evaluateBranchesTimeout() {
 	}
 }
 
-template<bool up> inline void TriStateOutput::evaluateBranchesStopped() {
+template<bool up> inline void TriStateOutputEvaluator::evaluateBranchesStopped() {
 	const std::vector<service::inbound::InputEvaluator*>& inputs = service::inbound::InputTaskFactory::get()->inputs();
 	for(u32 index = 0; index < (up ? _inputsUp.size() : _inputsDown.size()); index++) {
 		if(service::inbound::NoChangeEvent != inputs[(up ? _inputsUp : _inputsDown)[index]]->changed()) {
@@ -271,11 +271,11 @@ template<bool up> inline void TriStateOutput::evaluateBranchesStopped() {
 	}
 }
 
-} // output
-} // manager
+} // outbound
+} // service
 
-#endif // _TRISTATEOUTPUT_HPP_
+#endif // _TRISTATEOUTPUTEVALUATOR_HPP_
 // =============================================================================
 //! \file
 //! \copyright
-// ======================= end of file: tristateoutput.hpp =====================
+// ================= end of file: tristateoutputevaluator.hpp ==================
