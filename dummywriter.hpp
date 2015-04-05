@@ -108,9 +108,9 @@ inline void makeInputCfg(std::vector<u8>& project) {
 //make simple output properties
 static cu16 simpleO[] = {
 		//name						address        timeOn        TimeOff        inputCount        inputList
-		0, 0, 0, 0, 0, 0, 0, 0,		0,                0,          0,     	       	2,                0, 1,
-		0, 0, 0, 0, 0, 0, 0, 0,		1,                0,          0,        	    1,                4,
-		0, 0, 0, 0, 0, 0, 0, 0,		2,                0,          100,      		1,                1,
+		0, 0, 0, 0, 0, 0, 0, 0,		0,                0,          0,     	       	1,                16,
+		0, 0, 0, 0, 0, 0, 0, 0,		1,                0,          0,        	    1,                0,
+		0, 0, 0, 0, 0, 0, 0, 0,		2,                0,          0,	      		1,                18,
 		0, 0, 0, 0, 0, 0, 0, 0,		3,                0,          100,        		1,                5,
 		0, 0, 0, 0, 0, 0, 0, 0,		4,                100,        0,            	1,                8,
 		0, 0, 0, 0, 0, 0, 0, 0,		5,                100,        0,            	1,                12,
@@ -122,7 +122,7 @@ static cu16 simpleO[] = {
 		0, 0, 0, 0, 0, 0, 0, 0,		11,               100,        100,        		2,                7, 15
 };
 
-static cu16 simpleOutputCount = 1;
+static cu16 simpleOutputCount = 2;
 
 inline void makeSimpleOutputCfg(std::vector<u8>& project) {
 	project.push_back(static_cast<u8>(simpleOutputCount & 0XFF));
@@ -154,12 +154,12 @@ inline void makeTriStateOutputCfg(std::vector<u8>& project) {
 
 static cu16 irrigation[] = {
 		// name						area, input, up time,	start time, 		mode,				offset time, dailyPrecipitation,	unitPrecipitation,	repeat
-		0, 0, 0, 0, 0, 0, 0, 0,		10,		18,		10,			1,		manager::project::Normal,		20,			1000,					10,				1,
-		0, 0, 0, 0, 0, 0, 0, 0,		10,		17,		10,			1,		manager::project::Normal,		20,			2000,					10,				1,
-		0, 0, 0, 0, 0, 0, 0, 0,		10,		16,		10,		42300,		manager::project::Grown,		20,			1500,					10,				3
+		0, 0, 0, 0, 0, 0, 0, 0,		10,		16,		10,			1,		manager::project::Normal,		20,			10,						1,				1,
+		0, 0, 0, 0, 0, 0, 0, 0,		10,		18,		10,		42300,		manager::project::Grown,		20,			1500,					10,				3,
+		0, 0, 0, 0, 0, 0, 0, 0,		10,		17,		10,			1,		manager::project::Normal,		20,			2000,					10,				1
 };
 
-static cu16 irrigationCount = 0;
+static cu16 irrigationCount = 1;
 
 inline void makeIrrigationCfg(std::vector<u8>& project) {
 	project.push_back(static_cast<u8>(irrigationCount & 0XFF));
