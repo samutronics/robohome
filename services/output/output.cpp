@@ -7,7 +7,7 @@
 // =============================================================================
 #include "output.hpp"
 #include "inputmanager.hpp"
-#include "../projectconfiguration.hpp"
+#include "projectconfiguration.hpp"
 
 using namespace manager::output;
 using namespace manager::project;
@@ -27,7 +27,7 @@ output::output():
 
 void output::task(void *pvParameters) {
 	while(true) {
-		// The thread gives up its time-slice, if there is no semaphire given.
+		// The thread gives up its time-slice, if there is no semaphore given.
 		xSemaphoreTake(_THQueue, portMAX_DELAY);
 
 		const std::map<u32, Output*>& out = _outputManager->outputs();
