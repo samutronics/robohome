@@ -5,9 +5,9 @@
 //! \date			04.12.2014.
 //! \note
 // =============================================================================
-#include "input.hpp"
+#include "inputtask.hpp"
 #include "projectmanager.hpp"
-#include "../projectconfiguration.hpp"
+#include "projectconfiguration.hpp"
 
 using namespace std;
 using namespace manager::input;
@@ -15,15 +15,15 @@ using namespace manager::project;
 using namespace service::inbound;
 using namespace service::inbound::configuration;
 
-DECLARE_TH(input)
+DECLARE_TH(InputTask)
 
-input::input(): _data(ProjectManagerFactory::get()->sysConfig().hwInputNumber() / 8, 0) {
+InputTask::InputTask(): _data(ProjectManagerFactory::get()->sysConfig().hwInputNumber() / 8, 0) {
 	_THQueue = xSemaphoreCreateMutex();
 	IOStart();
 	timerStart();
 }
 
-void input::task(void *pvParameters) {
+void InputTask::task(void* /*pvParameters*/) {
 	while(true) {
 		// The thread gives up its time-slice, if there is no semaphore given.
 		xSemaphoreTake(_THQueue, portMAX_DELAY);
@@ -36,7 +36,7 @@ void input::task(void *pvParameters) {
 	}
 }
 
-void input::timerStart() const {
+void InputTask::timerStart() const {
 	SysCtlPeripheralEnable(configuration::timerPeriphery);
 	TimerConfigure	(configuration::timer, TIMER_CFG_PERIODIC);
 	TimerLoadSet	(configuration::timer, TIMER_A, systemGlobal::requestedSystemClockFrequency / configuration::pollingFrequency);
@@ -45,7 +45,7 @@ void input::timerStart() const {
 	TimerEnable		(configuration::timer, TIMER_A);
 }
 
-void input::IOStart() const {
+void InputTask::IOStart() const {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_SSI0);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOH);
 
@@ -63,7 +63,7 @@ void input::IOStart() const {
 	SSIEnable(SSI0_BASE);
 }
 
-void input::handlerTH() {
+void InputTask::handlerTH() {
 	TimerIntClear(timer, TIMER_TIMA_TIMEOUT);
 	xSemaphoreGiveFromISR(_THQueue, NULL);
 }

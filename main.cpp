@@ -16,10 +16,10 @@
 #include "sntp.hpp"
 #include "weather.hpp"
 #include "exosite.hpp"
+#include "inputtask.hpp"
 #include "irrigation.hpp"
 #include "taskfactory.hpp"
 #include "projectmanager.hpp"
-#include "services/input/input.hpp"
 #include "projectconfiguration.hpp"
 #include "services/output/output.hpp"
 
@@ -64,7 +64,7 @@ int main(void) {
 	UARTprintf("Project found\n");
 	manager::project::ProjectManagerFactory::get()->parse();
 
-	if(pdPASS != xTaskCreate(&libs::TaskFactory<InputFactory>::start,		"TaaT_TBHB_Input",	configUSER_SPACE_STACK_SIZE, NULL, 2, NULL)) { while(true);}
+	if(pdPASS != xTaskCreate(&libs::TaskFactory<InputTaskFactory>::start,	"TaaT_TBHB_Input",	configUSER_SPACE_STACK_SIZE, NULL, 2, NULL)) { while(true);}
 	if(pdPASS != xTaskCreate(&libs::TaskFactory<OutputFactory>::start,		"TaaT_Output",		configUSER_SPACE_STACK_SIZE, NULL, 2, NULL)) { while(true);}
 	if(pdPASS != xTaskCreate(&libs::TaskFactory<IrrigationFactory>::start,	"TaaT_Irrigation",	configUSER_SPACE_STACK_SIZE, NULL, 2, NULL)) { while(true);}
 	if(pdPASS != xTaskCreate(&libs::TaskFactory<WebFactory>::start,			"TaaT_THBH_NP",		configUSER_SPACE_STACK_SIZE, NULL, 1, NULL)) { while(true);}
