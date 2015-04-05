@@ -8,9 +8,7 @@
 #ifndef _REQUESTFACTORY_HPP_
 #define _REQUESTFACTORY_HPP_
 
-#include <string.h>
-
-#include "../projectconfiguration.hpp"
+#include "projectconfiguration.hpp"
 
 namespace service {
 namespace weather {

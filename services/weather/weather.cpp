@@ -5,8 +5,6 @@
 //! \date			29.12.2014.
 //! \note
 // =============================================================================
-#include "json.hpp"
-#include "lwip/api.h"
 #include "weather.hpp"
 #include "requestfactory.hpp"
 
