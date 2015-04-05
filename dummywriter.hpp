@@ -109,7 +109,7 @@ inline void makeInputCfg(std::vector<u8>& project) {
 static cu16 simpleO[] = {
 		//name						address        timeOn        TimeOff        inputCount        inputList
 		0, 0, 0, 0, 0, 0, 0, 0,		0,                0,          0,     	       	1,                16,
-		0, 0, 0, 0, 0, 0, 0, 0,		1,                0,          0,        	    1,                0,
+		0, 0, 0, 0, 0, 0, 0, 0,		1,                0,          0,        	    1,                17,
 		0, 0, 0, 0, 0, 0, 0, 0,		2,                0,          0,	      		1,                18,
 		0, 0, 0, 0, 0, 0, 0, 0,		3,                0,          100,        		1,                5,
 		0, 0, 0, 0, 0, 0, 0, 0,		4,                100,        0,            	1,                8,
@@ -122,7 +122,7 @@ static cu16 simpleO[] = {
 		0, 0, 0, 0, 0, 0, 0, 0,		11,               100,        100,        		2,                7, 15
 };
 
-static cu16 simpleOutputCount = 2;
+static cu16 simpleOutputCount = 3;
 
 inline void makeSimpleOutputCfg(std::vector<u8>& project) {
 	project.push_back(static_cast<u8>(simpleOutputCount & 0XFF));
@@ -159,7 +159,7 @@ static cu16 irrigation[] = {
 		0, 0, 0, 0, 0, 0, 0, 0,		10,		17,		10,			1,		manager::project::Normal,		20,			2000,					10,				1
 };
 
-static cu16 irrigationCount = 1;
+static cu16 irrigationCount = 3;
 
 inline void makeIrrigationCfg(std::vector<u8>& project) {
 	project.push_back(static_cast<u8>(irrigationCount & 0XFF));

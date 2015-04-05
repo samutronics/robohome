@@ -18,9 +18,8 @@ using namespace service::irrigation::configuration;
 
 DECLARE_TH(Irrigation);
 
-Irrigation::Irrigation():
-				_evaluators(ProjectManagerFactory::get()->irrigation().count(), 0),
-				_active(_evaluators.begin()) {
+Irrigation::Irrigation(): _evaluators(ProjectManagerFactory::get()->irrigation().count(), 0),
+		_active(_evaluators.begin()) {
 	metaIrrigation irr = ProjectManagerFactory::get()->irrigation();
 	for(u32 index = 0; index < irr.count(); index++) {
 		_evaluators[index] = evaluatorFactory(irr);
@@ -55,7 +54,7 @@ EvaluatorGrowm* Irrigation::evaluatorFactory(const metaIrrigation& irr) {
 		return new EvaluatorGrowm(irr, _currentTime);
 	}
 	default: {
-		UARTprintf("Unsuported evalator type in irrigation::evaluatorFactory()\n");
+		UARTprintf("Unsupported evaluator type: %d in irrigation::evaluatorFactory()\n", irr.mode());
 	}
 	}
 
