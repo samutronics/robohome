@@ -5,8 +5,8 @@
 //! \date			06.12.2014.
 //! \note
 // =============================================================================
-#include "output.hpp"
 #include "inputtask.hpp"
+#include "outputtask.hpp"
 #include "projectconfiguration.hpp"
 
 using namespace manager::output;
@@ -15,18 +15,18 @@ using namespace service::inbound;
 using namespace service::outbound;
 using namespace service::outbound::configuration;
 
-DECLARE_TH(output)
+DECLARE_TH(OutputTask)
 
-output::output():
+OutputTask::OutputTask():
 		_dataByteCount(ProjectManagerFactory::get()->sysConfig().hwOutputNumber() / 8),
 		_outputManager(OutputManagerFactory::get()) {
 	_THQueue = xSemaphoreCreateBinary();
 	timerStart();
 	IOStart();
-	IOWrite();
+	IOTransmit();
 }
 
-void output::task(void *pvParameters) {
+void OutputTask::task(void *pvParameters) {
 	while(true) {
 		// The thread gives up its time-slice, if there is no semaphore given.
 		xSemaphoreTake(_THQueue, portMAX_DELAY);
@@ -38,11 +38,11 @@ void output::task(void *pvParameters) {
 
 		InputTaskFactory::get()->reset();
 
-		IOWrite();
+		IOTransmit();
 	}
 }
 
-void output::timerStart() const {
+void OutputTask::timerStart() const {
 	SysCtlPeripheralEnable(timerPeriphery);
 	TimerConfigure	(timer, TIMER_CFG_PERIODIC);
 	TimerLoadSet	(timer, TIMER_A, systemGlobal::requestedSystemClockFrequency / pollingFrequency);
@@ -51,7 +51,7 @@ void output::timerStart() const {
 	TimerEnable		(timer, TIMER_A);
 }
 
-void output::IOStart() const {
+void OutputTask::IOStart() const {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_SSI1);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
@@ -77,7 +77,7 @@ void output::IOStart() const {
 	LoadON();
 }
 
-void output::handlerTH() {
+void OutputTask::handlerTH() {
 	TimerIntClear(timer, TIMER_TIMA_TIMEOUT);
 	xSemaphoreGiveFromISR(_THQueue, NULL);
 }
@@ -85,4 +85,4 @@ void output::handlerTH() {
 // =============================================================================
 //! \file
 //! \copyright
-// ========================= end of file: output.cpp ===========================
+// ======================= end of file: outputtask.cpp =========================

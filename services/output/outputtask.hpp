@@ -5,24 +5,24 @@
 //! \date			06.12.2014.
 //! \note
 // =============================================================================
-#ifndef _OUTPUT_H_
-#define _OUTPUT_H_
+#ifndef _OUTPUTTASK_HPP_
+#define _OUTPUTTASK_HPP_
 
 #include "iservice.hpp"
 #include "outputmanager.hpp"
 #include "projectmanager.hpp"
-#include "../projectconfiguration.hpp"
+#include "projectconfiguration.hpp"
 
 namespace service {
 namespace outbound {
 
-class output {
-protected: output();
+class OutputTask {
+protected: OutputTask();
 public: void task(void *pvParameters);
 
 private: void timerStart() const;
 private: void IOStart() const;
-private: inline void IOWrite() const;
+private: inline void IOTransmit() const;
 private: inline void LoadON() const;
 private: inline void LoadOFF() const;
 private: inline void LatchON() const;
@@ -34,29 +34,29 @@ private: manager::output::OutputManager* _outputManager;
 DEFINE_TH
 };
 
-typedef libs::SingletonFactory<output> OutputFactory;
+typedef libs::SingletonFactory<OutputTask> OutputTaskFactory;
 
 // =============================================================================
 // Inline method implementation
 // =============================================================================
 
-inline void output::LoadON() const {
+inline void OutputTask::LoadON() const {
 	GPIOPinWrite(GPIO_PORTH_BASE, GPIO_PIN_2, GPIO_PIN_2);
 }
 
-inline void output::LoadOFF() const {
+inline void OutputTask::LoadOFF() const {
 	GPIOPinWrite(GPIO_PORTH_BASE, GPIO_PIN_2, 0x0);
 }
 
-inline void output::LatchON() const {
+inline void OutputTask::LatchON() const {
 	GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_4, GPIO_PIN_4);
 }
 
-inline void output::LatchOFF() const {
+inline void OutputTask::LatchOFF() const {
 	GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_4, 0);
 }
 
-inline void output::IOWrite() const {
+inline void OutputTask::IOTransmit() const {
 	const std::vector<u32>& out = _outputManager->read();
 	LatchOFF();
 	for(u32 index = 0; index < _dataByteCount; index++) {
@@ -70,8 +70,8 @@ inline void output::IOWrite() const {
 } // outbound
 } // service
 
-#endif // _OUTPUT_H_
+#endif // _OUTPUTTASK_HPP_
 // =============================================================================
 //! \file
 //! \copyright
-// ========================== end of file: output.hpp ==========================
+// ======================== end of file: outputtask.hpp ========================
