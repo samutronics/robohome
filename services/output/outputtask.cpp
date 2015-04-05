@@ -5,6 +5,7 @@
 //! \date			06.12.2014.
 //! \note
 // =============================================================================
+#include "httppair.hpp"
 #include "mediator.hpp"
 #include "inputtask.hpp"
 #include "outputtask.hpp"
@@ -92,11 +93,11 @@ bool OutputTask::read(const CommandsIterator& it, std::string& result) const {
 	switch (it.key() & CmdOutputMask) {
 	case CmdReadOutput: {
 		for(u32 index = 0; index < _data.size(); index++) {
-			s8 buf[10];
-			sprintf(buf, "%d", _data[index]);
-			result += buf;
+			result += HttpPair(it.key(), _data[index]).pair();
+			result += '&';
 		}
 
+		result.erase(result.size() - 1);
 		return true;
 	}
 	case CmdReadOutputTime: {
@@ -105,9 +106,7 @@ bool OutputTask::read(const CommandsIterator& it, std::string& result) const {
 			return false;
 		}
 
-		s8 buf[10];
-		sprintf(buf, "%d", o->second->time());
-		result += buf;
+		result += HttpPair(it.key(), o->second->time()).pair();
 		return true;
 	}
 	default: {
