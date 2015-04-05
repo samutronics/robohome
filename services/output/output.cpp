@@ -6,11 +6,12 @@
 //! \note
 // =============================================================================
 #include "output.hpp"
-#include "inputmanager.hpp"
+#include "inputtask.hpp"
 #include "projectconfiguration.hpp"
 
 using namespace manager::output;
 using namespace manager::project;
+using namespace service::inbound;
 using namespace service::outbound;
 using namespace service::outbound::configuration;
 
@@ -35,7 +36,7 @@ void output::task(void *pvParameters) {
 			it->second->evaluate();
 		}
 
-		manager::input::InputManagerFactory::get()->reset();
+		InputTaskFactory::get()->reset();
 
 		IOWrite();
 	}

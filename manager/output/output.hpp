@@ -8,8 +8,8 @@
 #ifndef _OUTPUT_HPP_
 #define _OUTPUT_HPP_
 
-#include "input.hpp"
-#include "inputmanager.hpp"
+#include "inputtask.hpp"
+#include "inputevaluator.hpp"
 #include "projectconfiguration.hpp"
 
 namespace manager {
@@ -97,9 +97,9 @@ inline void Output::evaluate() {
 }
 
 inline void Output::evaluateBranchActive() {
-	const std::vector<input::Input*>& inputs = input::InputManagerFactory::get()->inputs();
+	const std::vector<service::inbound::InputEvaluator*>& inputs = service::inbound::InputTaskFactory::get()->inputs();
 	for(u32 index = 0; index < _inputs.size(); index++) {
-		if(input::NoChangeEvent != inputs[_inputs[index]]->changed()) {
+		if(service::inbound::NoChangeEvent != inputs[_inputs[index]]->changed()) {
 			if(0 != _timeoutOFF) {
 				_timer = _timeoutOFF;
 				_state = TimeOutOff;
@@ -115,13 +115,13 @@ inline void Output::evaluateBranchActive() {
 }
 
 inline void Output::evaluateBranchPassive() {
-	const std::vector<input::Input*>& inputs = input::InputManagerFactory::get()->inputs();
+	const std::vector<service::inbound::InputEvaluator*>& inputs = service::inbound::InputTaskFactory::get()->inputs();
 	for(u32 index = 0; index < _inputs.size(); index++) {
 		switch (inputs[_inputs[index]]->changed()) {
-		case input::NoChangeEvent: {
+		case service::inbound::NoChangeEvent: {
 			break;
 		}
-		case input::DeferredChangeEvent: {
+		case service::inbound::DeferredChangeEvent: {
 			if(0 != _timeoutON) {
 				_timer = _timeoutON;
 				_state = TimeOutOn;
@@ -130,7 +130,7 @@ inline void Output::evaluateBranchPassive() {
 
 			break;
 		}
-		case input::ChangeEvent: {
+		case service::inbound::ChangeEvent: {
 			write();
 			_state = Active;
 			return;
@@ -143,13 +143,13 @@ inline void Output::evaluateBranchPassive() {
 }
 
 inline void Output::evaluateBranchTimeOutOn() {
-	const std::vector<input::Input*>& inputs = input::InputManagerFactory::get()->inputs();
+	const std::vector<service::inbound::InputEvaluator*>& inputs = service::inbound::InputTaskFactory::get()->inputs();
 	for(u32 index = 0; index < _inputs.size(); index++) {
 		switch (inputs[_inputs[index]]->changed()) {
-		case input::NoChangeEvent: {
+		case service::inbound::NoChangeEvent: {
 			break;
 		}
-		case input::DeferredChangeEvent: {
+		case service::inbound::DeferredChangeEvent: {
 			if(0 != _timeoutON) {
 				_timer = _timeoutON;
 				return;
@@ -157,7 +157,7 @@ inline void Output::evaluateBranchTimeOutOn() {
 
 			break;
 		}
-		case input::ChangeEvent: {
+		case service::inbound::ChangeEvent: {
 			write();
 			_state = Active;
 			return;
@@ -176,9 +176,9 @@ inline void Output::evaluateBranchTimeOutOn() {
 }
 
 inline void Output::evaluateBranchTimeOutOff() {
-	const std::vector<input::Input*>& inputs = input::InputManagerFactory::get()->inputs();
+	const std::vector<service::inbound::InputEvaluator*>& inputs = service::inbound::InputTaskFactory::get()->inputs();
 	for(u32 index = 0; index < _inputs.size(); index++) {
-		if(input::NoChangeEvent != inputs[_inputs[index]]->changed()) {
+		if(service::inbound::NoChangeEvent != inputs[_inputs[index]]->changed()) {
 			_state = Active;
 			return;
 		}

@@ -8,7 +8,7 @@
 #ifndef _EVALUATORGROWN_H_
 #define _EVALUATORGROWN_H_
 
-#include "inputmanager.hpp"
+#include "inputtask.hpp"
 #include "metairrigation.hpp"
 #include "projectconfiguration.hpp"
 
@@ -77,7 +77,7 @@ inline bool EvaluatorGrowm::evaluate() {
 inline bool EvaluatorGrowm::evaluateBranchActive() {
 	_timer--;
 	if(0 == _timer) {
-		manager::input::InputManagerFactory::get()->write(_descriptor.input(), 0);
+		inbound::InputTaskFactory::get()->write(_descriptor.input(), 0);
 		_count++;
 		_timer = _descriptor.offsetTime() - _descriptor.upTime();
 		_state = Wait;
@@ -95,7 +95,7 @@ inline bool EvaluatorGrowm::evaluateBranchPassive() {
 	cs32 startHour = _descriptor.startTime() / 3600;
 	cs32 startMin = (_descriptor.startTime() - startHour * 3600) / 60;
 	if((startHour <= _currentTime.tm_hour) || ((startHour == _currentTime.tm_hour) && (startMin <= _currentTime.tm_min))) {
-		manager::input::InputManagerFactory::get()->write(_descriptor.input(), 1);
+		inbound::InputTaskFactory::get()->write(_descriptor.input(), 1);
 		_count = 0;
 		_day = _currentTime.tm_mday;
 		_timer = _descriptor.offsetTime() - _descriptor.upTime();
@@ -114,7 +114,7 @@ inline bool EvaluatorGrowm::evaluateBranchWait() {
 
 	_timer--;
 	if(0 == _timer) {
-		manager::input::InputManagerFactory::get()->write(_descriptor.input(), 1);
+		inbound::InputTaskFactory::get()->write(_descriptor.input(), 1);
 		_timer = _descriptor.upTime();
 		_state = Active;
 		return true;

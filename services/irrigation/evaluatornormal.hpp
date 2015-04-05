@@ -41,7 +41,7 @@ inline EvaluatorNormal::EvaluatorNormal(const manager::project::metaIrrigation& 
 inline bool EvaluatorNormal::evaluateBranchActive() {
 	_timer--;
 	if(0 == _timer) {
-		manager::input::InputManagerFactory::get()->write(_descriptor.input(), 0);
+		inbound::InputTaskFactory::get()->write(_descriptor.input(), 0);
 		_state = Passive;
 		return false;
 	}
@@ -60,7 +60,7 @@ inline bool EvaluatorNormal::evaluateBranchPassive() {
 		_day = _currentTime.tm_mday;
 		cu32 time = evaluateWeather();
 		if(0 != time) {
-			manager::input::InputManagerFactory::get()->write(_descriptor.input(), 1);
+			inbound::InputTaskFactory::get()->write(_descriptor.input(), 1);
 			_timer = time;
 			_state = Active;
 			return true;

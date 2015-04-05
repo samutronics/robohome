@@ -5,22 +5,45 @@
 //! \date			04.12.2014.
 //! \note
 // =============================================================================
+#include "mediator.hpp"
 #include "inputtask.hpp"
+#include "metainput.hpp"
+#include "metasysconfig.hpp"
 #include "projectmanager.hpp"
 #include "projectconfiguration.hpp"
 
 using namespace std;
-using namespace manager::input;
+using namespace libs;
+using namespace systemGlobal;
 using namespace manager::project;
 using namespace service::inbound;
 using namespace service::inbound::configuration;
 
 DECLARE_TH(InputTask)
 
-InputTask::InputTask(): _data(ProjectManagerFactory::get()->sysConfig().hwInputNumber() / 8, 0) {
+InputTask::InputTask(): _inputs(ProjectManagerFactory::get()->input().count(), 0),
+_dataChanged((_inputs.size() / (sizeof(_dataChanged[0]) * 8)) + ((_inputs.size() % (sizeof(_dataChanged[0]) * 8)) ? 1 : 0), 0),
+_dataCurrent(_dataChanged.size(), 0),
+_dataPrevious(_dataChanged.size(), 0),
+_lock(_dataChanged.size()) {
+	metaInput data = ProjectManagerFactory::get()->input();
+	for(u32 index = 0; index < data.count(); index++) {
+		_inputs[index] = new InputEvaluator(data.trigger(), index, _dataChanged, _dataCurrent, _dataPrevious);
+		data.next();
+	}
+
+	for(u32 index = 0; index < _dataChanged.size(); index++) {_lock[index] = xSemaphoreCreateMutex();}
+
+	MediatorFactory::get()->attach(ComponentIDInputService, this);
 	_THQueue = xSemaphoreCreateMutex();
 	IOStart();
 	timerStart();
+}
+
+InputTask::~InputTask() {
+	for(u32 index = 0; index < _inputs.size(); index++) {delete _inputs[index];}
+
+	for(u32 index = 0; index < _lock.size(); index++) {vSemaphoreDelete(_lock[index]);}
 }
 
 void InputTask::task(void* /*pvParameters*/) {
@@ -28,12 +51,20 @@ void InputTask::task(void* /*pvParameters*/) {
 		// The thread gives up its time-slice, if there is no semaphore given.
 		xSemaphoreTake(_THQueue, portMAX_DELAY);
 
-		IORead();
+		static std::vector<u8> data(ProjectManagerFactory::get()->sysConfig().hwInputNumber() / 8, 0);
+		IOTransmit(data);
 
-		InputManagerFactory::get()->write(_data);
-
-		for(u32 index = 0; index < _data.size(); _data[index++] = 0);
+		write(data);
 	}
+}
+
+bool InputTask::write(const CommandsIterator& it) {
+	write(it.key() & addressMask, strtoul(it.value().c_str(), NULL, 10));
+	return true;
+}
+
+bool InputTask::read(const CommandsIterator& it, std::string& result) const {
+	return false;
 }
 
 void InputTask::timerStart() const {

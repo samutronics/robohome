@@ -109,9 +109,9 @@ template<bool up> inline void TriStateOutput::evaluateBranchesActive() {
 		stop();
 	}
 
-	const std::vector<input::Input*>& inputs = input::InputManagerFactory::get()->inputs();
+	const std::vector<service::inbound::InputEvaluator*>& inputs = service::inbound::InputTaskFactory::get()->inputs();
 	for(u32 index = 0; index < (up ? _inputsDown.size() : _inputsUp.size()); index++) {
-		if(input::NoChangeEvent != inputs[(up ? _inputsDown : _inputsUp)[index]]->changed()) {
+		if(service::inbound::NoChangeEvent != inputs[(up ? _inputsDown : _inputsUp)[index]]->changed()) {
 			_state = up ? StoppedUp : StoppedDown;
 			stop();
 			return;
@@ -119,7 +119,7 @@ template<bool up> inline void TriStateOutput::evaluateBranchesActive() {
 	}
 
 	for(u32 index = 0; index < _inputs.size(); index++) {
-		if(input::NoChangeEvent != inputs[_inputs[index]]->changed()) {
+		if(service::inbound::NoChangeEvent != inputs[_inputs[index]]->changed()) {
 			_state = up ? StoppedUp : StoppedDown;
 			stop();
 			return;
@@ -128,16 +128,16 @@ template<bool up> inline void TriStateOutput::evaluateBranchesActive() {
 }
 
 template<bool up> inline void TriStateOutput::evaluateBranchesPassive() {
-	const std::vector<input::Input*>& inputs = input::InputManagerFactory::get()->inputs();
+	const std::vector<service::inbound::InputEvaluator*>& inputs = service::inbound::InputTaskFactory::get()->inputs();
 	for(u32 index = 0; index < (up ? _inputsDown.size() : _inputsUp.size()); index++) {
 		switch (inputs[(up ? _inputsDown : _inputsUp)[index]]->changed()) {
-		case input::ChangeEvent: {
+		case service::inbound::ChangeEvent: {
 			_state = up ? ActiveDown : ActiveUp;
 			_timer = _timeoutOFF;
 			up ? moveDown() : moveUp();
 			return;
 		}
-		case input::DeferredChangeEvent: {
+		case service::inbound::DeferredChangeEvent: {
 			if(0 != _timeoutON) {
 				_timer = _timeoutON;
 				_state = up ? TimeoutDown : TimeoutUp;
@@ -153,13 +153,13 @@ template<bool up> inline void TriStateOutput::evaluateBranchesPassive() {
 
 	for(u32 index = 0; index < _inputs.size(); index++) {
 		switch (inputs[_inputs[index]]->changed()) {
-		case input::ChangeEvent: {
+		case service::inbound::ChangeEvent: {
 			_state = up ? ActiveDown : ActiveUp;
 			up ? moveDown() : moveUp();
 			_timer = _timeoutOFF;
 			return;
 		}
-		case input::DeferredChangeEvent: {
+		case service::inbound::DeferredChangeEvent: {
 			if(0 != _timeoutON) {
 				_timer = _timeoutON;
 				_state = up ? TimeoutDown : TimeoutUp;
@@ -175,9 +175,9 @@ template<bool up> inline void TriStateOutput::evaluateBranchesPassive() {
 }
 
 template<bool up> inline void TriStateOutput::evaluateBranchesTimeout() {
-	const std::vector<input::Input*>& inputs = input::InputManagerFactory::get()->inputs();
+	const std::vector<service::inbound::InputEvaluator*>& inputs = service::inbound::InputTaskFactory::get()->inputs();
 	for(u32 index = 0; index < (up ? _inputsDown.size() : _inputsUp.size()); index++) {
-		if(input::NoChangeEvent != inputs[(up ? _inputsDown : _inputsUp)[index]]->changed()) {
+		if(service::inbound::NoChangeEvent != inputs[(up ? _inputsDown : _inputsUp)[index]]->changed()) {
 			_state = up ? PassiveDown : PassiveUp;
 			stop();
 			return;
@@ -185,7 +185,7 @@ template<bool up> inline void TriStateOutput::evaluateBranchesTimeout() {
 	}
 
 	for(u32 index = 0; index < (up ? _inputsUp.size() : _inputsDown.size()); index++) {
-		if(input::ChangeEvent == inputs[(up ? _inputsUp : _inputsDown)[index]]->changed()) {
+		if(service::inbound::ChangeEvent == inputs[(up ? _inputsUp : _inputsDown)[index]]->changed()) {
 			_timer = _timeoutOFF;
 			_state = up ? ActiveUp : ActiveDown;
 			up ? moveUp() : moveDown();
@@ -195,13 +195,13 @@ template<bool up> inline void TriStateOutput::evaluateBranchesTimeout() {
 
 	for(u32 index = 0; index < _inputs.size(); index++) {
 		switch (inputs[_inputs[index]]->changed()) {
-		case input::ChangeEvent: {
+		case service::inbound::ChangeEvent: {
 			_timer = _timeoutOFF;
 			_state = up ? ActiveUp : ActiveDown;
 			up ? moveUp() : moveDown();
 			return;
 		}
-		case input::DeferredChangeEvent: {
+		case service::inbound::DeferredChangeEvent: {
 			_state = up ? PassiveDown : PassiveUp;
 			return;
 		}
@@ -219,9 +219,9 @@ template<bool up> inline void TriStateOutput::evaluateBranchesTimeout() {
 }
 
 template<bool up> inline void TriStateOutput::evaluateBranchesStopped() {
-	const std::vector<input::Input*>& inputs = input::InputManagerFactory::get()->inputs();
+	const std::vector<service::inbound::InputEvaluator*>& inputs = service::inbound::InputTaskFactory::get()->inputs();
 	for(u32 index = 0; index < (up ? _inputsUp.size() : _inputsDown.size()); index++) {
-		if(input::NoChangeEvent != inputs[(up ? _inputsUp : _inputsDown)[index]]->changed()) {
+		if(service::inbound::NoChangeEvent != inputs[(up ? _inputsUp : _inputsDown)[index]]->changed()) {
 			_state = up ? ActiveUp : ActiveDown;
 			up ? moveUp() : moveDown();
 			return;
@@ -230,12 +230,12 @@ template<bool up> inline void TriStateOutput::evaluateBranchesStopped() {
 
 	for(u32 index = 0; index < _inputs.size(); index++) {
 		switch (inputs[_inputs[index]]->changed()) {
-		case input::ChangeEvent: {
+		case service::inbound::ChangeEvent: {
 			_state = up ? ActiveDown : ActiveUp;
 			up ? moveDown() : moveUp();
 			return;
 		}
-		case input::DeferredChangeEvent: {
+		case service::inbound::DeferredChangeEvent: {
 			if(0 != _timeoutON) {
 				_timer = _timeoutON;
 				_state = up ? TimeoutDown : TimeoutUp;
@@ -251,12 +251,12 @@ template<bool up> inline void TriStateOutput::evaluateBranchesStopped() {
 
 	for(u32 index = 0; index < (up ? _inputsDown.size() : _inputsUp.size()); index++) {
 		switch (inputs[(up ? _inputsDown : _inputsUp)[index]]->changed()) {
-		case input::ChangeEvent: {
+		case service::inbound::ChangeEvent: {
 			_state = up ? ActiveDown : ActiveUp;
 			up ? moveDown() : moveUp();
 			return;
 		}
-		case input::DeferredChangeEvent: {
+		case service::inbound::DeferredChangeEvent: {
 			if(0 != _timeoutON) {
 				_timer = _timeoutON;
 				_state = up ? TimeoutDown : TimeoutUp;

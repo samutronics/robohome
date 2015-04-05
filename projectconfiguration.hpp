@@ -118,11 +118,11 @@ static u32 currentSystemClockFrequency = 0;
 cu32 cmdRead				= 0x00000000;
 cu32 cmdWrite				= 0x80000000;
 
-cu32 ComponentIDMask		= 0x0F000000;
-cu32 ComponentIDInput		= 0x00000000;
-cu32 ComponentIDOutput		= 0x01000000;
-cu32 ComponentIDProject		= 0x02000000;
-cu32 ComponentIDIrrigation	= 0x03000000;
+cu32 ComponentIDMask			= 0x0F000000;
+cu32 ComponentIDInputService	= 0x00000000;
+cu32 ComponentIDOutput			= 0x01000000;
+cu32 ComponentIDProject			= 0x02000000;
+cu32 ComponentIDIrrigation		= 0x03000000;
 
 }  // system
 
