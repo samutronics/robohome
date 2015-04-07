@@ -20,15 +20,10 @@ inline void makeSysCfg(std::vector<u8>& project) {
 	project.push_back(16);	// write hw output count
 	project.push_back(0);	// write hw output count
 
-//	project.push_back(10);	// write IP address
-//	project.push_back(1);	// write IP address
-//	project.push_back(168);	// write IP address
-//	project.push_back(192);	// write IP address
-
-	project.push_back(0);	// write IP address
-	project.push_back(0);	// write IP address
-	project.push_back(0);	// write IP address
-	project.push_back(0);	// write IP address
+	project.push_back(10);	// write IP address
+	project.push_back(1);	// write IP address
+	project.push_back(168);	// write IP address
+	project.push_back(192);	// write IP address
 
 	project.push_back(0);	// write netmask
 	project.push_back(255);	// write netmask
