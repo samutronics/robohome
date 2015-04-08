@@ -9,7 +9,7 @@
 #define _DEVICEREQUESTFACTORY_HPP_
 
 #include "statisticentry.hpp"
-#include "../../projectconfiguration.hpp"
+#include "projectconfiguration.hpp"
 
 namespace service {
 namespace exosite {
