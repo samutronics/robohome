@@ -13,26 +13,33 @@
 namespace libs {
 namespace http {
 
-class pair {
+enum PairType {
+	HTTPArgumentPair,
+	HTTPHeaderPair
+};
+
+template<PairType type = HTTPArgumentPair>class pair {
 public: inline pair(const std::string& p);
 public: inline pair(cu32 k, cu32 value);
 public: inline pair(const std::string& k, cu32 value);
 public: inline pair(cu32 k, const std::string& value);
 public: inline pair(const std::string& k, const std::string& value);
 
-public: inline const std::string& build() const;
+public: inline const std::string& build();
 
 private: std::string _p;
 private: std::string _key;
 private: std::string _value;
 };
 
+typedef pair<>					argumentPair;
+typedef pair<HTTPHeaderPair>	headerPair;
 // =============================================================================
 // Inline method implementation
 // =============================================================================
 
-inline pair::pair(const std::string& p): _p(p) {
-	u32 equal = p.find('=');
+template<PairType type> inline pair<type>::pair(const std::string& p): _p(p) {
+	u32 equal = p.find((type == HTTPArgumentPair) ? '=' : ": ");
 	if(std::string::npos == equal) {
 		_p.clear();
 		return;
@@ -42,33 +49,32 @@ inline pair::pair(const std::string& p): _p(p) {
 	_value = p.substr(equal + 1);
 }
 
-inline pair::pair(cu32 k, cu32 value) {
+template<PairType type> inline pair<type>::pair(cu32 k, cu32 value) {
 	s8 buf[11];
 	sprintf(buf, "%d", k);
-	_pair += buf;
-	_pair += '=';
+	_key += buf;
 	sprintf(buf, "%d", value);
-	_pair += buf;
+	_value += buf;
 }
 
-inline pair::pair(const std::string& k, cu32 value): _pair(k) {
+template<PairType type> inline pair<type>::pair(const std::string& k, cu32 value): _key(k) {
 	s8 buf[11];
 	sprintf(buf, "%d", value);
 	_value += buf;
 }
 
-inline pair::pair(cu32 k, const std::string& value): _value(value) {
+template<PairType type> inline pair<type>::pair(cu32 k, const std::string& value): _value(value) {
 	s8 buf[11];
 	sprintf(buf, "%d", k);
 	_key += buf;
 }
 
-inline pair::pair(const std::string& k, const std::string& value): _key(k), _value(value) {}
+template<PairType type> inline pair<type>::pair(const std::string& k, const std::string& value): _key(k), _value(value) {}
 
-inline const std::string& pair::build() const {
+template<PairType type> inline const std::string& pair<type>::build() {
 	if(_p.empty()) {
 		_p += _key;
-		_p += '=';
+		_p.append((type == HTTPArgumentPair) ? "=" : ": ");
 		_p += _value;
 	}
 

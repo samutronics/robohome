@@ -6,11 +6,15 @@
 //! \note
 // =============================================================================
 #include "exosite.hpp"
+#include "mediator.hpp"
 #include "devicestatistic.hpp"
 #include "devicerequestFactory.hpp"
 
 using namespace std;
+using namespace libs;
+using namespace systemGlobal;
 using namespace service::exosite;
+using namespace service::outbound::configuration;
 
 bool deviceRequestFactory::updateEntryByResponse(statisticEntry& entry, const std::string& response) {
 	//

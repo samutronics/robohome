@@ -135,6 +135,7 @@ cu32 addressMask = 0xF;
 
 cu32 CmdIrrigationMask		= 0x00F00000;
 cu32 CmdTimer				= 0x00000000;
+cu32 CmdMassTimer			= 0x00100000;
 
 cu32 timer = TIMER2_BASE;
 cu32 pollingFrequency = 1;
@@ -158,6 +159,8 @@ cu32 addressMask = 0xFFFF;
 cu32 CmdOutputMask			= 0x00F00000;
 cu32 CmdReadOutput			= 0x00000000;
 cu32 CmdReadOutputTime		= 0x00100000;
+cu32 CmdMassReadOutput		= 0x00200000;
+cu32 CmdMassReadOutputTime	= 0x00300000;
 
 cu32 timer = TIMER1_BASE;
 cu32 pollingFrequency = 10;

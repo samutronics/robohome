@@ -5,6 +5,7 @@
 //! \date			03.27.2015.
 //! \note
 // =============================================================================
+#include "httppair.hpp"
 #include "mediator.hpp"
 #include "irrigation.hpp"
 #include "projectmanager.hpp"
@@ -75,14 +76,29 @@ bool Irrigation::write(const CommandsIterator& it) {
 }
 
 bool Irrigation::read(const CommandsIterator& it, std::string& result) const {
-	if((CmdTimer == (it.key() & CmdIrrigationMask)) && ((it.key() & addressMask) < _evaluators.size())) {
-		s8 buf[10];
-		sprintf(buf, "%d", _evaluators[it.key() & addressMask]->time());
-		result += buf;
+	switch (it.key() & CmdIrrigationMask) {
+	case CmdTimer: {
+		EvaluatorGrowm* e = _evaluators[it.key() & addressMask];
+		if(!e) {
+			return false;
+		}
+
+		result += HttpPair(it.key(), e->time()).pair();
 		return true;
 	}
+	case CmdMassTimer: {
+		for(u32 index = 0; index < _evaluators.size(); index++) {
+			result += HttpPair(it.key(), _evaluators[index]->time()).pair();
+		}
 
-	return false;
+		result.erase(result.size() - 1);
+		return true;
+	}
+	default: {
+		UARTprintf("Unsupported command Irrigation::read()\n");
+		return false;
+	}
+	}
 }
 
 
