@@ -38,7 +38,7 @@ inline bool CommandsIterator::next() {
 		return false;
 	}
 
-	_key = strtoul(std::string(_command.substr(_position, pos - _position)).c_str(), NULL, 10);
+	_key = strtoul(std::string(_command.substr(_position, pos - _position)).c_str(), NULL, 16);
 
 	pos++;
 	_position = _command.find('&', pos);

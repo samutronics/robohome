@@ -7,14 +7,28 @@
 // =============================================================================
 #include "exosite.hpp"
 #include "mediator.hpp"
+#include "projectmanager.hpp"
 #include "devicestatistic.hpp"
 #include "devicerequestFactory.hpp"
 
 using namespace std;
 using namespace libs;
 using namespace systemGlobal;
+using namespace manager::project;
 using namespace service::exosite;
 using namespace service::outbound::configuration;
+using namespace service::irrigation::configuration;
+
+deviceRequestFactory::deviceRequestFactory():
+		writeRequestOutbound(255, 0),
+		readRequestOutbound(255, 0),
+		_inputs(ProjectManagerFactory::get()->input().count()) {
+	for(u32 index = 0; index < _inputs.size(); ++index) {
+		s8 buf[11];
+		sprintf(buf, "%X", cmdWrite | ComponentIDInputService | index);
+		_inputs[index] = string(buf);
+	}
+}
 
 bool deviceRequestFactory::updateEntryByResponse(statisticEntry& entry, const std::string& response) {
 	//
@@ -56,50 +70,45 @@ bool deviceRequestFactory::updateEntryByResponse(statisticEntry& entry, const st
 
 const std::string& deviceRequestFactory::readRequest() {
 	readRequestOutbound.clear();
-    deviceStatistic::reset();
-    while(deviceStatistic::next()) {
-    	if(!deviceStatistic::current()->entryAliasInCloud) {continue;}
+	for(u32 index = 0; index < _inputs.size(); ++index) {
+		readRequestOutbound += _inputs[index];
+		readRequestOutbound += "=&";
+	}
 
-    	if((deviceStatistic::current()->access == READ_ONLY) || (deviceStatistic::current()->access == READ_WRITE)) {
-    		addRequest(deviceStatistic::current()->entryAliasInCloud, readRequestOutbound);
-    	}
-    }
-
+	readRequestOutbound.erase(readRequestOutbound.size() - 1);
     return readRequestOutbound;
 }
 
 const std::string& deviceRequestFactory::writeRequest() {
 	writeRequestOutbound.clear();
-    deviceStatistic::reset();
-    while(deviceStatistic::next()) {
-    	if(!deviceStatistic::current()->entryAliasInCloud) {continue;}
 
-    	if((deviceStatistic::current()->access == WRITE_ONLY) || (deviceStatistic::current()->access == READ_WRITE)) {
-    		string str;
-    		str.reserve(100);
-    		deviceStatistic::current()->requestFormat(str);
-    		addRequest(str, writeRequestOutbound);
-    	}
-    }
+	s8 buf[11];
+	sprintf(buf, "%X", cmdRead | ComponentIDOutputService | CmdMassReadOutput);
+	string cmd(buf);
+	cmd += "=0&";
+	sprintf(buf, "%X", cmdRead | ComponentIDOutputService | CmdMassReadOutputTime);
+	cmd += buf;
+	cmd += "=0&";
+	sprintf(buf, "%X", cmdRead | ComponentIDIrrigation | CmdMassTimer);
+	cmd += buf;
+	cmd += "=0";
 
-    return writeRequestOutbound;
-}
-
-bool deviceRequestFactory::addRequest(const std::string& newRequest, std::string& buf) {
-	if(!buf.empty()) {
-		//
-		// If the buffer has any data in it, add an ampersand to separate
-		// this request from any previous requests.
-		//
-		buf += '&';
+	CommandsIterator cmdIt(cmd);
+	cmdIt.next();
+	MediatorFactory::get()->execute(cmdIt, writeRequestOutbound);
+	if('&' != writeRequestOutbound[writeRequestOutbound.size() - 1]) {
+		writeRequestOutbound += '&';
 	}
 
-	//
-	// Append the data from the new request to the request buffer, and make
-	// sure to put a terminator after it.
-	//
-	buf.append(newRequest);
-	return true;
+	cmdIt.next();
+	MediatorFactory::get()->execute(cmdIt, writeRequestOutbound);
+	if('&' != writeRequestOutbound[writeRequestOutbound.size() - 1]) {
+		writeRequestOutbound += '&';
+	}
+
+	cmdIt.next();
+	MediatorFactory::get()->execute(cmdIt, writeRequestOutbound);
+	return writeRequestOutbound;
 }
 
 // =============================================================================

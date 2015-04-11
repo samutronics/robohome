@@ -15,19 +15,16 @@ namespace service {
 namespace exosite {
 
 class deviceRequestFactory {
-public: inline deviceRequestFactory();
+public: deviceRequestFactory();
 
 public: const std::string& readRequest();
 public: const std::string& writeRequest();
 public: bool updateEntryByResponse(statisticEntry& entry, const std::string& response);
 
-private: bool addRequest(const std::string& newRequest, std::string& buf);
-
 private: std::string writeRequestOutbound;
 private: std::string readRequestOutbound;
+private: std::vector<std::string>	_inputs;
 };
-
-inline deviceRequestFactory::deviceRequestFactory(): writeRequestOutbound(255, ' '), readRequestOutbound(255, ' ') {}
 
 } // exosite
 } // service

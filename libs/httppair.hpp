@@ -29,23 +29,23 @@ private: std::string _pair;
 
 inline HttpPair::HttpPair(cu32 k, cu32 value) {
 	s8 buf[11];
-	sprintf(buf, "%d", k);
+	sprintf(buf, "%X", k);
 	_pair += buf;
 	_pair += '=';
-	sprintf(buf, "%d", value);
+	sprintf(buf, "%X", value);
 	_pair += buf;
 }
 
 inline HttpPair::HttpPair(const std::string& k, cu32 value): _pair(k) {
 	_pair += '=';
 	s8 buf[11];
-	sprintf(buf, "%d", value);
+	sprintf(buf, "%X", value);
 	_pair += buf;
 }
 
 inline HttpPair::HttpPair(cu32 k, const std::string& value) {
 	s8 buf[11];
-	sprintf(buf, "%d", k);
+	sprintf(buf, "%X", k);
 	_pair += buf;
 	_pair += '=';
 	_pair += value;

@@ -24,10 +24,8 @@ private: inline TaskFactory();
 // =============================================================================
 
 template<typename T> inline void TaskFactory<T>::start(void* args) {
-	while(true) {
-		T::get()->task(args);
-		UARTprintf("Task returned from infinte loop\n");
-	}
+	T::get()->task(args);
+	UARTprintf("Task returned from infinte loop\n");
 }
 
 template<typename T> inline TaskFactory<T>::TaskFactory() {
