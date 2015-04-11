@@ -7,7 +7,6 @@
 // =============================================================================
 #include "exosite.hpp"
 #include "mediator.hpp"
-#include "devicestatistic.hpp"
 #include "commandsiterator.hpp"
 #include "exositerequestfactory.hpp"
 #include "projectconfiguration.hpp"

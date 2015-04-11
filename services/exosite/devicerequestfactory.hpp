@@ -8,7 +8,6 @@
 #ifndef _DEVICEREQUESTFACTORY_HPP_
 #define _DEVICEREQUESTFACTORY_HPP_
 
-#include "statisticentry.hpp"
 #include "projectconfiguration.hpp"
 
 namespace service {
@@ -19,10 +18,9 @@ public: deviceRequestFactory();
 
 public: const std::string& readRequest();
 public: const std::string& writeRequest();
-public: bool updateEntryByResponse(statisticEntry& entry, const std::string& response);
 
-private: std::string writeRequestOutbound;
-private: std::string readRequestOutbound;
+private: std::string 				_writeRequestOutbound;
+private: std::string 				_readRequestOutbound;
 private: std::vector<std::string>	_inputs;
 };
 

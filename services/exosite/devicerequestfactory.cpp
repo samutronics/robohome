@@ -8,7 +8,6 @@
 #include "exosite.hpp"
 #include "mediator.hpp"
 #include "projectmanager.hpp"
-#include "devicestatistic.hpp"
 #include "devicerequestFactory.hpp"
 
 using namespace std;
@@ -20,8 +19,8 @@ using namespace service::outbound::configuration;
 using namespace service::irrigation::configuration;
 
 deviceRequestFactory::deviceRequestFactory():
-		writeRequestOutbound(255, 0),
-		readRequestOutbound(255, 0),
+		_writeRequestOutbound(255, 0),
+		_readRequestOutbound(255, 0),
 		_inputs(ProjectManagerFactory::get()->input().count()) {
 	for(u32 index = 0; index < _inputs.size(); ++index) {
 		s8 buf[11];
@@ -30,57 +29,19 @@ deviceRequestFactory::deviceRequestFactory():
 	}
 }
 
-bool deviceRequestFactory::updateEntryByResponse(statisticEntry& entry, const std::string& response) {
-	//
-	// Find the desired alias in the buffer.
-	//
-	u32 pcValueStart = response.find(entry.entryAliasInCloud);
-
-	//
-	// If we couldn't find it, return a zero. Otherwise, continue extracting
-	// the value.
-	//
-	if(string::npos == pcValueStart) {return false;}
-
-	//
-	// Find the equals-sign, which should be just before the start of the
-	// value.
-	//
-	pcValueStart = response.find('=', pcValueStart);
-
-	if(string::npos == pcValueStart) {return false;}
-
-	//
-	// Advance to the first character of the value.
-	//
-	pcValueStart++;
-
-	u32 pcValueEnd = response.find('&', pcValueStart);
-
-	if(pcValueStart == pcValueEnd) {
-		entry.setValue("");
-		return true;
-	}
-
-	if(string::npos == pcValueEnd) {pcValueEnd = response.length();}
-
-	entry.setValue(response.substr(pcValueStart, pcValueEnd - pcValueStart));
-	return true;
-}
-
 const std::string& deviceRequestFactory::readRequest() {
-	readRequestOutbound.clear();
+	_readRequestOutbound.clear();
 	for(u32 index = 0; index < _inputs.size(); ++index) {
-		readRequestOutbound += _inputs[index];
-		readRequestOutbound += "=&";
+		_readRequestOutbound += _inputs[index];
+		_readRequestOutbound += "=&";
 	}
 
-	readRequestOutbound.erase(readRequestOutbound.size() - 1);
-    return readRequestOutbound;
+	_readRequestOutbound.erase(_readRequestOutbound.size() - 1);
+    return _readRequestOutbound;
 }
 
 const std::string& deviceRequestFactory::writeRequest() {
-	writeRequestOutbound.clear();
+	_writeRequestOutbound.clear();
 
 	s8 buf[11];
 	sprintf(buf, "%X", cmdRead | ComponentIDOutputService | CmdMassReadOutput);
@@ -95,20 +56,20 @@ const std::string& deviceRequestFactory::writeRequest() {
 
 	CommandsIterator cmdIt(cmd);
 	cmdIt.next();
-	MediatorFactory::get()->execute(cmdIt, writeRequestOutbound);
-	if('&' != writeRequestOutbound[writeRequestOutbound.size() - 1]) {
-		writeRequestOutbound += '&';
+	MediatorFactory::get()->execute(cmdIt, _writeRequestOutbound);
+	if('&' != _writeRequestOutbound[_writeRequestOutbound.size() - 1]) {
+		_writeRequestOutbound += '&';
 	}
 
 	cmdIt.next();
-	MediatorFactory::get()->execute(cmdIt, writeRequestOutbound);
-	if('&' != writeRequestOutbound[writeRequestOutbound.size() - 1]) {
-		writeRequestOutbound += '&';
+	MediatorFactory::get()->execute(cmdIt, _writeRequestOutbound);
+	if('&' != _writeRequestOutbound[_writeRequestOutbound.size() - 1]) {
+		_writeRequestOutbound += '&';
 	}
 
 	cmdIt.next();
-	MediatorFactory::get()->execute(cmdIt, writeRequestOutbound);
-	return writeRequestOutbound;
+	MediatorFactory::get()->execute(cmdIt, _writeRequestOutbound);
+	return _writeRequestOutbound;
 }
 
 // =============================================================================
