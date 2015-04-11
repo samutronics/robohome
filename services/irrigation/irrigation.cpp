@@ -89,6 +89,7 @@ bool Irrigation::read(const CommandsIterator& it, std::string& result) const {
 	case CmdMassTimer: {
 		for(u32 index = 0; index < _evaluators.size(); index++) {
 			result += HttpPair(it.key(), _evaluators[index]->time()).pair();
+			result += '&';
 		}
 
 		result.erase(result.size() - 1);

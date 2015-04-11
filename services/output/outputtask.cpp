@@ -97,7 +97,7 @@ bool OutputTask::read(const CommandsIterator& it, std::string& result) const {
 	}
 	case CmdMassReadOutput: {
 		for(u32 index = 0; index < _data.size(); index++) {
-			result += HttpPair(index, _data[index]).pair();
+			result += HttpPair(it.key() | index, _data[index]).pair();
 			result += '&';
 		}
 
@@ -114,8 +114,9 @@ bool OutputTask::read(const CommandsIterator& it, std::string& result) const {
 		return true;
 	}
 	case CmdMassReadOutputTime: {
-		for(map<u32, OutputEvaluator*>::const_iterator it = _output.begin(); it != _output.end(); ++it) {
-			result += HttpPair(it->first, it->second->time()).pair();
+		for(map<u32, OutputEvaluator*>::const_iterator iterator = _output.begin(); iterator != _output.end(); ++iterator) {
+			result += HttpPair(it.key() | iterator->first, iterator->second->time()).pair();
+			result += '&';
 		}
 
 		result.erase(result.size() - 1);
