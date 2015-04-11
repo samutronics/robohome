@@ -66,9 +66,12 @@ void exositeRequestFactory::parseReadResult(pbuf* buf, std::string& result) {
 	int http_status = getHTTPStatus(buf);
 	if (200 == http_status) {
 		result.append(static_cast<s8*>(buf->payload), buf->len);
-		if(string::npos == result.find("\r\n\r\n")) {
+		u32 args = result.find("\r\n\r\n");
+		if(args == string::npos) {
 			result.clear();
 		}
+
+		result.erase(0, args + 4);
 	}
 }
 

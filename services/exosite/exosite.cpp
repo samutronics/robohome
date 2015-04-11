@@ -6,11 +6,14 @@
 //! \note
 // =============================================================================
 #include "exosite.hpp"
+#include "mediator.hpp"
 #include "devicestatistic.hpp"
+#include "commandsiterator.hpp"
 #include "exositerequestfactory.hpp"
-#include "../projectconfiguration.hpp"
+#include "projectconfiguration.hpp"
 
 using namespace std;
+using namespace libs;
 using namespace service::exosite;
 
 bool Exosite::processingReply(netbuf* reply) {
@@ -19,20 +22,11 @@ bool Exosite::processingReply(netbuf* reply) {
 	}
 	else {
 		_exositeRequestFactory.parseReadResult(reply->p, _workerBuffer);
-		deviceStatistic::reset();
-		while(deviceStatistic::next()) {
-			taskENTER_CRITICAL();
-			_deviceRequestFactory.updateEntryByResponse(*deviceStatistic::current(), _workerBuffer);
 
-			//Guard the message printing.
-			taskENTER_CRITICAL();
-			if(deviceStatistic::current()->entryName) {
-				UARTprintf("%s=%s\n", deviceStatistic::current()->entryName, deviceStatistic::current()->getValue().c_str());
-			}
-			taskEXIT_CRITICAL(); //this is only for the systematic use of print guarding
-
-			taskEXIT_CRITICAL();
-		}
+		string tmp;
+		CommandsIterator it(_workerBuffer);
+		it.next();
+		MediatorFactory::get()->execute(it, tmp);
 	}
 
 	netbuf_delete(reply);
