@@ -18,8 +18,9 @@ template<ProtocolVersion version = HTTP10> class PostRequestBuilder: public abst
 public: inline PostRequestBuilder(cs8* url);
 public: inline PostRequestBuilder(const std::string& url);
 
+using abstractRequestBuilder<version>::build;
+
 public: virtual inline void build(argumentPair& p);
-public: virtual inline void build(headerPair& p);
 public: virtual inline void build(const std::string& p);
 
 private: std::string _contentLength;
@@ -35,6 +36,7 @@ template<ProtocolVersion version> cs8 PostRequestBuilder<version>::_contentLengt
 template<ProtocolVersion version>
 inline PostRequestBuilder<version>::PostRequestBuilder(cs8* url):
 abstractRequestBuilder<version>("POST ", url), _contentLength(_contentLengthText) {
+	_contentLength += "0\r\n";
 	this->_fields.push_back(&this->_version);
 	this->_fields.push_back(&this->_headerField);
 	this->_fields.push_back(&_contentLength);
@@ -57,12 +59,7 @@ inline void PostRequestBuilder<version>::build(argumentPair& p) {
 	sprintf(buf, "%d", this->_content.size());
 	_contentLength.erase(sizeof(_contentLengthText) - 1);
 	_contentLength += buf;
-}
-
-template<ProtocolVersion version>
-inline void PostRequestBuilder<version>::build(headerPair& p) {
-	this->_headerField += "\r\n";
-	this->_headerField += p.build();
+	_contentLength += "\r\n\r\n";
 }
 
 template<ProtocolVersion version>
@@ -73,6 +70,7 @@ inline void PostRequestBuilder<version>::build(const std::string& p) {
 	sprintf(buf, "%d", this->_content.size());
 	_contentLength.erase(sizeof(_contentLengthText) - 1);
 	_contentLength += buf;
+	_contentLength += "\r\n\r\n";
 }
 
 } // http

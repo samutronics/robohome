@@ -18,8 +18,9 @@ template<ProtocolVersion version = HTTP10> class GetRequestBuilder: public abstr
 public: inline GetRequestBuilder(cs8* url);
 public: inline GetRequestBuilder(const std::string& url);
 
+using abstractRequestBuilder<version>::build;
+
 public: virtual inline void build(argumentPair& p);
-public: virtual inline void build(headerPair& p);
 public: virtual inline void build(const std::string& p);
 };
 
@@ -48,14 +49,7 @@ inline void GetRequestBuilder<version>::build(argumentPair& p) {
 }
 
 template<ProtocolVersion version>
-inline void GetRequestBuilder<version>::build(headerPair& p) {
-	this->_headerField += "\r\n";
-	this->_headerField += p.build();
-}
-
-template<ProtocolVersion version>
-inline void GetRequestBuilder<version>::build(const std::string& p) {
-	this->_content += p;
+inline void GetRequestBuilder<version>::build(const std::string& /*p*/) {
 }
 
 

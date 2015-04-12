@@ -20,8 +20,8 @@ public: inline abstractRequestBuilder(cs8* method, const std::string& url);
 public: inline abstractRequestBuilder(const std::string& method, cs8* url);
 public: inline abstractRequestBuilder(const std::string& method, const std::string& url);
 
+public: virtual void build(headerPair& p);
 public: virtual void build(argumentPair& p) = 0;
-public: virtual void build(headerPair& p) = 0;
 public: virtual void build(const std::string& p) = 0;
 
 protected: const std::string _url;
@@ -54,6 +54,12 @@ template<ProtocolVersion version>
 inline abstractRequestBuilder<version>::abstractRequestBuilder(const std::string& method, const std::string& url): _url(url), _method(method) {
 	this->_fields.push_back(&_method);
 	this->_fields.push_back(&_url);
+}
+
+template<ProtocolVersion version>
+inline void abstractRequestBuilder<version>::build(headerPair& p) {
+	this->_headerField += p.build();
+	this->_headerField += "\r\n";
 }
 
 } // http
