@@ -19,8 +19,11 @@ enum PairType {
 };
 
 template<PairType type = HTTPArgumentPair>class pair {
+public: inline pair(cs8* p, cu32 length = 0);
 public: inline pair(const std::string& p);
 public: inline pair(cu32 k, cu32 value);
+public: inline pair(cs8* k, cu32 keyLength, cu32 value);
+public: inline pair(cu32 k, cs8* value, cu32 valueLength);
 public: inline pair(const std::string& k, cu32 value);
 public: inline pair(cu32 k, const std::string& value);
 public: inline pair(const std::string& k, const std::string& value);
@@ -37,6 +40,17 @@ typedef pair<HTTPHeaderPair>	headerPair;
 // =============================================================================
 // Inline method implementation
 // =============================================================================
+
+template<PairType type> inline pair<type>::pair(cs8* p, cu32 length): _p(p, length) {
+	u32 equal = p.find((type == HTTPArgumentPair) ? '=' : ": ");
+	if(std::string::npos == equal) {
+		_p.clear();
+		return;
+	}
+
+	_key = p.substr(0, equal - 1);
+	_value = p.substr(equal + 1);
+}
 
 template<PairType type> inline pair<type>::pair(const std::string& p): _p(p) {
 	u32 equal = p.find((type == HTTPArgumentPair) ? '=' : ": ");
@@ -57,10 +71,22 @@ template<PairType type> inline pair<type>::pair(cu32 k, cu32 value) {
 	_value += buf;
 }
 
+template<PairType type> inline pair<type>::pair(cs8* k, cu32 keyLength, cu32 value): _key(k, keyLength) {
+	s8 buf[11];
+	sprintf(buf, "%d", value);
+	_value += buf;
+}
+
 template<PairType type> inline pair<type>::pair(const std::string& k, cu32 value): _key(k) {
 	s8 buf[11];
 	sprintf(buf, "%d", value);
 	_value += buf;
+}
+
+template<PairType type> inline pair<type>::pair(cu32 k, cs8* value, cu32 valueLength): _value(value, valueLength) {
+	s8 buf[11];
+	sprintf(buf, "%d", k);
+	_key += buf;
 }
 
 template<PairType type> inline pair<type>::pair(cu32 k, const std::string& value): _value(value) {
