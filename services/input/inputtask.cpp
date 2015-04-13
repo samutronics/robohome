@@ -52,6 +52,8 @@ void InputTask::task(void* /*pvParameters*/) {
 		xSemaphoreTake(_THQueue, portMAX_DELAY);
 
 		static std::vector<u8> data(ProjectManagerFactory::get()->sysConfig().hwInputNumber() / 8, 0);
+		for(u32 index = 0; index < data.size(); data[index++] = 0);
+
 		IOTransmit(data);
 
 		write(data);
