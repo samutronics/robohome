@@ -110,8 +110,16 @@ template<bool up> inline void TriStateOutputEvaluator::evaluateBranchesActive() 
 	}
 
 	const std::vector<service::inbound::InputEvaluator*>& inputs = service::inbound::InputTaskFactory::get()->inputs();
-	for(u32 index = 0; index < (up ? _inputsDown.size() : _inputsUp.size()); index++) {
-		if(service::inbound::NoChangeEvent != inputs[(up ? _inputsDown : _inputsUp)[index]]->changed()) {
+	for(u32 index = 0; index < _inputsUp.size(); index++) {
+		if(service::inbound::NoChangeEvent != inputs[_inputsUp[index]]->changed()) {
+			_state = up ? StoppedUp : StoppedDown;
+			stop();
+			return;
+		}
+	}
+
+	for(u32 index = 0; index < _inputsDown.size(); index++) {
+		if(service::inbound::NoChangeEvent != inputs[_inputsDown[index]]->changed()) {
 			_state = up ? StoppedUp : StoppedDown;
 			stop();
 			return;

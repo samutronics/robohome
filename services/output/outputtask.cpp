@@ -24,8 +24,8 @@ using namespace service::outbound::configuration;
 DECLARE_TH(OutputTask)
 
 OutputTask::OutputTask(): _dataByteCount(ProjectManagerFactory::get()->sysConfig().hwOutputNumber() / 8),
-_data(ProjectManagerFactory::get()->output().count() + ProjectManagerFactory::get()->triStateOutput().count()
-		/ (sizeof(_data[0] * 8)) + ((ProjectManagerFactory::get()->output().count() + ProjectManagerFactory::get()->triStateOutput().count() % (sizeof(_data[0]) * 8)) ? 1 : 0), 0) {
+_data(((ProjectManagerFactory::get()->output().count() + ProjectManagerFactory::get()->triStateOutput().count()) / (sizeof(_data[0]) * 8))
+		+ (((ProjectManagerFactory::get()->output().count() + ProjectManagerFactory::get()->triStateOutput().count()) % (sizeof(_data[0]) * 8)) ? 1 : 0), 0) {
 	std::vector<u16> simpleTmp;
 	metaOutput simpleoutput = ProjectManagerFactory::get()->output();
 	for(u32 index = 0; index < simpleoutput.count(); index++) {
