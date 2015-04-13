@@ -2,14 +2,16 @@
 //! \file
 //! \brief
 //! \author         Norbert Toth
-//! \date			10.04.2015.
+//! \date			12.04.2015.
 //! \note
 // =============================================================================
-#include "postrequestbuilder.hpp"
+#include "response.hpp"
 
 using namespace libs::http;
+
+cs8 response::_contentLengthText[] = "Content-Length: ";
 
 // =============================================================================
 //! \file
 //! \copyright
-// ======================= end of file: postrequestbuilder.cpp =================
+// ========================== end of file: response.hpp ========================
