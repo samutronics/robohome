@@ -40,6 +40,7 @@ private: std::vector<InputEvaluator*>	_inputs;
 private: std::vector<u32>				_dataChanged;
 private: std::vector<u32>				_dataCurrent;
 private: std::vector<u32>				_dataPrevious;
+private: std::vector<u8>				_transmissionStatus;
 private: std::vector<xSemaphoreHandle>	_lock;
 DEFINE_TH
 };
@@ -73,9 +74,7 @@ inline void InputTask::IOTransmit(std::vector<u8>& data) const {
 }
 
 inline void InputTask::reset() {
-	for(u32 index = 0; index < _dataChanged.size(); index++) {
-		_dataChanged[index] = 0;
-	}
+	for(u32 index = 0; index < _dataChanged.size(); _dataChanged[index++] = 0);
 }
 
 inline const std::vector<InputEvaluator*>& InputTask::inputs() const {

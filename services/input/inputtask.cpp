@@ -10,7 +10,6 @@
 #include "metainput.hpp"
 #include "metasysconfig.hpp"
 #include "projectmanager.hpp"
-#include "projectconfiguration.hpp"
 
 using namespace std;
 using namespace libs;
@@ -25,6 +24,7 @@ InputTask::InputTask(): _inputs(ProjectManagerFactory::get()->input().count(), 0
 _dataChanged((_inputs.size() / (sizeof(_dataChanged[0]) * 8)) + ((_inputs.size() % (sizeof(_dataChanged[0]) * 8)) ? 1 : 0), 0),
 _dataCurrent(_dataChanged.size(), 0),
 _dataPrevious(_dataChanged.size(), 0),
+_transmissionStatus(ProjectManagerFactory::get()->sysConfig().hwInputNumber() / 8, 0),
 _lock(_dataChanged.size()) {
 	metaInput data = ProjectManagerFactory::get()->input();
 	for(u32 index = 0; index < data.count(); index++) {
@@ -37,6 +37,11 @@ _lock(_dataChanged.size()) {
 	MediatorFactory::get()->attach(ComponentIDInputService, this);
 	_THQueue = xSemaphoreCreateMutex();
 	IOStart();
+	IOTransmit(_transmissionStatus);
+	for(u32 index = 0; index < _transmissionStatus.size(); ++index) {
+		_dataPrevious[index / sizeof(_dataPrevious[0])] |= _transmissionStatus[index] << (index % (sizeof(_dataPrevious[0]) * 8));
+	}
+
 	timerStart();
 }
 
@@ -51,12 +56,10 @@ void InputTask::task(void* /*pvParameters*/) {
 		// The thread gives up its time-slice, if there is no semaphore given.
 		xSemaphoreTake(_THQueue, portMAX_DELAY);
 
-		static std::vector<u8> data(ProjectManagerFactory::get()->sysConfig().hwInputNumber() / 8, 0);
-		for(u32 index = 0; index < data.size(); data[index++] = 0);
+		for(u32 index = 0; index < _transmissionStatus.size(); _transmissionStatus[index++] = 0);
+		IOTransmit(_transmissionStatus);
 
-		IOTransmit(data);
-
-		write(data);
+		write(_transmissionStatus);
 	}
 }
 
