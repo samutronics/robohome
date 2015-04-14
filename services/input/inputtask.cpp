@@ -40,7 +40,7 @@ _lock(_dataChanged.size()) {
 	IOStart();
 	IOTransmit(_transmissionStatus);
 	for(u32 index = 0; index < _transmissionStatus.size(); ++index) {
-		_dataPrevious[index / sizeof(_dataPrevious[0])] |= _transmissionStatus[index] << (index % (sizeof(_dataPrevious[0]) * 8));
+		_dataCurrent[index / sizeof(_dataCurrent[0])] |= _transmissionStatus[index] << (index % (sizeof(_dataCurrent[0]) * 8));
 	}
 
 	timerStart();
