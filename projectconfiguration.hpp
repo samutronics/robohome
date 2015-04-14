@@ -179,6 +179,10 @@ namespace configuration {
 
 cu32 addressMask = 0xFFFF;
 
+cu32 CmdInputMask			= 0x00F00000;
+cu32 CmdWriteInput			= 0x00000000;
+cu32 CmdReadInput			= 0x00100000;
+
 cu32 timer = TIMER0_BASE;
 cu32 pollingFrequency = 20;
 cu32 timerPeriphery =

@@ -5,6 +5,7 @@
 //! \date			04.12.2014.
 //! \note
 // =============================================================================
+#include "httppair.hpp"
 #include "mediator.hpp"
 #include "inputtask.hpp"
 #include "metainput.hpp"
@@ -64,11 +65,25 @@ void InputTask::task(void* /*pvParameters*/) {
 }
 
 bool InputTask::write(const CommandsIterator& it) {
-	write(it.key() & addressMask, strtoul(it.value().c_str(), NULL, 10));
-	return true;
+	if(CmdWriteInput == (it.key() & CmdInputMask)) {
+		write(it.key() & addressMask, strtoul(it.value().c_str(), NULL, 10));
+		return true;
+	}
+
+	return false;
 }
 
 bool InputTask::read(const CommandsIterator& it, std::string& result) const {
+	if(CmdReadInput == (it.key() & CmdInputMask)) {
+		for(u32 index = 0; index < _transmissionStatus.size(); ++index) {
+			result += HttpPair(it.key() | index, _transmissionStatus[index]).pair();
+			result += '&';
+		}
+
+		result.erase(result.size() - 1);
+		return true;
+	}
+
 	return false;
 }
 
