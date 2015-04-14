@@ -146,13 +146,9 @@ template<bool up> inline void TriStateOutputEvaluator::evaluateBranchesPassive()
 			return;
 		}
 		case service::inbound::DeferredChangeEvent: {
-			if(0 != _timeoutON) {
-				_timer = _timeoutON;
-				_state = up ? TimeoutDown : TimeoutUp;
-				return;
-			}
-
-			break;
+			_timer = (0 == _timeoutON) ? 1 : _timeoutON;
+			_state = up ? TimeoutDown : TimeoutUp;
+			return;
 		}
 		default:
 			break;
@@ -168,13 +164,9 @@ template<bool up> inline void TriStateOutputEvaluator::evaluateBranchesPassive()
 			return;
 		}
 		case service::inbound::DeferredChangeEvent: {
-			if(0 != _timeoutON) {
-				_timer = _timeoutON;
-				_state = up ? TimeoutDown : TimeoutUp;
-				return;
-			}
-
-			break;
+			_timer = (0 == _timeoutON) ? 1 : _timeoutON;
+			_state = up ? TimeoutDown : TimeoutUp;
+			return;
 		}
 		default:
 			break;
@@ -244,13 +236,9 @@ template<bool up> inline void TriStateOutputEvaluator::evaluateBranchesStopped()
 			return;
 		}
 		case service::inbound::DeferredChangeEvent: {
-			if(0 != _timeoutON) {
-				_timer = _timeoutON;
-				_state = up ? TimeoutDown : TimeoutUp;
-				return;
-			}
-
-			break;
+			_timer = (0 == _timeoutON) ? 1 : _timeoutON;
+			_state = up ? TimeoutDown : TimeoutUp;
+			return;
 		}
 		default:
 			break;
@@ -265,13 +253,9 @@ template<bool up> inline void TriStateOutputEvaluator::evaluateBranchesStopped()
 			return;
 		}
 		case service::inbound::DeferredChangeEvent: {
-			if(0 != _timeoutON) {
-				_timer = _timeoutON;
-				_state = up ? TimeoutDown : TimeoutUp;
-				return;
-			}
-
-			break;
+			_timer = (0 == _timeoutON) ? 1 : _timeoutON;
+			_state = up ? TimeoutDown : TimeoutUp;
+			return;
 		}
 		default:
 			break;
