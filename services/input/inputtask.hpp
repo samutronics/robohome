@@ -67,7 +67,7 @@ inline void InputTask::IOTransmit(std::vector<u8>& data) const {
 
 		u32 tmp = 0;
 		SSIDataGet(SSI0_BASE, &tmp);
-		data[data.size() - index - 1] |= (tmp & 0XFF) << ((data.size() - (index % data.size()) - 1) * 8);
+		data[data.size() - index - 1] |= (tmp & 0XFF);
 	}
 
 	LoadON();
